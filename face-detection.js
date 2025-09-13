@@ -1,0 +1,80 @@
+const video = document.getElementById("video");
+
+//start the camera
+Promise.all([
+    // load libraries
+    faceapi.nets.ssdMobilenetv1.loadFromUri("face_recogniton/ai_models"),
+    faceapi.nets.faceRecognitionNet.loadFromUri("face_recogniton/ai_models"),
+    faceapi.nets.faceLandmark68Net.loadFromUri("face_recogniton/ai_models"),
+]).then(startWebcam);
+
+//start camera
+function startWebcam() {
+    navigator.mediaDevices
+        .getUserMedia({
+            video: true,
+            audio: false,
+        })
+        .then((stream) => {
+            video.srcObject = stream;
+        })
+        .catch((error) => {
+            console.log("unable to access the camera");
+            console.error(error);
+        });
+}
+
+//identify faces
+function getLabeledFaceDescriptions() {
+    const labels = ["raphael", "dominic", "john-cena", "the-rock"];
+    return Promise.all(
+        labels.map(async (label) => {
+            const descriptions = [];
+            // we need 2 images for each person
+            for (let i = 1; i <= 2; i++) {
+                const img = await faceapi.fetchImage(`./face_recogniton/labels/${label}/${i}.jpg`);
+                const detections = await faceapi
+                    .detectSingleFace(img)
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+                descriptions.push(detections.descriptor);
+            }
+            return new faceapi.LabeledFaceDescriptors(label, descriptions);
+        })
+    );
+}
+
+
+//when the video starts to play
+video.addEventListener("play", async () => {
+    const labeledFaceDescriptors = await getLabeledFaceDescriptions();
+    const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
+
+    const canvas = faceapi.createCanvasFromMedia(video);
+    document.body.append(canvas);
+
+    const displaySize = { width: video.width, height: video.height };
+    faceapi.matchDimensions(canvas, displaySize);
+
+    setInterval(async () => {
+        const detections = await faceapi
+            .detectAllFaces(video)
+            .withFaceLandmarks()
+            .withFaceDescriptors();
+
+        const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+        canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+
+        const results = resizedDetections.map((d) => {
+            return faceMatcher.findBestMatch(d.descriptor);
+        });
+        results.forEach((result, i) => {
+            const box = resizedDetections[i].detection.box;
+            const drawBox = new faceapi.draw.DrawBox(box, {
+                label: result,
+            });
+            drawBox.draw(canvas);
+        });
+    }, 100);
+});
