@@ -3,9 +3,9 @@ const video = document.getElementById("video");
 //start the camera
 Promise.all([
     // load libraries
-    faceapi.nets.ssdMobilenetv1.loadFromUri("face_recogniton/ai_models"),
-    faceapi.nets.faceRecognitionNet.loadFromUri("face_recogniton/ai_models"),
-    faceapi.nets.faceLandmark68Net.loadFromUri("face_recogniton/ai_models"),
+    faceapi.nets.ssdMobilenetv1.loadFromUri("views/ai_models"),
+    faceapi.nets.faceRecognitionNet.loadFromUri("views/ai_models"),
+    faceapi.nets.faceLandmark68Net.loadFromUri("views/ai_models"),
 ]).then(startWebcam);
 
 //start camera
@@ -32,7 +32,7 @@ function getLabeledFaceDescriptions() {
             const descriptions = [];
             // we need 2 images for each person
             for (let i = 1; i <= 2; i++) {
-                const img = await faceapi.fetchImage(`./face_recogniton/labels/${label}/${i}.jpg`);
+                const img = await faceapi.fetchImage(`./views/labels/${label}/${i}.jpg`);
                 const detections = await faceapi
                     .detectSingleFace(img)
                     .withFaceLandmarks()
