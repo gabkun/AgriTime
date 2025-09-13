@@ -13,6 +13,6 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log('gwapo raph');
-    console.log(`Server running on port http://localhost:${PORT}`);
-  });
+  console.log('gwapo Dominic');
+  console.log(`Server running on port http://localhost:${PORT}`);
+});
