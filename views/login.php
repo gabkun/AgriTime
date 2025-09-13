@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 //Simple PHP script to display current date and time
 date_default_timezone_Set("Asia/Manila");
 echo "Current time". date("Y-M-D H:i:s");
@@ -16,4 +16,4 @@ echo "Current time". date("Y-M-D H:i:s");
     <h1>Time In: <?php echo date("g:i a") . " - PHT"; ?></h1>
     <video id="video" width="600" height="450" autoplay></video>
 </body>
-</html>
+</html> -->
