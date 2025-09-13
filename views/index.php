@@ -18,9 +18,7 @@ $currentTime = date('g:ia');
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
-    <div>
-        <h1>Time In: <?php echo $currentTime; ?> - PHT</h1>
-    </div>
-    <video id="video" width="600" height="450" autoplay muted></video>
+ 
+   <video id="video" width="600" height="450" autoplay>
 </body>
 </html>

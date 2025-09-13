@@ -26,6 +26,7 @@ function getLabeledFaceDescriptions() {
     return Promise.all(
         labels.map(async (label) => {
             const descriptions = [];
+            // Load two images per label
             for (let i = 1; i <= 2; i++) {
                 const img = await faceapi.fetchImage(`labels/${label}/${i}.jpg`);
                 const detections = await faceapi
@@ -65,8 +66,28 @@ video.addEventListener("play", async () => {
         );
 
         results.forEach((result, i) => {
-            const box = resizedDetections[i].detection.box;
-            const drawBox = new faceapi.draw.DrawBox(box, {
+            const detection = resizedDetections[i].detection;
+            const box = detection.box;
+
+            // Find center point of detected face
+            const centerX = box.x + box.width / 2;
+            const centerY = box.y + box.height / 2;
+
+            // Define a new box centered on the face
+            const boxSize = Math.max(box.width, box.height);
+            const newX = centerX - boxSize / 2;
+            const newY = centerY - boxSize / 2;
+
+            const centeredBox = new faceapi.Box({
+                x: newX,
+                y: newY,
+                width: boxSize,
+                height: boxSize,
+            });
+
+
+
+            const drawBox = new faceapi.draw.DrawBox(centeredBox, {
                 label: result.toString(),
             });
             drawBox.draw(canvas);
