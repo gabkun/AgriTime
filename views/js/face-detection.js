@@ -22,12 +22,12 @@ function startWebcam() {
 
 // Prepare labeled faces
 function getLabeledFaceDescriptions() {
-    const labels = ["raphael", "dominic", "john-cena", "the-rock", "gabkun"];
+    const labels = ["raphael", "dominic", "gabkun"];
     return Promise.all(
         labels.map(async (label) => {
             const descriptions = [];
             // Load two images per label
-            for (let i = 1; i <= 2; i++) {
+            for (let i = 1; i <= 5; i++) {
                 const img = await faceapi.fetchImage(`labels/${label}/${i}.jpg`);
                 const detections = await faceapi
                     .detectSingleFace(img)
