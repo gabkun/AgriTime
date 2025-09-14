@@ -22,7 +22,7 @@ function startWebcam() {
 
 // Prepare labeled faces
 function getLabeledFaceDescriptions() {
-    const labels = ["raphael", "dominic", "john-cena", "the-rock"];
+    const labels = ["raphael", "dominic", "john-cena", "the-rock", "gabkun"];
     return Promise.all(
         labels.map(async (label) => {
             const descriptions = [];
@@ -65,7 +65,17 @@ video.addEventListener("play", async () => {
             faceMatcher.findBestMatch(d.descriptor)
         );
 
-        results.forEach((result, i) => {
+        for (let i = 0; i < results.length; i++) {
+            const label = results[i].toString();
+
+            //display only one box
+            if (label.includes("unknown")) {
+                continue;
+            }
+            if (i > 0) {
+                break;
+            }
+
             const detection = resizedDetections[i].detection;
             const box = detection.box;
 
@@ -84,13 +94,12 @@ video.addEventListener("play", async () => {
                 width: boxSize,
                 height: boxSize,
             });
-
-
-
             const drawBox = new faceapi.draw.DrawBox(centeredBox, {
-                label: result.toString(),
+                label: label,
             });
             drawBox.draw(canvas);
-        });
+            break;
+        }
     }, 100);
+
 });
