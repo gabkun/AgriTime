@@ -1,0 +1,113 @@
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      display: flex;
+      min-height: 100vh;
+    }
+    .left, .right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .left {
+      background: #f0f9ff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .right {
+      background: linear-gradient(135deg, #a3e635, #34d399);
+      color: white;
+      text-align: center;
+    }
+    form {
+      width: 100%;
+      max-width: 400px;
+      background: white;
+      padding: 25px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    form h2 {
+      margin-top: 0;
+      text-align: center;
+      color: #222;
+    }
+    form p {
+      font-size: 14px;
+      text-align: center;
+      color: #555;
+      margin-bottom: 20px;
+    }
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      display: block;
+      color: #333;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #34d399;
+      box-shadow: 0 0 4px rgba(52, 211, 153, 0.5);
+    }
+    button {
+      background: #22c55e;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      border-radius: 5px;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #16a34a;
+    }
+    .message {
+      margin-top: 10px;
+      font-weight: bold;
+      text-align: center;
+      color: green;
+    }
+    .footer-text {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 14px;
+    }
+    .footer-text a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+    .footer-text a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .left, .right {
+        flex: none;
+        width: 100%;
+        min-height: 50vh;
+      }
+      form {
+        max-width: 90%;
+      }
+    }
+
+    .cancel-btn{
+        background: #ff2600;
+    }

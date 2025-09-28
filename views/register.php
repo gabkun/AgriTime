@@ -99,38 +99,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
   <meta charset="UTF-8">
   <title>Agritime Attendance System - Registration</title>
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="styles/register.css">
   <script defer src="js/face-api.min.js"></script>
 </head>
 <body>
+  <div class="left">
+    <form method="POST" enctype="multipart/form-data">
+      <h2>Register</h2>
+      <p>Welcome to the Attendance Registration page.<br>Please fill in the form to create your account.</p>
 
-<!-- Background --> 
-<div class="login-background"></div>
+      <label>First Name</label>
+      <input type="text" name="firstName" required>
 
-<!-- Register Box -->
-<div class="login-container">
-  <div class="login-header">
-    <img src="assets/img/logo.png" alt="AgriTime Logo" class="logo">
-    <h2>Agritime Attendance System - Register</h2>
-  </div>
+      <label>Last Name</label>
+      <input type="text" name="lastName" required>
 
-  <form action="register.php" method="POST" enctype="multipart/form-data" id="registerForm">
-    <div class="center-text-button">
-      <input type="text" name="firstName" placeholder="First Name" required>
-      <input type="text" name="lastName" placeholder="Last Name" required>
+      <label>Date of Birth</label>
       <input type="date" name="dob" required>
-      <input type="email" name="email" placeholder="Email" required>
-      <input type="password" name="password" placeholder="Password" required>
-      <input type="text" name="contactNo" placeholder="Contact Number" required>
-      <select name="role" required>
+
+
+
+      <label>Email Address</label>
+      <input type="email" name="email" required>
+
+      <label>Password</label>
+      <input type="password" name="password" required>
+
+
+
+      <label>Contact No.</label>
+      <input type="text" name="contactNo" required>
+
+        <select name="role" required>
         <option value="">Select Role</option>
         <option value="1">Employee</option>
         <option value="2">Admin</option>
       </select>
-      <input type="text" name="nationality" placeholder="Nationality" required>
+
+  <input type="text" name="nationality" placeholder="Nationality" required>
       <input type="text" name="maritalStatus" placeholder="Marital Status" required>
       <input type="text" name="emergencyContact" placeholder="Emergency Contact" required>
       <input type="text" name="employeeID" placeholder="Employee ID" required>
+
 
       <!-- Webcam capture -->
       <div class="camera-section">
@@ -143,9 +153,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
       <p class="register-text">Have an account? <a href="/login">Login Here</a></p>
       <button type="submit" class="login-btn">Register</button>
-    </div>
-  </form>
-</div>
+
+      <button type="submit" class="cancel-btn">Cancel</button>
+
+      <?php if (!empty($message)): ?>
+        <p class="message"><?= $message ?></p>
+      <?php endif; ?>
+
+      <div class="footer-text">
+        Already have an account? <a href="login.php">Login here</a>
+      </div>
+    </form>
+  </div>
+  
+  <div class="right">
+    <img src="assets/Agri.jpg" alt="Agri Logo" width="120">
+    <h2>AgriTime Payroll<br>Attendance System</h2>
+  </div>
 
     <script>
     document.addEventListener("DOMContentLoaded", () => {
