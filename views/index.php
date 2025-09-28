@@ -12,13 +12,28 @@ $currentTime = date('g:ia');
 
     <!-- Scripts -->
     <script defer src="js/face-api.min.js"></script>
-    <script defer src="js/face-detection.js"></script>
-
+    <!-- <script defer src="js/face-detection.js"></script>  -->
+    <script defer src="js/loadFaceDetection.js"></script>
     <!-- Styles -->
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
  
-   <video id="video" width="600" height="450" autoplay>
+   <video id="video" width="600" height="450" autoplay></video>
+    <script>
+        window.addEventListener("DOMContentLoaded", async () => {
+            const video = document.getElementById("video");
+            const labels = ["raphael", "dominic", "gabkun"];
+            
+            await loadFaceDetection(video, labels, {
+                modelsPath: "models",
+                imagesPath: "labels",
+                onDetect: (label, detection) => {
+                    console.log("Detected:", label, detection);
+                }
+            });
+        });
+</script>
+   
 </body>
 </html>
