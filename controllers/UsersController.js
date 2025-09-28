@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import User from '../models/UserModel.js';
 
 // Get all users
@@ -24,12 +26,63 @@ export const getUserById = async (req, res) => {
 // Create a new user
 export const createUser = async (req, res) => {
   try {
-    const userId = await User.create(req.body);
+    const {
+      firstName,
+      lastName,
+      dob,
+      email,
+      password,
+      contactNo,
+      role,
+      nationality,
+      maritalStatus,
+      emergencyContact,
+      employeeID
+    } = req.body;
+
+    // Create folder name using only LASTNAME
+    const folderName = lastName.trim().toUpperCase();
+    const folderPath = path.join(process.cwd(), 'views', 'labels', folderName);
+
+    // Create folder if it doesn't exist
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath, { recursive: true });
+    }
+
+    // ⚠️ IMPORTANT: Move uploaded images to the folder
+    if (req.files && req.files.length > 0) {
+      req.files.forEach((file) => {
+        const destinationPath = path.join(folderPath, file.originalname);
+        fs.renameSync(file.path, destinationPath);
+      });
+    }
+
+    // ✅ Save only the folder directory as the profilePic field
+    const profilePic = `views/labels/${folderName}`;
+
+    // Insert into database
+    const userId = await User.create({
+      firstName,
+      lastName,
+      dob,
+      email,
+      password,
+      contactNo,
+      role,
+      profilePic, // <— now stores the folder path only
+      nationality,
+      maritalStatus,
+      emergencyContact,
+      employeeID
+    });
+
     res.status(201).json({ message: 'User created successfully', userId });
   } catch (err) {
+    console.error('Error creating user:', err);
     res.status(500).json({ message: 'Error creating user', error: err.message });
   }
 };
+
 
 // Update user
 export const updateUser = async (req, res) => {

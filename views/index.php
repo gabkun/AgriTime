@@ -23,7 +23,7 @@ $currentTime = date('g:ia');
     <script>
         window.addEventListener("DOMContentLoaded", async () => {
             const video = document.getElementById("video");
-            const labels = ["raphael", "dominic", "gabkun"];
+            const labels = ["raphael", "BRAGANZA1", "MALANDAY1"];
             
             await loadFaceDetection(video, labels, {
                 modelsPath: "models",
