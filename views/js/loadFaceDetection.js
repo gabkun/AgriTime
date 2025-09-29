@@ -1,33 +1,25 @@
-
-/**
- * Registers face detection and recognition on a video element.
- * @param {HTMLVideoElement} videoElement - The video element to use.
- * @param {Array} labels - Array of label names for face registration.
- * @param {Object} options - Optional settings (modelsPath, imagesPath, onDetect callback).
- */
-
 async function loadFaceDetection(videoElement, labels, options = {}) {
-
     const modelsPath = options.modelsPath || "models";
     const imagesPath = options.imagesPath || "labels";
-    const onDetect = options.onDetect || (() => { })
+    const onDetect = options.onDetect || (() => { });
 
-
-    // Create and show loading indicator
+    // Show loading indicator
     const loadingDiv = document.createElement("div");
     loadingDiv.id = "face-loading-indicator";
-    loadingDiv.style.position = "fixed";
-    loadingDiv.style.top = "0";
-    loadingDiv.style.left = "0";
-    loadingDiv.style.width = "100vw";
-    loadingDiv.style.height = "100vh";
-    loadingDiv.style.background = "rgba(0,0,0,0.5)";
-    loadingDiv.style.display = "flex";
-    loadingDiv.style.alignItems = "center";
-    loadingDiv.style.justifyContent = "center";
-    loadingDiv.style.zIndex = "9999";
-    loadingDiv.style.color = "#fff";
-    loadingDiv.style.fontSize = "2rem";
+    Object.assign(loadingDiv.style, {
+        position: "fixed",
+        top: "0",
+        left: "0",
+        width: "100vw",
+        height: "100vh",
+        background: "rgba(0,0,0,0.5)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: "9999",
+        color: "#fff",
+        fontSize: "2rem"
+    });
     loadingDiv.innerText = "Loading face data...";
     document.body.appendChild(loadingDiv);
 
@@ -47,7 +39,7 @@ async function loadFaceDetection(videoElement, labels, options = {}) {
         return;
     }
 
-    // Prepare labeled faces
+    // Prepare face descriptors
     async function getLabeledFaceDescriptions() {
         return Promise.all(
             labels.map(async (label) => {
@@ -65,40 +57,61 @@ async function loadFaceDetection(videoElement, labels, options = {}) {
         );
     }
 
-    videoElement.addEventListener("play", async () => {
+    videoElement.addEventListener("loadedmetadata", async () => {
         const labeledFaceDescriptors = await getLabeledFaceDescriptions();
         loadingDiv.remove();
+
         const matcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
 
+        // ✅ Append canvas to #video-container
         const canvas = faceapi.createCanvasFromMedia(videoElement);
-        document.body.append(canvas);
+        const container = document.getElementById("video-container");
+        container.appendChild(canvas);
 
-        const size = { width: videoElement.width, height: videoElement.height };
-        faceapi.matchDimensions(canvas, size);
+        // ✅ Dynamically set canvas size based on video
+        const displaySize = {
+            width: videoElement.videoWidth || videoElement.width,
+            height: videoElement.videoHeight || videoElement.height,
+        };
+        faceapi.matchDimensions(canvas, displaySize);
 
+        // Resize canvas to match video
+        canvas.width = displaySize.width;
+        canvas.height = displaySize.height;
+
+        // Start detecting
         setInterval(async () => {
             const detections = await faceapi
                 .detectAllFaces(videoElement)
                 .withFaceLandmarks()
                 .withFaceDescriptors();
 
-            const resized = faceapi.resizeResults(detections, size);
-            canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+            const resized = faceapi.resizeResults(detections, displaySize);
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            const results = resized.map(d => matcher.findBestMatch(d.descriptor));
-            for (let i = 0; i < results.length; i++) {
-                const label = results[i].toString();
-                if (label.includes("unknown")) continue;
-                if (i > 0) break;
+            // resized.forEach((result) => { //raphael(0.5)
+            //     const label = matcher.findBestMatch(result.descriptor).toString();
+            //     const drawBox = new faceapi.draw.DrawBox(result.detection.box, { label });
+            //     drawBox.draw(canvas);
 
-                const box = resized[i].detection.box;
-                const drawBox = new faceapi.draw.DrawBox(box, { label });
+            //     if (!label.includes("unknown")) {
+            //         onDetect(label, result.detection);
+            //     }
+            // });
+
+            resized.forEach((result) => {
+                const bestMatch = matcher.findBestMatch(result.descriptor);
+                const label = bestMatch.label; // only name without confidence score
+                const drawBox = new faceapi.draw.DrawBox(result.detection.box, { label });
                 drawBox.draw(canvas);
 
-                onDetect(label, resized[i].detection);
-                break;
-            }
+                if (label !== "unknown") {
+                    onDetect(label, result.detection);
+                }
+            });
+
+
         }, 100);
     });
-
 }
