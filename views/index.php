@@ -1,7 +1,50 @@
-<?php
-date_default_timezone_set('Asia/Manila');
-$currentTime = date('g:ia');
+<?php 
+date_default_timezone_set("Asia/Manila");
+
+// ✅ Handle POST from detected face
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $faceImage = $_POST["faceImage"] ?? '';
+
+    if (!empty($faceImage)) {
+        // Express backend API endpoint
+        $url = "http://localhost:8080/api/user/login";
+
+        // Send as x-www-form-urlencoded (simpler and cleaner)
+        $data = ['faceImage' => $faceImage];
+
+        $options = [
+            "http" => [
+                "header"  => "Content-Type: application/x-www-form-urlencoded\r\n",
+                "method"  => "POST",
+                "content" => http_build_query($data)
+            ]
+        ];
+
+        $context  = stream_context_create($options);
+        $result = @file_get_contents($url, false, $context);
+
+        if ($result === FALSE) {
+            echo "<script>alert('Error connecting to API. Please try again.');</script>";
+        } else {
+            $response = json_decode($result, true);
+
+            if (isset($response["message"]) && $response["message"] === "Login successful") {
+                echo "<script>
+                        alert('Welcome back, " . htmlspecialchars($faceImage) . "!');
+                        window.location.href = '/dashboard';
+                      </script>";
+            } else {
+                $msg = $response["message"] ?? "Invalid credentials or face not recognized.";
+                echo "<script>alert('" . addslashes($msg) . "');</script>";
+            }
+        }
+    } else {
+        echo "<script>alert('No face detected. Please try again.');</script>";
+    }
+}
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,46 +108,51 @@ $currentTime = date('g:ia');
       }
     });
 
-    // Trigger face detection only on button click
-    async function captureFace() {
-      alert("Please face the camera to start scanning...");
+async function captureFace() {
+  alert("Please face the camera to start scanning...");
 
-      const labels = ["raphael", "BRAGANZA1", "MALANDAY1"];
+  // Fetch all labels dynamically from PHP
+  const response = await fetch("get_labels.php");
+  const labels = await response.json();
 
-      await loadFaceDetection(video, labels, {
-        modelsPath: "models",
-        imagesPath: "labels",
-        onDetect: (label, detection) => {
-          console.log("Detected:", label);
-          if (label) {
-            // Hide scan button
-            document.getElementById("scanBtn").style.display = "none";
+  console.log("Loaded labels:", labels);
 
-            const feedback = document.getElementById("login-feedback");
-            const messageEl = document.getElementById("welcome-message");
-            let countdown = 5;
+  if (labels.length === 0) {
+    alert("No registered face data found. Please register first.");
+    return;
+  }
 
-            // Show feedback container
-            feedback.style.display = "flex";
+  // Proceed with detection using the fetched labels
+  await loadFaceDetection(video, labels, {
+    modelsPath: "models",
+    imagesPath: "labels",
+    onDetect: (label, detection) => {
+      console.log("Detected:", label);
+      if (label) {
+        document.getElementById("scanBtn").style.display = "none";
 
-            // Set hidden input value
-            document.getElementById("faceImage").value = label;
+        const feedback = document.getElementById("login-feedback");
+        const messageEl = document.getElementById("welcome-message");
+        let countdown = 5;
 
-            // Start countdown
+        feedback.style.display = "flex";
+        document.getElementById("faceImage").value = label;
+
+        messageEl.textContent = `Welcome back, ${label}! Logging you in ${countdown}...`;
+        const intervalId = setInterval(() => {
+          countdown--;
+          if (countdown > 0) {
             messageEl.textContent = `Welcome back, ${label}! Logging you in ${countdown}...`;
-            const intervalId = setInterval(() => {
-              countdown--;
-              if (countdown > 0) {
-                messageEl.textContent = `Welcome back, ${label}! Logging you in ${countdown}...`;
-              } else {
-                clearInterval(intervalId);
-                document.getElementById("faceForm").submit();
-              }
-            }, 1000);
+          } else {
+            clearInterval(intervalId);
+            document.getElementById("faceForm").submit();
           }
-        }
-      });
+        }, 1000);
+      }
     }
+  });
+}
+
   </script>
 
   <style>
