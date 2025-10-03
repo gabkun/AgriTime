@@ -41,7 +41,7 @@ export const createUser = async (req, res) => {
     } = req.body;
 
     // Create folder name using only LASTNAME
-    const folderName = lastName.trim().toUpperCase();
+    const folderName = lastName;
     const folderPath = path.join(process.cwd(), 'views', 'labels', folderName);
 
     // Create folder if it doesn't exist
@@ -103,3 +103,70 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ message: 'Error deleting user', error: err.message });
   }
 };
+
+export const facialLogin = async (req, res) => {
+  try {
+    const label = req.body.label || req.body.faceImage;
+
+    console.log("Facial Login Attempt Received");
+    console.log("Raw Request Body:", req.body);
+
+    if (!label) {
+      console.warn("No face label detected in request body.");
+      return res.status(400).json({ message: "No face label detected." });
+    }
+
+    const lastName = label;
+    const folderPath = path.join(process.cwd(), "views", "labels", lastName);
+
+    console.log("Detected Face Label:", lastName);
+    console.log("Expected Folder Path:", folderPath);
+
+    // Log the time of detection
+    const loginTime = new Date().toLocaleString("en-PH", { timeZone: "Asia/Manila" });
+    console.log("Login Attempt Time (PH):", loginTime);
+
+    // Check if user folder exists
+    if (!fs.existsSync(folderPath)) {
+      console.warn(`No folder found for ${lastName} at ${folderPath}`);
+      return res.status(404).json({ message: "No matching face data found." });
+    }
+
+    // Find user by last name in database
+    const user = await User.findByLastName(lastName);
+
+    console.log("Database Query: SELECT * FROM users WHERE lastName = ?", [lastName]);
+
+    if (!user) {
+      console.warn(`User not found in database for last name: ${lastName}`);
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Log user data
+    console.log("User Found:", {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+      email: user.email,
+      employeeID: user.employeeID,
+      profilePic: user.profilePic,
+    });
+
+    console.log("Facial login successful for:", `${user.firstName} ${user.lastName}`);
+    console.log("Redirecting to dashboard...");
+
+    // SUCCESS RESPONSE
+    res.status(200).json({
+      message: "Login successful",
+      user,
+      redirect: "/dashboard",
+      loginTime,
+    });
+  } catch (err) {
+    console.error("Error during facial login:", err);
+    res.status(500).json({ message: "Server error during facial login", error: err.message });
+  }
+};
+
+

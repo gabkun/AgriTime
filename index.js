@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true })); 
 
 app.use(express.static(path.join(process.cwd(), "views")));
 

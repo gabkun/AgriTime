@@ -72,6 +72,15 @@ const User = {
       });
     });
   },
+    // ✅ Used for facial login
+  findByLastName: (lastName) => {
+    return new Promise((resolve, reject) => {
+      db.query("SELECT * FROM users WHERE lastName = ?", [lastName], (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0]);
+      });
+    });
+  },
 };
 
 export default User;

@@ -7,7 +7,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!empty($faceImage)) {
         // Express backend API endpoint
-        $url = "http://localhost:8080/api/user/login";
+        $url = "http://localhost:8080/api/user/facial-login";
 
         // Send as x-www-form-urlencoded (simpler and cleaner)
         $data = ['faceImage' => $faceImage];
@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if (isset($response["message"]) && $response["message"] === "Login successful") {
                 echo "<script>
-                        alert('Welcome back, " . htmlspecialchars($faceImage) . "!');
+                        alert('Welcome back, " . htmlspecialchars($faceImage) . "! Redirecting to dashboard...');
                         window.location.href = '/dashboard';
                       </script>";
             } else {
@@ -43,7 +43,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -93,11 +92,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h1>AgriTime Payroll<br>Attendance System</h1>
   </div>
 
-
   <script>
     const video = document.getElementById("video");
 
-    // Start the camera as soon as page loads
+    // ✅ Start the camera as soon as page loads
     window.addEventListener("DOMContentLoaded", async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -108,51 +106,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       }
     });
 
-async function captureFace() {
-  alert("Please face the camera to start scanning...");
+    // ✅ Capture Face and handle 100 detection check
+    async function captureFace() {
+      alert("Please face the camera to start scanning...");
 
-  // Fetch all labels dynamically from PHP
-  const response = await fetch("get_labels.php");
-  const labels = await response.json();
+      // Fetch all labels dynamically from PHP
+      const response = await fetch("get_labels.php");
+      const labels = await response.json();
 
-  console.log("Loaded labels:", labels);
+      console.log("Loaded labels:", labels);
 
-  if (labels.length === 0) {
-    alert("No registered face data found. Please register first.");
-    return;
-  }
-
-  // Proceed with detection using the fetched labels
-  await loadFaceDetection(video, labels, {
-    modelsPath: "models",
-    imagesPath: "labels",
-    onDetect: (label, detection) => {
-      console.log("Detected:", label);
-      if (label) {
-        document.getElementById("scanBtn").style.display = "none";
-
-        const feedback = document.getElementById("login-feedback");
-        const messageEl = document.getElementById("welcome-message");
-        let countdown = 5;
-
-        feedback.style.display = "flex";
-        document.getElementById("faceImage").value = label;
-
-        messageEl.textContent = `Welcome back, ${label}! Logging you in ${countdown}...`;
-        const intervalId = setInterval(() => {
-          countdown--;
-          if (countdown > 0) {
-            messageEl.textContent = `Welcome back, ${label}! Logging you in ${countdown}...`;
-          } else {
-            clearInterval(intervalId);
-            document.getElementById("faceForm").submit();
-          }
-        }, 1000);
+      if (labels.length === 0) {
+        alert("No registered face data found. Please register first.");
+        return;
       }
-    }
-  });
-}
 
+      // Store label detection counts
+      let detectionCounts = {};
+
+      // ✅ Proceed with detection using the fetched labels
+      await loadFaceDetection(video, labels, {
+        modelsPath: "models",
+        imagesPath: "labels",
+        onDetect: (label, detection) => {
+          if (!label) return;
+
+          // Count how many times each label was detected
+          detectionCounts[label] = (detectionCounts[label] || 0) + 1;
+
+          console.log(`Detected: ${label} (${detectionCounts[label]}x)`);
+
+          // ✅ If detected 100 times, trigger login
+          if (detectionCounts[label] >= 100) {
+            console.log(`✅ Triggering login for ${label}`);
+            detectionCounts[label] = 0; // reset counter
+
+            document.getElementById("scanBtn").style.display = "none";
+            const feedback = document.getElementById("login-feedback");
+            const messageEl = document.getElementById("welcome-message");
+            let countdown = 5;
+
+            feedback.style.display = "flex";
+            document.getElementById("faceImage").value = label;
+
+            messageEl.textContent = `Welcome back, ${label}! Logging you in ${countdown}...`;
+
+            const intervalId = setInterval(() => {
+              countdown--;
+              if (countdown > 0) {
+                messageEl.textContent = `Welcome back, ${label}! Logging you in ${countdown}...`;
+              } else {
+                clearInterval(intervalId);
+                // ✅ Submit to backend (facial login)
+                document.getElementById("faceForm").submit();
+              }
+            }, 1000);
+          }
+        }
+      });
+    }
   </script>
 
   <style>
