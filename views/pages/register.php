@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <link rel="stylesheet" href="styles/register.css">
   <script defer src="js/face-api.min.js"></script>
 </head>
-<body>
+<body class="register-page">
   <div class="left">
     <form method="POST" enctype="multipart/form-data">
       <h2>Register</h2>
