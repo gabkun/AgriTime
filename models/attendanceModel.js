@@ -56,20 +56,26 @@ const AttendanceModel = {
 },
 // Check if employee has daily status
 checkDailyStatus: (employeeID) => {
-  const query = "SELECT * FROM daily_status WHERE employeeID = ?";
-  return new Promise((resolve, reject) => {
-    db.query(query, [employeeID], (err, results) => {
-      if (err) return reject(err);
-      resolve(results);
+    return new Promise((resolve, reject) => {
+      const query = `
+        SELECT attendance_status, timestamp 
+        FROM daily_status 
+        WHERE employeeID = ? 
+        AND DATE(timestamp) = CURDATE()  -- ✅ Only today
+        ORDER BY timestamp ASC
+      `;
+      db.query(query, [employeeID], (err, results) => {
+        if (err) return reject(err);
+        resolve(results);
+      });
     });
-  });
-},
+  },
 
 getLatestTimestamp: (employeeID) => {
   return new Promise((resolve, reject) => {
     const query = `
       SELECT timestamp 
-      FROM tbl_attendance 
+      FROM daily_status 
       WHERE employee_id = ? AND DATE(timestamp) = CURDATE()
       ORDER BY timestamp DESC 
       LIMIT 1

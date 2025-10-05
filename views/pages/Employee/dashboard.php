@@ -23,31 +23,26 @@ $dailyStatus = null;
 
 if ($statusResponse !== FALSE) {
     $decoded = json_decode($statusResponse, true);
-    // ✅ Safely get attendance_status if available
     $dailyStatus = $decoded["attendance_status"] ?? null;
 } else {
     $dailyStatus = null;
 }
 
-// ✅ Fetch Daily Timestamp (latest recorded time today)
-$timestampUrl = "$apiBaseUrl/timestamp/$employeeID";
+$timestampUrl = "$apiBaseUrl/status/$employeeID";
 $timestampResponse = @file_get_contents($timestampUrl);
 $dailyTimestamp = null;
 
 if ($timestampResponse !== FALSE) {
     $decodedTime = json_decode($timestampResponse, true);
-    $dailyTimestamp = $decodedTime["timestamp"];
+    $dailyTimestamp = $decodedTime["time"] ?? null;
 }
 
 // ✅ Handle Time-In and Time-Out actions
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $employeeID = $user["employeeID"];
 
-    // TIME IN
-    if (isset($_POST["time_in"])) {
-        $url = "$apiBaseUrl/timein";
-        $data = ["employeeID" => $employeeID];
-
+    // Common function to send POST request
+    function callAttendanceAPI($url, $data) {
         $options = [
             "http" => [
                 "header"  => "Content-Type: application/x-www-form-urlencoded\r\n",
@@ -55,41 +50,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 "content" => http_build_query($data)
             ]
         ];
-
         $context = stream_context_create($options);
-        $result = @file_get_contents($url, false, $context);
+        return @file_get_contents($url, false, $context);
+    }
+
+    // ✅ TIME IN
+    if (isset($_POST["time_in"])) {
+        $url = "$apiBaseUrl/timein";
+        $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
 
         if ($result === FALSE) {
             echo "<script>alert('⚠️ Error connecting to Time-In API');</script>";
         } else {
             $response = json_decode($result, true);
             $message = $response["message"] ?? "Unknown response";
-            echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
+
+            // ✅ Reload after success
+            if (strpos(strtolower($message), 'success') !== false) {
+                echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
+            } else {
+                echo "<script>alert('" . addslashes($message) . "');</script>";
+            }
         }
     }
 
-    // TIME OUT
+    // ✅ TIME OUT
     if (isset($_POST["time_out"])) {
         $url = "$apiBaseUrl/timeout";
-        $data = ["employeeID" => $employeeID];
-
-        $options = [
-            "http" => [
-                "header"  => "Content-Type: application/x-www-form-urlencoded\r\n",
-                "method"  => "POST",
-                "content" => http_build_query($data)
-            ]
-        ];
-
-        $context = stream_context_create($options);
-        $result = @file_get_contents($url, false, $context);
+        $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
 
         if ($result === FALSE) {
             echo "<script>alert('⚠️ Error connecting to Time-Out API');</script>";
         } else {
             $response = json_decode($result, true);
             $message = $response["message"] ?? "Unknown response";
-            echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
+
+            // ✅ Reload only if success
+            if (strpos(strtolower($message), 'success') !== false) {
+                echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
+            } else {
+                echo "<script>alert('" . addslashes($message) . "');</script>";
+            }
         }
     }
 }
@@ -126,6 +127,7 @@ if ($dailyStatus === null) {
 }
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -142,11 +144,11 @@ if ($dailyStatus === null) {
     <div class="main-content">
       <header class="header">
         <div class="logo">
-          <img src="logo.png" alt="AgriTime Logo">
+      <img src="../assets/Agri.jpg" alt="Agri Logo" width="150">
           <h2>AgriTime Payroll Attendance System</h2>
         </div>
         <div class="user-profile">
-          <img src="user.jpg" alt="User">
+                <img src="../assets/user.png" alt="Agri Logo" width="120">
           <span><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></span>
           <p><?php echo htmlspecialchars($roleName); ?></p>
           <h3><?php echo $currentTime; ?></h3>
@@ -176,19 +178,19 @@ if ($dailyStatus === null) {
             <!-- ✅ Display Daily Status -->
             <p style="margin-top:10px;">
               <strong>Status Today:</strong>
-              <?php 
-                echo ($dailyStatus === null) ? "Not yet timed in" : 
-                     (($dailyStatus == 1) ? "Timed In" : 
-                     (($dailyStatus == 0) ? "Timed Out" : "On Break"));
-              ?>
+            <?php 
+            echo ($dailyStatus === null) ? "Not yet timed in" : 
+                (($dailyStatus == 1) ? "Timed In" : 
+                (($dailyStatus == 0) ? "Timed Out" : "On Break"));
+            ?>
             </p>
 
-            <!-- ✅ Display Timestamp -->
-            <?php if ($dailyTimestamp): ?>
-              <p><strong>Last Recorded Time:</strong> <?php echo htmlspecialchars($dailyTimestamp); ?></p>
-            <?php else: ?>
-              <p><strong>Last Recorded Time:</strong> —</p>
-            <?php endif; ?>
+          <?php if (!empty($dailyTimestamp)): ?>
+            <p><strong>Last Recorded Time:</strong> <?php echo htmlspecialchars($dailyTimestamp); ?></p>
+          <?php else: ?>
+            <p><strong>Last Recorded Time:</strong> —</p>
+          <?php endif; ?>
+
           </div>
         </div>
       </section>

@@ -10,52 +10,42 @@ export const timein = async (req, res) => {
   try {
     console.log("📥 Incoming employeeID:", employee_id);
 
-    // ✅ Check if employee exists in users table
+    // ✅ Check if employee exists
     const employeeExists = await AttendanceModel.checkEmployeeExists(employee_id);
     if (employeeExists.length === 0) {
-      console.warn("⚠️ Employee does not exist:", employee_id);
       return res.status(404).json({ message: 'Employee not found' });
     }
 
-    // ✅ Record time-in
+    // ✅ Check if already timed in today
+    const statusExists = await AttendanceModel.checkDailyStatus(employee_id);
+    if (statusExists.length > 0 && statusExists[0].attendance_status == 1) {
+      console.log("⚠️ Employee already timed in today:", employee_id);
+      return res.status(400).json({ message: 'You have already timed in today.' });
+    }
+
+    // ✅ Record new time-in
     await AttendanceModel.recordTimeIn(employee_id);
     console.log("✅ Time in successfully recorded for employee:", employee_id);
 
-    // ✅ Check daily status
-    const statusExists = await AttendanceModel.checkDailyStatus(employee_id);
-    console.log("🧩 Daily status check result:", statusExists);
-
     if (statusExists.length === 0) {
-      // Insert new status if not exists
       await AttendanceModel.insertDailyStatus(employee_id, 1);
-      console.log("🆕 Daily status created for employee:", employee_id);
     } else {
-      // Update existing status
       await AttendanceModel.updateDailyStatus(employee_id, 1);
-      console.log("♻️ Daily status updated for employee:", employee_id);
     }
 
-    // ✅ Emit socket update
     if (req.io) req.io.emit('attendanceUpdated');
 
-    return res.status(200).json({ 
-      message: 'Time in recorded successfully' 
-    });
+    return res.status(200).json({ message: 'Time in recorded successfully' });
 
   } catch (err) {
     console.error("❌ Error during time in process:", err);
-    return res.status(500).json({ 
-      message: 'Error during time in process', 
-      error: err.message || err.toString(), 
-      stack: err.stack 
-    });
+    return res.status(500).json({ message: 'Error during time in process' });
   }
 };
 
-
 export const timeout = async (req, res) => {
   const { employeeID } = req.body;
-  if (!employeeID) 
+  if (!employeeID)
     return res.status(400).json({ message: 'Employee ID is required' });
 
   const employee_id = employeeID;
@@ -63,73 +53,90 @@ export const timeout = async (req, res) => {
   try {
     console.log("📥 Incoming employeeID:", employee_id);
 
-    // ✅ Check if employee exists
     const employeeExists = await AttendanceModel.checkEmployeeExists(employee_id);
     if (employeeExists.length === 0) {
-      console.warn("⚠️ Employee does not exist:", employee_id);
       return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    // ✅ Check if already timed out today
+    const statusExists = await AttendanceModel.checkDailyStatus(employee_id);
+
+    if (statusExists.length === 0) {
+      return res.status(400).json({ message: 'You must time in first before timing out.' });
+    }
+
+    if (statusExists[0].attendance_status == 0) {
+      console.log("⚠️ Employee already timed out today:", employee_id);
+      return res.status(400).json({ message: 'You have already timed out today.' });
     }
 
     // ✅ Record time-out
     await AttendanceModel.recordTimeOut(employee_id);
     console.log("✅ Time out successfully recorded for employee:", employee_id);
 
-    // ✅ Check daily status
-    const statusExists = await AttendanceModel.checkDailyStatus(employee_id);
-    console.log("🧩 Daily status check result:", statusExists);
+    await AttendanceModel.updateDailyStatus(employee_id, 0);
 
-    if (statusExists.length === 0) {
-      await AttendanceModel.insertDailyStatus(employee_id, 0);
-      console.log("🆕 Daily status created for employee:", employee_id);
-    } else {
-      await AttendanceModel.updateDailyStatus(employee_id, 0);
-      console.log("♻️ Daily status updated for employee:", employee_id);
-    }
-
-    // ✅ Emit socket update
     if (req.io) req.io.emit('attendanceUpdated');
 
-    return res.status(200).json({ 
-      message: 'Time out recorded successfully' 
-    });
+    return res.status(200).json({ message: 'Time out recorded successfully' });
 
   } catch (err) {
     console.error("❌ Error during time out process:", err);
-    return res.status(500).json({ 
-      message: 'Error during time out process', 
-      error: err.message || err.toString(), 
-      stack: err.stack 
-    });
+    return res.status(500).json({ message: 'Error during time out process' });
   }
 };
+
 
 // controllers/AttendanceControl.js
 export const getDailyStatus = async (req, res) => {
   const { employeeID } = req.params;
 
   try {
+    // ✅ Query today's attendance only
     const status = await AttendanceModel.checkDailyStatus(employeeID);
 
     if (status.length === 0) {
-      return res.status(404).json({ message: 'No daily status found for this employee.' });
+      return res.status(404).json({ 
+        message: 'No attendance record for today.',
+        attendance_status: null,
+        time: null
+      });
     }
 
-    // Get the most recent record
-    const latestStatus = status[status.length - 1];
+    // ✅ Get only records created today (Philippine time)
+    const today = new Date().toLocaleDateString('en-PH', { timeZone: 'Asia/Manila' });
+
+    const todayRecords = status.filter(record => {
+      const recordDate = new Date(record.timestamp).toLocaleDateString('en-PH', { timeZone: 'Asia/Manila' });
+      return recordDate === today;
+    });
+
+    if (todayRecords.length === 0) {
+      // No records for today
+      return res.status(404).json({ 
+        message: 'No attendance record for today.',
+        attendance_status: null,
+        time: null
+      });
+    }
+
+    // ✅ Get the most recent record for today
+    const latestStatus = todayRecords[todayRecords.length - 1];
     const { attendance_status, timestamp } = latestStatus;
 
-    // ✅ Convert timestamp to 12-hour time (hour:minute AM/PM)
+    // ✅ Format time (12-hour format)
     const timeOnly = new Date(timestamp).toLocaleTimeString('en-PH', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true,
+      timeZone: 'Asia/Manila'
     });
 
-    // ✅ Return the result
+    // ✅ Send back response
     return res.status(200).json({
       employeeID,
       attendance_status,
-      time: timeOnly,
+      time: timeOnly
     });
 
   } catch (err) {
@@ -140,6 +147,7 @@ export const getDailyStatus = async (req, res) => {
     });
   }
 };
+
 
 
 export const getDailyTimestamp = async (req, res) => {
