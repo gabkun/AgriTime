@@ -72,7 +72,7 @@ body {
   border-radius: 10px;
   padding: 20px;
   text-align: center;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .card h3 {
@@ -107,7 +107,7 @@ body {
   background: white;
   border-radius: 10px;
   padding: 20px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .attendance-calendar table {
@@ -117,7 +117,8 @@ body {
   margin-top: 10px;
 }
 
-.attendance-calendar th, td {
+.attendance-calendar th,
+td {
   padding: 8px;
 }
 
@@ -134,7 +135,7 @@ body {
   border-radius: 10px;
   padding: 20px;
   text-align: center;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .employee-info .profile-pic {
@@ -149,6 +150,20 @@ body {
 
 .employee-info .buttons {
   margin-top: 15px;
+}
+
+.employee-infoTimedIn {
+  width: 50%;
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.employee-board {
+
+  background: #1a8f3c;
 }
 
 .break-btn,
@@ -176,4 +191,92 @@ body {
 
 .timein-btn:hover {
   background: #43a047;
+}
+
+.employee-middleboard {
+  width: 300px;
+  background: rgb(250, 250, 250);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  margin: 5px;
+
+}
+
+.middle-section {
+  display: flex;
+  flex-direction: row;
+
+
+}
+
+.boardText {
+  padding: 5px;
+}
+
+.profile-container {
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 4px solid #4CAF50;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-pic {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Calendar Container */
+.calendar {
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.calendar h2 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Table Styling */
+.calendar table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.calendar th,
+.calendar td {
+  padding: 10px;
+  font-size: 14px;
+  height: 40px;
+  width: 40px;
+  border-radius: 5px;
+}
+
+.calendar td.today {
+  background: #4CAF50;
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+calendar-board {
+  width: 450px;
+  background: rgb(250, 250, 250);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  margin: 5px;
+
 }
