@@ -151,6 +151,21 @@ if ($dailyStatus === null) {
   <link rel="stylesheet" href="../../styles/employee.css">
 </head>
 
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggleBtn = document.getElementById("toggle-btn");
+      const sidebar = document.getElementById("sidebar");
+
+      if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener("click", () => {
+          sidebar.classList.toggle("hidden");
+        });
+      } else {
+        console.warn("Sidebar or toggle button not found.");
+      }
+    });
+</script>
+
 <body>
   <div class="container">
     <?php include('sidebar.php'); ?>
@@ -162,7 +177,7 @@ if ($dailyStatus === null) {
           <h2>AgriTime Payroll Attendance sssSystem</h2>
         </div>
         <div class="user-profile">
-                <img src="../assets/user.png" alt="Agri Logo" width="120">
+                <img src="assets/user.png" alt="Agri Logo" width="120">
           <span><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></span>
           <p><?php echo htmlspecialchars($roleName); ?></p>
           <h3><?php echo $currentTime; ?></h3>
@@ -192,7 +207,7 @@ if ($dailyStatus === null) {
                 <div class="employee-middleboard">
                       <h4>Request PaySlip</h1>
                         <div class="buttons">
-                          <img src="assets/payslip.png" alt="paySlip" class="profile-pic">
+                          <img src="assets/Agri.jpg" alt="paySlip" class="profile-pic">
                           <form method="POST" style="display:inline;">
                               <button type="submit" name="download" class="timein-btn" >Download</button>
                           </form>

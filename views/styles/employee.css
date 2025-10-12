@@ -207,8 +207,8 @@ td {
 .middle-section {
   display: flex;
   flex-direction: row;
-
-
+  justify-content: center;
+  margin: 5;
 }
 
 .boardText {

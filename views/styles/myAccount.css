@@ -1,0 +1,138 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: linear-gradient(to bottom right, #e8f5e9, #f9fff5);
+    color: #2e4a2d;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Container */
+.account-container {
+    background: #fff;
+    width: 90%;
+    max-width: 750px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 25px 30px;
+    border-top: 6px solid #6ab04c;
+}
+
+/* Header */
+.account-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 2px solid #dcedc8;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.account-header .logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+.account-header h2 {
+    font-size: 1.8rem;
+    color: #33691e;
+}
+
+/* Form */
+.account-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px 20px;
+}
+
+/* Full width fields */
+.account-form .address-box,
+.account-form .form-buttons {
+    grid-column: span 2;
+}
+
+/* Inputs and labels */
+.form-group label {
+    font-weight: 600;
+    color: #2e7d32;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #c5e1a5;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #81c784;
+}
+
+/* Textarea */
+.form-group textarea {
+    resize: vertical;
+    min-height: 70px;
+}
+
+/* Buttons */
+.form-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.save-btn,
+.cancel-btn {
+    background: #7cb342;
+    color: #fff;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+}
+
+.save-btn:hover {
+    background: #689f38;
+}
+
+.cancel-btn {
+    background: #9e9e9e;
+}
+
+.cancel-btn:hover {
+    background: #757575;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .account-form {
+        grid-template-columns: 1fr;
+    }
+
+    .account-header h2 {
+        font-size: 1.5rem;
+    }
+}

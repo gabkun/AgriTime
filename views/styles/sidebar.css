@@ -1,0 +1,130 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 240px;
+    background-color: #1e5631;
+    color: #fff;
+    padding: 20px 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+/* Sidebar hidden (for mobile toggle) */
+.sidebar.hidden {
+    transform: translateX(-100%);
+}
+
+/* Sidebar header */
+.sidebar-user {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar-user h3 {
+    font-size: 1.4em;
+    margin-bottom: 5px;
+    color: #b9f6ca;
+}
+
+.sidebar-user p {
+    font-size: 0.9em;
+    color: #e0ffe8;
+}
+
+/* Nav Links */
+.nav-links {
+    list-style: none;
+    padding: 0 15px;
+}
+
+.nav-links li {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+    padding: 12px 15px;
+    border-radius: 10px;
+    transition: background 0.3s ease, transform 0.2s ease;
+    cursor: pointer;
+}
+
+.nav-links li:hover {
+    background: #2ecc71;
+    transform: translateX(5px);
+}
+
+.nav-links li.active {
+    background: #27ae60;
+}
+
+.nav-links .icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+    flex: 1;
+}
+
+/* Toggle Button */
+.toggle-btn {
+    position: fixed;
+    bottom: 15px;
+    left: 15px;
+    background: green;
+    color: #fff;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    border-radius: 5px;
+    padding: 8px 12px;
+    z-index: 1100;
+    transition: background 0.3s;
+}
+
+.toggle-btn:hover {
+    background: #27ae60;
+}
+
+/* Main content */
+.main-content {
+    margin-left: 240px;
+    padding: 20px;
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar.hidden~.main-content {
+    margin-left: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .toggle-btn {
+        display: block;
+    }
+}

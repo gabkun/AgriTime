@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <p>Welcome to the Attendance Registration page.<br>Please fill in the form to create your account.</p>
 
       <label>First Name</label>
-      <input type="text" name="fname" required>
+      <input type="text" name="fname" required placeholder="cjsjdj">
 
       <label>Last Name</label>
       <input type="text" name="lname" required>
