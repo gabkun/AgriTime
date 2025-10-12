@@ -50,7 +50,7 @@ $user = $_SESSION["user"];
           <div class="form-row">
             <div class="form-group">
               <label>Birthday</label>
-              <input type="date" name="birthday" value="<?php echo htmlspecialchars($user['birthday'] ?? ''); ?>" disabled>
+              <input type="date" name="birthday" value="<?php echo htmlspecialchars($user['dob'] ?? ''); ?>" disabled>
             </div>
 
             <div class="form-group">
@@ -65,7 +65,7 @@ $user = $_SESSION["user"];
           <div class="form-row">
             <div class="form-group">
               <label>Phone Number</label>
-              <input type="text" name="phone" value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>" disabled>
+              <input type="text" name="phone" value="<?php echo htmlspecialchars($user['contactNo'] ?? ''); ?>" disabled>
             </div>
 
             <div class="form-group">
