@@ -20,6 +20,10 @@ switch ($request) {
         require __DIR__ . '/pages/Employee/myaccount.php';
         break;    
 
+     case '/employee/attendancereport':
+        require __DIR__ . '/pages/Employee/attendancereport.php';
+        break;   
+
     case '/hr/dashboard':
         require __DIR__ . '/pages/HR/dashboard.php';
         break;

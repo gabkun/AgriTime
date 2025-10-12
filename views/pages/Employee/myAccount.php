@@ -6,52 +6,56 @@ if (!isset($_SESSION["user"])) {
 }
 $user = $_SESSION["user"];
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Account | AgriTime</title>
-  <link rel="stylesheet" href="../../styles/myAccount.css">
   <link rel="stylesheet" href="../../styles/sidebar.css">
+  <link rel="stylesheet" href="../../styles/myAccount.css">
 </head>
 
 <body>
   <div class="container">
-    <!-- ✅ Include Sidebar -->
     <?php include('sidebar.php'); ?>
 
-    <!-- ✅ Main Content Area -->
     <div class="main-content">
       <header class="account-header">
-        <img src="../assets/Agri.jpg" alt="Agri Logo" class="logo">
-        <h2>My Account</h2>
+        <div class="profile-info">
+          <img src="../assets/user.png" alt="Profile" class="profile-img">
+          <div>
+            <h2><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></h2>
+            <p>AgriTime Attendance System</p>
+          </div>
+        </div>
+        <button type="button" id="editBtn" class="edit-btn">✏️ Edit Profile</button>
       </header>
 
       <div class="account-body">
-        <form action="updateAccount.php" method="POST" class="account-form">
+        <form action="updateAccount.php" method="POST" class="account-form" id="accountForm">
+
           <div class="form-row">
             <div class="form-group">
               <label>First Name</label>
-              <input type="text" name="firstName" value="<?php echo htmlspecialchars($user['firstName']); ?>" required>
+              <input type="text" name="firstName" value="<?php echo htmlspecialchars($user['firstName']); ?>" disabled required>
             </div>
 
             <div class="form-group">
               <label>Last Name</label>
-              <input type="text" name="lastName" value="<?php echo htmlspecialchars($user['lastName']); ?>" required>
+              <input type="text" name="lastName" value="<?php echo htmlspecialchars($user['lastName']); ?>" disabled required>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label>Birthday</label>
-              <input type="date" name="birthday" value="<?php echo htmlspecialchars($user['birthday'] ?? ''); ?>">
+              <input type="date" name="birthday" value="<?php echo htmlspecialchars($user['birthday'] ?? ''); ?>" disabled>
             </div>
 
             <div class="form-group">
               <label>Gender</label>
-              <select name="gender">
+              <select name="gender" disabled>
                 <option value="Male" <?php if(($user['gender'] ?? '') == 'Male') echo 'selected'; ?>>Male</option>
                 <option value="Female" <?php if(($user['gender'] ?? '') == 'Female') echo 'selected'; ?>>Female</option>
               </select>
@@ -61,12 +65,12 @@ $user = $_SESSION["user"];
           <div class="form-row">
             <div class="form-group">
               <label>Phone Number</label>
-              <input type="text" name="phone" value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>">
+              <input type="text" name="phone" value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>" disabled>
             </div>
 
             <div class="form-group">
               <label>Shift Time</label>
-              <input type="text" name="shiftTime" value="<?php echo htmlspecialchars($user['shiftTime'] ?? ''); ?>">
+              <input type="text" name="shiftTime" value="<?php echo htmlspecialchars($user['shiftTime'] ?? ''); ?>" disabled>
             </div>
           </div>
 
@@ -78,13 +82,13 @@ $user = $_SESSION["user"];
 
             <div class="form-group">
               <label>Branch</label>
-              <input type="text" name="branch" value="<?php echo htmlspecialchars($user['branch'] ?? 'Main Branch'); ?>">
+              <input type="text" name="branch" value="<?php echo htmlspecialchars($user['branch'] ?? 'Main Branch'); ?>" disabled>
             </div>
           </div>
 
-          <div class="form-group">
+          <div class="form-group address-box">
             <label>Address</label>
-            <textarea name="address"><?php echo htmlspecialchars($user['address'] ?? ''); ?></textarea>
+            <textarea name="address" disabled><?php echo htmlspecialchars($user['address'] ?? ''); ?></textarea>
           </div>
 
           <div class="form-group">
@@ -93,7 +97,7 @@ $user = $_SESSION["user"];
           </div>
 
           <div class="form-buttons">
-            <button type="submit" class="save-btn">💾 Save Changes</button>
+            <button type="submit" class="save-btn" id="saveBtn" disabled>💾 Save Changes</button>
             <a href="dashboard.php" class="cancel-btn">← Back</a>
           </div>
         </form>
@@ -101,17 +105,30 @@ $user = $_SESSION["user"];
     </div>
   </div>
 
-  <!-- ✅ Sidebar Toggle Script -->
   <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const toggleBtn = document.getElementById("toggle-btn");
-    const sidebar = document.getElementById("sidebar");
-    if (toggleBtn && sidebar) {
-      toggleBtn.addEventListener("click", () => {
-        sidebar.classList.toggle("hidden");
+    // Sidebar toggle
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggleBtn = document.getElementById("toggle-btn");
+      const sidebar = document.getElementById("sidebar");
+      if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener("click", () => sidebar.classList.toggle("hidden"));
+      }
+
+      // Edit Mode Toggle
+      const editBtn = document.getElementById("editBtn");
+      const saveBtn = document.getElementById("saveBtn");
+      const inputs = document.querySelectorAll("#accountForm input:not([readonly]), #accountForm select, #accountForm textarea");
+
+      editBtn.addEventListener("click", () => {
+        const isEditing = editBtn.classList.toggle("active");
+
+        inputs.forEach(input => input.disabled = !isEditing);
+        saveBtn.disabled = !isEditing;
+
+        editBtn.textContent = isEditing ? "🔒 Cancel Edit" : "✏️ Edit Profile";
+        editBtn.style.backgroundColor = isEditing ? "#e53935" : "#66bb6a";
       });
-    }
-  });
+    });
   </script>
 </body>
 </html>

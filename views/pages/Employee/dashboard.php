@@ -177,7 +177,7 @@ if ($dailyStatus === null) {
           <h2>AgriTime Payroll Attendance sssSystem</h2>
         </div>
         <div class="user-profile">
-                <img src="assets/user.png" alt="Agri Logo" width="120">
+                <img src="../assets/grit.jpg" alt="Agri Logo" width="120">
           <span><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></span>
           <p><?php echo htmlspecialchars($roleName); ?></p>
           <h3><?php echo $currentTime; ?></h3>
@@ -186,35 +186,48 @@ if ($dailyStatus === null) {
 
        
       <section class="dashboard">
-        <!-- middle section -->
-          <div class= "middle-section">
-                <div class="employee-middleboard">
-                      <h4 class="boardText">Total Days Work</h3>
-                      <h4 class="boardText">This Month</h2>
-                      <h1>10 days</h1>
+          <!--   Dashboard Summary Section -->
+            <div class="summary-section">
+              <!-- Total Days Worked -->
+                  <div class="summary-card">
+                    <div class="card-icon total">
+                      <i>📅</i>
+                    </div>
+                    <div class="card-info">
+                      <h4>Total Days Worked</h4>
+                      <p>This Month</p>
+                      <h2>10 Days</h2>
+                    </div>
+                  </div>
+
+                  <!-- Late Count -->
+                  <div class="summary-card">
+                    <div class="card-icon late">
+                      <i>⏰</i>
+                    </div>
+                    <div class="card-info">
+                      <h4>Late Arrivals</h4>
+                      <p>This Month</p>
+                      <h2>2</h2>
+                    </div>
+                  </div>
+
+                  <!-- Payslip Board -->
+                  <div class="summary-card payslip">
+                    <div class="card-icon payslip-icon">
+                      <i>💵</i>
+                    </div>
+                    <div class="card-info">
+                      <h4>Payslip Request</h4>
+                      <p>Download your payslip</p>
+                      <form method="POST">
+                        <button type="submit" name="download" class="download-btn">Download</button>
+                      </form>
+                    </div>
+                  </div>
                 </div>
-                <div class="employee-middleboard">
-                      <h4 class="boardText">Late</h3>
-                      <h4 class="boardText">This Month</h2>
-                      <h1>2</h1>
-                </div>
-                  <div class="employee-middleboard">
-                      <h4 class="boardText">Total Overtime Hours/Febraury</h3>
-                      <h4 class="boardText">00 hours</h2>
-                      <h4 class="boardText">40 minutes</h2>
-                      <h4 class="boardText">55 seconds</h2>
-                </div>
-                <div class="employee-middleboard">
-                      <h4>Request PaySlip</h1>
-                        <div class="buttons">
-                          <img src="assets/Agri.jpg" alt="paySlip" class="profile-pic">
-                          <form method="POST" style="display:inline;">
-                              <button type="submit" name="download" class="timein-btn" >Download</button>
-                          </form>
-                        </div>
-                </div>
-          </div>
-          <!-- middle section -->
+
+ 
                   <div class="bottom-section">
                         <div class="calendar-board">
                           <div class="calendar">

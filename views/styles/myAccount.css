@@ -7,64 +7,101 @@
 }
 
 body {
-    background: linear-gradient(to bottom right, #e8f5e9, #f9fff5);
+    background: linear-gradient(135deg, #f1f8e9, #e8f5e9);
     color: #2e4a2d;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
 }
 
-/* Container */
-.account-container {
-    background: #fff;
-    width: 90%;
-    max-width: 750px;
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    padding: 25px 30px;
-    border-top: 6px solid #6ab04c;
+.main-content {
+    flex: 1;
+    padding: 20px 30px;
+    transition: margin-left 0.3s ease;
 }
 
 /* Header */
 .account-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 15px;
-    border-bottom: 2px solid #dcedc8;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 15px 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+    border-left: 6px solid #66bb6a;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-.account-header .logo {
-    width: 60px;
-    height: 60px;
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-img {
+    width: 65px;
+    height: 65px;
     border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #a5d6a7;
 }
 
 .account-header h2 {
-    font-size: 1.8rem;
-    color: #33691e;
+    font-size: 1.6rem;
+    color: #2e7d32;
 }
 
-/* Form */
+.account-header p {
+    font-size: 0.9rem;
+    color: #558b2f;
+}
+
+/* Edit Button */
+.edit-btn {
+    background: #66bb6a;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(102, 187, 106, 0.3);
+}
+
+.edit-btn:hover {
+    background: #558b2f;
+    transform: translateY(-2px);
+}
+
+/* Account Body */
+.account-body {
+    background: #ffffff;
+    padding: 25px 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-top: 5px solid #81c784;
+}
+
 .account-form {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px 20px;
+    gap: 20px;
 }
 
-/* Full width fields */
-.account-form .address-box,
-.account-form .form-buttons {
+.address-box,
+.form-buttons {
     grid-column: span 2;
 }
 
-/* Inputs and labels */
 .form-group label {
     font-weight: 600;
-    color: #2e7d32;
-    margin-bottom: 5px;
+    color: #33691e;
+    margin-bottom: 6px;
     display: block;
 }
 
@@ -72,24 +109,28 @@ body {
 .form-group select,
 .form-group textarea {
     width: 100%;
-    padding: 8px 10px;
-    border-radius: 8px;
+    padding: 10px 12px;
     border: 1px solid #c5e1a5;
+    border-radius: 8px;
     font-size: 0.95rem;
     outline: none;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
+    background: #fcfff7;
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-    border-color: #81c784;
+    border-color: #7cb342;
+    box-shadow: 0 0 0 3px rgba(124, 179, 66, 0.2);
 }
 
-/* Textarea */
-.form-group textarea {
-    resize: vertical;
-    min-height: 70px;
+input[disabled],
+select[disabled],
+textarea[disabled] {
+    background: #f3f3f3;
+    color: #777;
+    cursor: not-allowed;
 }
 
 /* Buttons */
@@ -97,25 +138,28 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 .save-btn,
 .cancel-btn {
-    background: #7cb342;
+    background: #66bb6a;
     color: #fff;
-    padding: 10px 18px;
+    padding: 10px 20px;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     font-size: 1rem;
-    transition: background 0.3s ease;
+    font-weight: 500;
+    transition: all 0.3s ease;
     text-decoration: none;
     text-align: center;
+    box-shadow: 0 3px 8px rgba(102, 187, 106, 0.3);
 }
 
 .save-btn:hover {
-    background: #689f38;
+    background: #558b2f;
+    transform: translateY(-2px);
 }
 
 .cancel-btn {
@@ -124,15 +168,27 @@ body {
 
 .cancel-btn:hover {
     background: #757575;
+    transform: translateY(-2px);
 }
 
 /* Responsive */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .account-form {
         grid-template-columns: 1fr;
     }
 
-    .account-header h2 {
-        font-size: 1.5rem;
+    .account-header {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .edit-btn {
+        align-self: flex-end;
+    }
+
+    .form-buttons {
+        flex-direction: column;
+        gap: 10px;
     }
 }
