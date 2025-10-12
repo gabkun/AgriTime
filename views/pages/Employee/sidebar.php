@@ -15,25 +15,22 @@
       </div>
 
      <ul class="nav-links">
-        <li class="<?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">
-          <i class="icon">🏠</i>
-          <a href="/employee/dashboard.php">Dashboard</a>
-        </li>
+    <?php 
+$currentPage = basename($_SERVER['REQUEST_URI']);
+?>
+<li class="<?php echo $currentPage == 'dashboard' ? 'active' : ''; ?>">
+  <i class="icon">🏠</i>
+  <a href="/employee/dashboard">Dashboard</a>
+</li>
+<li class="<?php echo $currentPage == 'report' ? 'active' : ''; ?>">
+  <i class="icon">📊</i>
+  <a href="/employee/report">Attendance Report</a>
+</li>
+<li class="<?php echo $currentPage == 'myaccount' ? 'active' : ''; ?>">
+  <i class="icon">👤</i>
+  <a href="/employee/myaccount">My Account</a>
+</li>
 
-        <li class="<?php echo basename($_SERVER['PHP_SELF']) == 'attendance_report.php' ? 'active' : ''; ?>">
-          <i class="icon">📊</i>
-          <a href="/employee/attendance_report.php">Attendance Report</a>
-        </li>
-
-        <li class="<?php echo basename($_SERVER['PHP_SELF']) == 'myAccount.php' ? 'active' : ''; ?>">
-          <i class="icon">👤</i>
-          <a href="/employee/myAccount">My Account</a>
-        </li>
-
-        <li>
-          <i class="icon">🚪</i>
-          <a href="/employee/logout.php">Logout</a>
-        </li>
       </ul>
     </div>
 
