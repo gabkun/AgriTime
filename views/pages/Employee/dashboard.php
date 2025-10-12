@@ -259,10 +259,10 @@ if ($dailyStatus === null) {
                     </div>
                     <div class="employee-infoTimedIn">
                        <div class="employee-board">             
-                          <img src="user.jpg" alt="Employee" class="profile-pic">
+                         <img src="../assets/grit.jpg" alt="Employee" class="profile-pic">
                           <h4><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></h4>
                         
-                          <p>Employee ID: <?php echo htmlspecialchars($user['employeeID']); ?></p>
+                          <p>Employeefff ID: <?php echo htmlspecialchars($user['employeeID']); ?></p>
                           <h3><?php echo $currentTime; ?></h3>
                         </div>
                         
