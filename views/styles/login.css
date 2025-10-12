@@ -1,90 +1,563 @@
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      height: 100vh;
-    }
-    .left {
-      flex: 1;
-      background: #f0f4f9;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 40px;
-    }
-    .left h2 { font-size: 28px; margin-bottom: 10px; }
-    .left p { color: #555; margin-bottom: 20px; }
-    video {
-      width: 300px;
-      height: 220px;
-      border: 3px solid #333;
-      border-radius: 10px;
-      object-fit: cover;
-    }
-    button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      background: #16a34a; color: #fff;
-      border: none; border-radius: 5px; cursor: pointer;
-    }
-    button:hover { background: #15803d; }
-    .note {
-      margin-top: 20px;
-      font-size: 14px;
-      text-align: center;
-    }
-    .note a { color: #2563eb; text-decoration: none; }
-    .note a:hover { text-decoration: underline; }
-    .right {
-      flex: 1;
-      background: linear-gradient(135deg, #a7f3d0, #4ade80);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      padding: 20px;
-    }
-    .right img {
-      width: 120px; height: 120px; border-radius: 20px; margin-bottom: 20px;
-    }
-    .right h1 {
-      font-size: 26px; font-weight: bold; text-align: center;
-    }
+/* styles/login.css - cleaned & fixed (nature theme) */
 
-       #video-container {
-      position: relative;
-      width: 600px;
-      height: 450px;
-    }
+/* ==== RESET ==== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
 
-    #video {
-      width: 100%;
-      height: 100%;
-      display: block;
-      border: 2px solid #ccc;
-      z-index: 1;
-    }
+/* ==== LAYOUT ==== */
+body.login-page {
+  display: flex;
+  min-height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+}
 
-    #video-container canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 2;
-      pointer-events: none;
-    }
+/* Split columns */
+.left,
+.right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  transition: all 0.35s ease;
+}
 
-   .loader {
-    border: 6px solid #f3f3f3;
-    border-top: 6px solid #2a9d8f;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 1s linear infinite;
+.left {
+  background: #ffffffcc;
+  box-shadow: inset -5px 0 20px rgba(0, 0, 0, 0.05);
+  position: relative;
+  gap: 12px;
+}
+
+.right {
+  background: linear-gradient(135deg, #2e7d32, #66bb6a);
+  color: #fff;
+  text-align: center;
+  padding: 60px 40px;
+}
+
+/* right side logo */
+.right img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  margin-bottom: 20px;
+}
+
+/* ==== HEADER (Login text) ==== */
+.login-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2e7d32;
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 8px;
+  position: relative;
+  animation: fadeInDown 0.9s ease both;
+}
+
+/* soft vine underline */
+.login-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #81c784, #43a047, #81c784);
+  border-radius: 10px;
+  animation: growVine 1.2s ease both;
+}
+
+.login-subtext {
+  font-size: 1.05rem;
+  text-align: center;
+  color: #388e3c;
+  margin-bottom: 18px;
+  font-weight: 500;
+  animation: fadeIn 1s ease .1s both;
+}
+
+/* add a little leaf emoji after the subtext */
+.login-subtext::after {
+  content: " 🍃";
+  display: inline-block;
+  margin-left: 6px;
+  animation: leafDrift 3s ease-in-out infinite;
+}
+
+/* ==== VIDEO CIRCLE ==== */
+#video-container {
+  position: relative;
+  /* use fixed pixel sizes for circle, easier across browsers */
+  width: 550px;
+  height: 550px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 6px solid #43a047;
+  box-shadow: 0 0 25px rgba(67, 160, 71, 0.45);
+  background: #000;
+}
+
+#video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* glowing scanner line inside circle */
+#video-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #00e676, transparent);
+  animation: scan-line 2s linear infinite;
+}
+
+/* draw face-api canvas overlay on top (canvas created by JS should be absolutely positioned in same container) */
+#video-container canvas {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ==== PROGRESS BAR ==== */
+.progress-container {
+  width: 280px;
+  max-width: 80%;
+  margin-top: 18px;
+  background: #c8e6c9;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 14px;
+  box-shadow: 0 0 10px rgba(67, 160, 71, 0.25);
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #43a047, #81c784);
+  border-radius: 12px;
+  transition: width 0.25s linear;
+}
+
+/* percent text under progress */
+#progressText {
+  display: block;
+  text-align: center;
+  font-weight: 600;
+  margin-top: 10px;
+  color: #2e7d32;
+}
+
+/* ==== SCAN BUTTON ==== */
+#scanBtn {
+  margin-top: 14px;
+  padding: 10px 26px;
+  background: #43a047;
+  border: none;
+  border-radius: 24px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(67, 160, 71, 0.18);
+  transition: transform .15s ease, background .15s ease;
+}
+
+#scanBtn:hover {
+  transform: translateY(-2px);
+  background: #2e7d32;
+}
+
+/* ==== WELCOME FEEDBACK BOX (hidden by default) ==== */
+/* keep visible-capable on all screen sizes (not hidden in css) */
+.welcome-feedback {
+  display: none;
+  /* JS will show it when needed */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+  gap: 10px;
+  background: linear-gradient(135deg, #f0fff0, #eef9ef);
+  padding: 14px 18px;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(76, 175, 80, 0.12);
+}
+
+.leaf-spinner {
+  font-size: 1.8rem;
+  animation: leafSpin 2s linear infinite;
+}
+
+#welcome-message {
+  color: #2e7d32;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: center;
+}
+
+/* ==== LOADER (circular) ==== */
+.loader {
+  border: 4px solid #c8e6c9;
+  border-top: 4px solid #43a047;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  animation: spin 1s linear infinite;
+}
+
+/* ==== ANIMATIONS ==== */
+@keyframes spin {
+  0% {
+    transform: rotate(0)
   }
 
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  100% {
+    transform: rotate(360deg)
   }
+}
+
+@keyframes scan-line {
+  0% {
+    top: 0;
+    opacity: .6
+  }
+
+  50% {
+    top: 50%;
+    opacity: 1
+  }
+
+  100% {
+    top: 100%;
+    opacity: .6
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0)
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0)
+  }
+}
+
+@keyframes growVine {
+  from {
+    width: 0;
+    opacity: 0
+  }
+
+  to {
+    width: 60px;
+    opacity: 1
+  }
+}
+
+@keyframes leafDrift {
+  0% {
+    transform: rotate(0deg) translateY(0)
+  }
+
+  50% {
+    transform: rotate(10deg) translateY(-3px)
+  }
+
+  100% {
+    transform: rotate(0deg) translateY(0)
+  }
+}
+
+@keyframes leafSpin {
+  0% {
+    transform: rotate(0) scale(1)
+  }
+
+  50% {
+    transform: rotate(180deg) scale(1.08)
+  }
+
+  100% {
+    transform: rotate(360deg) scale(1)
+  }
+}
+
+/* ==== RESPONSIVE RULES (no nesting!) ==== */
+@media (max-width: 900px) {
+  body.login-page {
+    flex-direction: column;
+  }
+
+  .right {
+    display: none;
+  }
+
+  .left {
+    width: 100%;
+    padding: 28px;
+  }
+
+  #video-container {
+    width: 260px;
+    height: 260px;
+  }
+
+  .progress-container {
+    width: 240px;
+  }
+
+  .login-title {
+    font-size: 1.9rem;
+  }
+
+  .login-subtext {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 420px) {
+  #video-container {
+    width: 200px;
+    height: 200px;
+  }
+
+  .progress-container {
+    width: 200px;
+  }
+
+  .login-title {
+    font-size: 1.6rem;
+  }
+
+  .login-subtext {
+    font-size: 0.95rem;
+  }
+
+}
+
+/* ==== NOTE SECTION (Register link) ==== */
+.note {
+  margin-top: 25px;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #2e7d32;
+  font-weight: 500;
+  background: #f1f8e9;
+  padding: 10px 18px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(67, 160, 71, 0.15);
+  transition: all 0.3s ease;
+  animation: fadeIn 1.2s ease both;
+}
+
+.note:hover {
+  background: #e8f5e9;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(67, 160, 71, 0.25);
+}
+
+.note a {
+  color: #388e3c;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 5px;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.note a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0%;
+  height: 2px;
+  background: #43a047;
+  transition: width 0.3s ease;
+  border-radius: 10px;
+}
+
+.note a:hover {
+  color: #2e7d32;
+}
+
+.note a:hover::after {
+  width: 100%;
+}
+
+/* ==== RIGHT SIDE (Logo Panel) ==== */
+/* ==== RIGHT SIDE (Logo Panel - Enhanced Nature Theme) ==== */
+.right {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #2e7d32, #43a047, #66bb6a);
+  background-size: 200% 200%;
+  animation: bgFlow 8s ease-in-out infinite;
+  color: #fff;
+  text-align: center;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.15);
+
+
+
+
+
+}
+
+/* floating leaves pattern (subtle) */
+.right::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+/* floating logo */
+.right img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 5px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.4), 0 0 60px rgba(102, 187, 106, 0.4);
+  animation: floatLogo 3s ease-in-out infinite;
+}
+
+/* title */
+.right h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  animation: fadeInUp 1.2s ease both;
+}
+
+/* optional subtitle (tagline) */
+.right::after {
+  content: "Empowering Farmers • Tracking Time • Growing Success 🌾";
+  font-size: 0.95rem;
+  color: #f1f8e9;
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.9;
+  letter-spacing: 0.3px;
+  animation: fadeIn 2s ease 0.5s both;
+}
+
+/* ==== ANIMATIONS ==== */
+@keyframes bgFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes floatLogo {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==== FARMER IMAGE ANIMATION ==== */
+.farmer-illustration {
+  width: 220px;
+  max-width: 80%;
+  position: absolute;
+  bottom: 40px;
+  right: 50px;
+  animation: farmerFloat 4s ease-in-out infinite;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.farmer-illustration:hover {
+  transform: scale(1.05) rotate(-3deg);
+}
+
+/* wallking float animation */
+@keyframes farmerFloat {
+  0% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+
+  25% {
+    transform: translateX(-8px) translateY(-6px) rotate(-2deg);
+  }
+
+  50% {
+    transform: translateX(0) translateY(-10px) rotate(0deg);
+  }
+
+  75% {
+    transform: translateX(8px) translateY(-6px) rotate(2deg);
+  }
+
+  100% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+}

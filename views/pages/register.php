@@ -105,72 +105,93 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body class="register-page">
   <div class="left">
     <form method="POST" enctype="multipart/form-data">
-      <h2>Register</h2>
-      <p>Welcome to the Attendance Registration page.<br>Please fill in the form to create your account.</p>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AgriTime Registration</title>
+  <link rel="stylesheet" href="styles/register.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
 
-      <label>First Name</label>
-      <input type="text" name="firstName" required placeholder="First-Name">
+<div class="container">
+  <div class="card">
+    <div class="card-left">
+      <h1>🌱 AgriTime</h1>
+      <p>Join our nature-driven attendance system.</p>
+      <img src="assets/Agri.jpg" alt="Farm Illustration">
+    </div>
 
-      <label>Last Name</label>
-      <input type="text" name="lastName" required>
+    <div class="card-right">
+      <h2>Register Account</h2>
+      <form method="POST" enctype="multipart/form-data">
+        
+        <div class="form-row">
+          <div>
+            <label>First Name</label>
+            <input type="text" name="firstName" required>
+          </div>
+          <div>
+            <label>Last Name</label>
+            <input type="text" name="lastName" required>
+          </div>
+        </div>
 
-      <label>Date of Birth</label>
-      <input type="date" name="dob" required>
+        <div class="form-row">
+          <div>
+            <label>Date of Birth</label>
+            <input type="date" name="dob" required>
+          </div>
+          <div>
+            <label>Role</label>
+            <select name="role" required>
+              <option value="">Select Role</option>
+              <option value="1">Employee</option>
+              <option value="2">Admin</option>
+            </select>
+          </div>
+        </div>
 
+        <label>Email Address</label>
+        <input type="email" name="email" required>
 
+        <label>Password</label>
+        <input type="password" name="password" required>
 
-      <label>Email Address</label>
-      <input type="email" name="email" required>
+        <label>Contact Number</label>
+        <input type="text" name="contactNo" required>
 
-      <label>Password</label>
-      <input type="password" name="password" required>
+        <div class="form-row">
+          <input type="text" name="nationality" placeholder="Nationality" required>
+          <select name="maritalStatus" required>
+            <option value="">Select Marital Status</option>
+            <option value="Single">Single</option>
+            <option value="Married">Married</option>
+            <option value="Divorced">Divorced</option>
+            <option value="Widowed">Widowed</option>
+          </select>
+        </div>
 
+        <input type="text" name="emergencyContact" placeholder="Emergency Contact" required>
+        <input type="text" name="employeeID" placeholder="Employee ID" required>
 
+        <div class="camera-section">
+          <h3>📸 Capture 5 Profile Photos</h3>
+          <video id="video" width="100%" height="220" autoplay></video><br>
+          <button type="button" id="captureBtn" class="capture-btn">Capture</button>
+          <p id="photoCount">Photos Taken: 0 / 5</p>
+        </div>
 
-      <label>Contact No.</label>
-      <input type="text" name="contactNo" required>
-
-        <select name="role" required>
-        <option value="">Select Role</option>
-        <option value="1">Employee</option>
-        <option value="2">Admin</option>
-      </select>
-
-  <input type="text" name="nationality" placeholder="Nationality" required>
-      <input type="text" name="maritalStatus" placeholder="Marital Status" required>
-      <input type="text" name="emergencyContact" placeholder="Emergency Contact" required>
-      <input type="text" name="employeeID" placeholder="Employee ID" required>
-
-
-      <!-- Webcam capture -->
-      <div class="camera-section">
-        <h3>Take Your 5 Profile Photos</h3>
-        <video id="video" width="400" height="300" autoplay></video><br>
-        <button type="button" id="captureBtn" class="login-btn">Capture Photo</button>
-        <p id="photoCount">Photos Taken: 0 / 5</p>
-        <input type="hidden" id="photoFolder" name="photoFolder">
-      </div>
-
-      <p class="register-text">Have an account? <a href="/login">Login Here</a></p>
-      <button type="submit" class="login-btn">Register</button>
-
-      <button type="submit" class="cancel-btn">Cancel</button>
-
-      <?php if (!empty($message)): ?>
-        <p class="message"><?= $message ?></p>
-      <?php endif; ?>
-
-      <div class="footer-text">
-        Already have an account? <a href="login.php">Login here</a>
-      </div>
-    </form>
+        <button type="submit" class="register-btn">Register</button>
+        <a href="login.php" class="login-link">Already have an account? Login</a>
+      </form>
+    </div>
   </div>
-  
-  <div class="right">
-    <img src="assets/Agri.jpg" alt="Agri Logo" width="120">
-    <h2>AgriTime Payroll<br>Attendance System</h2>
-  </div>
+</div>
 
+</body>
+</html>
     <script>
     document.addEventListener("DOMContentLoaded", () => {
       const video = document.getElementById("video");

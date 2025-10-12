@@ -1,113 +1,265 @@
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
-      display: flex;
-      min-height: 100vh;
-    }
-    .left, .right {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .left {
-      background: #f0f9ff;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .right {
-      background: linear-gradient(135deg, #a3e635, #34d399);
-      color: white;
-      text-align: center;
-    }
-    form {
-      width: 100%;
-      max-width: 400px;
-      background: white;
-      padding: 25px 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    form h2 {
-      margin-top: 0;
-      text-align: center;
-      color: #222;
-    }
-    form p {
-      font-size: 14px;
-      text-align: center;
-      color: #555;
-      margin-bottom: 20px;
-    }
-    label {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 5px;
-      display: block;
-      color: #333;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 14px;
-    }
-    input:focus, select:focus {
-      outline: none;
-      border-color: #34d399;
-      box-shadow: 0 0 4px rgba(52, 211, 153, 0.5);
-    }
-    button {
-      background: #22c55e;
-      border: none;
-      padding: 12px;
-      width: 100%;
-      border-radius: 5px;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #16a34a;
-    }
-    .message {
-      margin-top: 10px;
-      font-weight: bold;
-      text-align: center;
-      color: green;
-    }
-    .footer-text {
-      margin-top: 12px;
-      text-align: center;
-      font-size: 14px;
-    }
-    .footer-text a {
-      color: #2563eb;
-      text-decoration: none;
-    }
-    .footer-text a:hover {
-      text-decoration: underline;
-    }
-    @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-      .left, .right {
-        flex: none;
-        width: 100%;
-        min-height: 50vh;
-      }
-      form {
-        max-width: 90%;
-      }
-    }
+/* ==== BODY ==== */
+body {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #a8e6cf, #dcedc1, #a5d6a7);
+  background-size: 200% 200%;
+  animation: bgMove 10s ease infinite;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
 
-    .cancel-btn{
-        background: #ff2600;
-    }
+/* ==== CONTAINER ==== */
+.container {
+  width: 100%;
+  max-width: 1100px;
+  padding: 20px;
+}
+
+/* ==== CARD ==== */
+.card {
+  display: flex;
+  flex-wrap: wrap;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 100, 0, 0.15);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 100, 0, 0.25);
+}
+
+/* ==== LEFT SIDE ==== */
+.card-left {
+  flex: 1;
+  background: linear-gradient(135deg, #43a047, #66bb6a, #81c784);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 50px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated leaf pattern overlay */
+.card-left::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("https://www.transparenttextures.com/patterns/leaves.png");
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.card-left h1 {
+  font-size: 2.3rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.card-left p {
+  max-width: 300px;
+  font-size: 15px;
+  margin-bottom: 25px;
+  opacity: 0.9;
+}
+
+.card-left img {
+  width: 85%;
+  max-width: 260px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(255, 255, 255, 0.3);
+  animation: floatLogo 4s ease-in-out infinite;
+}
+
+/* ==== RIGHT SIDE ==== */
+.card-right {
+  flex: 1.2;
+  padding: 50px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #ffffff;
+  border-left: 2px solid #dcedc1;
+}
+
+.card-right h2 {
+  text-align: center;
+  color: #1b4332;
+  font-size: 1.9rem;
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.card-right h2::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 3px;
+  background: #34d399;
+  border-radius: 3px;
+}
+
+/* ==== FORM ==== */
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: 600;
+  color: #2d6a4f;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+input,
+select {
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #b7e4c7;
+  background: #f9fff9;
+  font-size: 14px;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+input:focus,
+select:focus {
+  border-color: #34d399;
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.4);
+  outline: none;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+
+/* ==== CAMERA SECTION ==== */
+.camera-section {
+  border: 2px dashed #b7e4c7;
+  border-radius: 10px;
+  padding: 20px;
+  background: #f0fdf4;
+  margin-bottom: 15px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.camera-section:hover {
+  border-color: #34d399;
+  background: #e8fcef;
+}
+
+/* ==== BUTTONS ==== */
+.capture-btn {
+  background: #34d399;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.capture-btn:hover {
+  background: #059669;
+  transform: scale(1.05);
+}
+
+.register-btn {
+  background: linear-gradient(135deg, #2d6a4f, #1b4332);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.register-btn:hover {
+  background: linear-gradient(135deg, #1b4332, #081c15);
+  transform: scale(1.05);
+}
+
+/* ==== LOGIN LINK ==== */
+.login-link {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  color: #2d6a4f;
+  font-weight: 500;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.login-link:hover {
+  color: #1b4332;
+  text-decoration: underline;
+}
+
+/* ==== ANIMATIONS ==== */
+@keyframes bgMove {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes floatLogo {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ==== RESPONSIVE ==== */
+@media (max-width: 900px) {
+  .card {
+    flex-direction: column;
+  }
+
+  .card-left,
+  .card-right {
+    flex: none;
+    width: 100%;
+  }
+
+  .card-left {
+    padding: 30px 15px;
+  }
+
+  .card-right {
+    padding: 30px 20px;
+  }
+}
