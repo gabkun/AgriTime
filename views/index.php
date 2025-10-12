@@ -16,6 +16,10 @@ switch ($request) {
         require __DIR__ . '/pages/Employee/dashboard.php';
         break;
 
+    case '/employee/myAccount':
+        require __DIR__ . '/pages/Employee/myAccount.php';
+        break;    
+
     case '/hr/dashboard':
         require __DIR__ . '/pages/HR/dashboard.php';
         break;
@@ -23,7 +27,7 @@ switch ($request) {
     case '/admin/dashboard':
         require __DIR__ . '/pages/Admin/dashboard.php';
         break;
-
+  
     default:
         http_response_code(404);
         echo "<h1>404 - Page Not Found</h1>";

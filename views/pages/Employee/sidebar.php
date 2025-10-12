@@ -27,7 +27,7 @@
 
         <li class="<?php echo basename($_SERVER['PHP_SELF']) == 'myAccount.php' ? 'active' : ''; ?>">
           <i class="icon">👤</i>
-          <a href="/employee/myAccount.php">My Account</a>
+          <a href="/employee/myAccount">My Account</a>
         </li>
 
         <li>
