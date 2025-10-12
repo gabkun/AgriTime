@@ -170,3 +170,53 @@ export const getDailyTimestamp = async (req, res) => {
     res.status(500).json({ message: "Error fetching timestamp", error: err.message });
   }
 };
+
+export const getAttendanceReport = async (req, res) => {
+  const { employeeID } = req.params;
+
+  if (!employeeID) {
+    return res.status(400).json({ message: "Employee ID is required" });
+  }
+
+  try {
+    const report = await AttendanceModel.getAttendanceReport(employeeID);
+
+    if (report.length === 0) {
+      return res.status(404).json({ message: "No attendance records found" });
+    }
+
+    // ✅ Format response
+    const formattedReport = report.map((r) => ({
+      date: new Date(r.date).toLocaleDateString("en-PH", {
+        timeZone: "Asia/Manila",
+      }),
+      time_in: new Date(r.time_in).toLocaleTimeString("en-PH", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Asia/Manila",
+      }),
+      time_out: r.time_out
+        ? new Date(r.time_out).toLocaleTimeString("en-PH", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+            timeZone: "Asia/Manila",
+          })
+        : "—",
+      total_hours: r.total_time ? r.total_time : "—",
+    }));
+
+    res.status(200).json({
+      employeeID,
+      totalDays: formattedReport.length,
+      records: formattedReport,
+    });
+  } catch (err) {
+    console.error("❌ Error generating attendance report:", err);
+    res.status(500).json({
+      message: "Error generating attendance report",
+      error: err.message,
+    });
+  }
+};

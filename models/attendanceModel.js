@@ -87,6 +87,32 @@ getLatestTimestamp: (employeeID) => {
   });
 },
 
+// ✅ Generate Attendance Report
+getAttendanceReport: (employeeID) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 
+        ti.employeeID,
+        DATE(ti.time_in) AS date,
+        ti.time_in,
+        to1.time_out,
+        TIMEDIFF(to1.time_out, ti.time_in) AS total_time
+      FROM time_in ti
+      JOIN time_out to1 
+        ON ti.employeeID = to1.employeeID
+        AND DATE(ti.time_in) = DATE(to1.time_out)
+      WHERE ti.employeeID = ?
+      ORDER BY ti.time_in DESC
+    `;
+
+    db.query(query, [employeeID], (err, results) => {
+      if (err) return reject(err);
+      resolve(results);
+    });
+  });
+},
+
+
 };
 
 export default AttendanceModel;
