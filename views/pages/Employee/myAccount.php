@@ -98,7 +98,7 @@ $user = $_SESSION["user"];
 
           <div class="form-buttons">
             <button type="submit" class="save-btn" id="saveBtn" disabled>💾 Save Changes</button>
-            <a href="dashboard.php" class="cancel-btn">← Back</a>
+            <a href="dashboard" class="cancel-btn">← Back</a>
           </div>
         </form>
       </div>

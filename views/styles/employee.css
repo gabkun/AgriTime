@@ -114,6 +114,8 @@ body {
   text-align: center;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .employee-middleboard:hover {
@@ -396,4 +398,52 @@ body {
   .card-icon {
     margin-bottom: 10px;
   }
+}
+
+
+/* ==== FARMER IMAGE ANIMATION ==== */
+
+.farmer-illustration {
+  width: 50%;
+
+  justify-content: center;
+  align-content: center;
+  transform: translateX(-50%);
+  animation: farmerFloat 4s ease-in-out infinite;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
+  pointer-events: none;
+}
+
+
+.farmer-illustration:hover {
+  transform: scale(1.05) rotate(-3deg);
+}
+
+/* wallking float animation */
+@keyframes farmerFloat {
+  0% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+
+  25% {
+    transform: translateX(-8px) translateY(-6px) rotate(-2deg);
+  }
+
+  50% {
+    transform: translateX(0) translateY(-10px) rotate(0deg);
+  }
+
+  75% {
+    transform: translateX(8px) translateY(-6px) rotate(2deg);
+  }
+
+  100% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+}
+
+.workwork {
+  text-align: center;
+  color: #1a8f3c;
+  margin-bottom: 10px;
 }

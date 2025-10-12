@@ -309,7 +309,10 @@ if ($dailyStatus === null) {
                     </div>
                     
                       <div class="employee-middleboard">
-                          <h4 class="boardText">insert Image here</h3>     
+                            <img src="../assets/farmer.png" alt="Farmer" class="farmer-illustration">   
+                            <div class ="calendar-board">
+                            <h2 class="workwork">Work Work!</h3>
+                            </div>
                       </div>
                   </div>
                 </section>

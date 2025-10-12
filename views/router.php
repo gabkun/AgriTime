@@ -103,7 +103,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <!-- RIGHT: Logo Section -->
             <div class="right">
               <img src="assets/Agri.jpg" alt="System Logo" />
-               <img src="assets/farmer.png" alt="Farmer" class="farmer-illustration">
               <h1>AgriTime Payroll<br>Attendance System</h1>
            
             </div>
@@ -184,7 +183,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           progressBar.style.width = "100%";
           progressBar.style.background = "linear-gradient(90deg, #4caf50, #2e7d32)";
 
-          messageEl.textContent = `Welcome back, ${label}! Logging you in ${countdown}...`;
 
           const intervalId = setInterval(() => {
             countdown--;
