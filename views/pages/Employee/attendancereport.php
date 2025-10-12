@@ -2,11 +2,29 @@
 session_start();
 date_default_timezone_set("Asia/Manila");
 
+// ✅ Redirect if not logged in
 if (!isset($_SESSION["user"])) {
     header("Location: /");
     exit;
 }
+
 $user = $_SESSION["user"];
+$employeeID = $user["employeeID"];
+
+// ✅ API Base URL
+$apiBaseUrl = "http://localhost:8080/api/attendance";
+$reportUrl = "$apiBaseUrl/report/$employeeID";
+
+// ✅ Fetch Attendance Report
+$reportResponse = @file_get_contents($reportUrl);
+$attendanceData = [];
+
+if ($reportResponse !== FALSE) {
+    $decoded = json_decode($reportResponse, true);
+    $attendanceData = $decoded["records"] ?? [];
+} else {
+    $attendanceData = [];
+}
 ?>
 
 <!DOCTYPE html>
@@ -78,34 +96,30 @@ $user = $_SESSION["user"];
         </div>
 
         <div class="table-container">
-          <table id="attendance-table">
+          <table id="attendance-table" data-sort-order="asc">
             <thead>
               <tr>
                 <th onclick="sortTable(0)">Date ⬍</th>
                 <th onclick="sortTable(1)">Time In ⬍</th>
                 <th onclick="sortTable(2)">Time Out ⬍</th>
-                <th>Employee Name</th>
+                <th onclick="sortTable(3)">Total Hours ⬍</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>2025-02-25</td>
-                <td class="time-in">9:43 AM</td>
-                <td class="time-out">5:00 PM</td>
-                <td>John</td>
-              </tr>
-              <tr>
-                <td>2025-02-24</td>
-                <td class="time-in">9:35 AM</td>
-                <td class="time-out">5:10 PM</td>
-                <td>Maria</td>
-              </tr>
-              <tr>
-                <td>2025-02-26</td>
-                <td class="time-in">9:20 AM</td>
-                <td class="time-out">5:05 PM</td>
-                <td>Carlos</td>
-              </tr>
+              <?php if (!empty($attendanceData)): ?>
+                <?php foreach ($attendanceData as $record): ?>
+                  <tr>
+                    <td><?php echo htmlspecialchars($record['date']); ?></td>
+                    <td class="time-in"><?php echo htmlspecialchars($record['time_in']); ?></td>
+                    <td class="time-out"><?php echo htmlspecialchars($record['time_out']); ?></td>
+                    <td class="total"><?php echo htmlspecialchars($record['total_hours']); ?></td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="4" style="text-align:center; padding:15px;">No attendance records found.</td>
+                </tr>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>
