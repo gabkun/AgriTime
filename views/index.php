@@ -28,6 +28,22 @@ switch ($request) {
         require __DIR__ . '/pages/HR/dashboard.php';
         break;
 
+    case '/hr/attendancereport':
+        require __DIR__ . '/pages/HR/attendancereport.php';
+        break;
+
+    case '/hr/employeedb':
+        require __DIR__ . '/pages/HR/employeedb.php';
+        break;        
+
+    case '/hr/myaccount':
+        require __DIR__ . '/pages/HR/myaccount.php';
+        break;  
+    
+    case '/hr/generatepayslip':
+        require __DIR__ . '/pages/HR/generatepayslip.php';
+        break; 
+
     case '/admin/dashboard':
         require __DIR__ . '/pages/Admin/dashboard.php';
         break;

@@ -1,0 +1,299 @@
+/* Base Layout */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: #f5f9ff;
+  color: #333;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar */
+#sidebar {
+  width: 240px;
+  background: #1a8f3c;
+  color: #fff;
+  transition: all 0.3s ease;
+  min-height: 100vh;
+}
+
+#sidebar.hidden {
+  margin-left: -240px;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.main-content.expanded {
+  margin-left: 0;
+  width: 100%;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo img {
+  width: 40px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-profile img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* Attendance Section */
+.attendance-section {
+  margin-top: 20px;
+}
+
+/* Report Header */
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  background: #e8f5e9;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.report-header h3 {
+  color: #2e7d32;
+  font-size: 1.4rem;
+}
+
+.filter-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-box label {
+  font-weight: 500;
+  color: #33691e;
+}
+
+.filter-box input {
+  padding: 5px 10px;
+  border: 1px solid #a5d6a7;
+  border-radius: 8px;
+  outline: none;
+}
+
+#filter-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#filter-btn:hover {
+  background: #43a047;
+}
+
+/* Table */
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+  background: #388e3c;
+  color: white;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+th {
+  cursor: pointer;
+  user-select: none;
+}
+
+tr:hover {
+  background: #f1f8e9;
+}
+
+.time-in {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.time-out {
+  color: #c62828;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .main-content {
+    margin-left: 0;
+    padding: 15px;
+  }
+
+  .report-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-box {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 600px) {
+  #filter-btn {
+    width: 100%;
+  }
+}
+
+/* ✅ Action Buttons */
+.action-btns button {
+  margin-right: 5px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: white;
+  transition: 0.3s;
+}
+
+.view-btn { background-color: #43a047; }
+.edit-btn { background-color: #ffb300; }
+.delete-btn { background-color: #e53935; }
+
+.view-btn:hover { background-color: #388e3c; }
+.edit-btn:hover { background-color: #fb8c00; }
+.delete-btn:hover { background-color: #c62828; }
+
+/* ✅ Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 20px 30px;
+  border-radius: 12px;
+  width: 60%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+}
+
+.modal-header h3 {
+  color: #1a8f3c;
+}
+
+.close-btn {
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #e53935;
+  font-weight: bold;
+}
+
+.modal-body {
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.modal-body input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.modal-footer {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.save-btn {
+  background-color: #1a8f3c;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.save-btn:hover {
+  background-color: #2e7d32;
+}
+
+@media (max-width: 768px) {
+  .modal-body {
+    grid-template-columns: 1fr;
+  }
+}

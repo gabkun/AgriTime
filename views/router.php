@@ -35,11 +35,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION["user"] = $response["user"];
                 $_SESSION["login_time"] = $response["loginTime"];
 
+                // ✅ Check role-based redirect
+                $role = $response["user"]["role"] ?? null;
+                $firstName = addslashes($response["user"]["firstName"]);
+
+                if ($role == 1) {
+                    $redirect = "/employee/dashboard";
+                } elseif ($role == 2) {
+                    $redirect = "/hr/dashboard";
+                } elseif ($role == 3) {
+                    $redirect = "/admin/dashboard";
+                } else {
+                    echo "<script>
+                            alert('User not found. Please login again.');
+                            window.location.href = '/login';
+                          </script>";
+                    exit;
+                }
+
                 // ✅ Redirect using router route
                 echo "<script>
-                        alert('Welcome back, " . addslashes($response['user']['firstName']) . "!');
-                        window.location.href = '/employee/dashboard';
+                        alert('Welcome back, {$firstName}!');
+                        window.location.href = '{$redirect}';
                       </script>";
+                exit;
+
             } else {
                 // Handle invalid credentials or unrecognized face
                 $msg = $response["message"] ?? "Invalid credentials or face not recognized.";
@@ -51,6 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
         <html lang="en">
