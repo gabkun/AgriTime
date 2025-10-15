@@ -306,13 +306,14 @@ if ($dailyStatus === null) {
                     <?php else: ?>
                       <p><strong>Last Recorded Time:</strong> —</p>
                     <?php endif; ?>
-                    </div>
-                    
-                      <div class="employee-middleboard">
-                            <img src="../assets/farmer.png" alt="Farmer" class="farmer-illustration">   
-                            <div class ="calendar-board">
-                            <h2 class="workwork">Work Work!</h3>
-                            </div>
+                     </div>
+                        <div class="secretary-board">
+                        <img src="../assets/secretary.png" alt="Secretary" class="secretary-illustration">
+                        <div class="secretary-text">
+                          <h2>Week-Ends?</h2>
+                          <p>Manage schedules • Assist teams • Keep things running</p>
+                          <button class="secretary-btn">View Schedule</button>
+                        </div>
                       </div>
                   </div>
                 </section>

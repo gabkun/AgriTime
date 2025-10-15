@@ -146,7 +146,8 @@ thead {
   color: white;
 }
 
-th, td {
+th,
+td {
   padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #e0e0e0;
@@ -211,13 +212,29 @@ tr:hover {
   transition: 0.3s;
 }
 
-.view-btn { background-color: #43a047; }
-.edit-btn { background-color: #ffb300; }
-.delete-btn { background-color: #e53935; }
+.view-btn {
+  background-color: #43a047;
+}
 
-.view-btn:hover { background-color: #388e3c; }
-.edit-btn:hover { background-color: #fb8c00; }
-.delete-btn:hover { background-color: #c62828; }
+.edit-btn {
+  background-color: #ffb300;
+}
+
+.delete-btn {
+  background-color: #e53935;
+}
+
+.view-btn:hover {
+  background-color: #388e3c;
+}
+
+.edit-btn:hover {
+  background-color: #fb8c00;
+}
+
+.delete-btn:hover {
+  background-color: #c62828;
+}
 
 /* ✅ Modal Styles */
 .modal {
@@ -229,7 +246,7 @@ tr:hover {
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
@@ -296,4 +313,366 @@ tr:hover {
   .modal-body {
     grid-template-columns: 1fr;
   }
+}
+
+/* 🌿 NATURE HR DESIGN — FLAT COLORS */
+body {
+  background-color: #f4fbe2;
+  /* soft light green background */
+  color: #355e3b;
+  /* dark leafy green text */
+  font-family: "Poppins", sans-serif;
+}
+
+/* Header */
+.header {
+  background-color: #cddc39;
+  /* warm yellow-green */
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(85, 107, 47, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo h2 {
+  color: #2e7d32;
+  /* deep green text */
+}
+
+/* Report Header */
+.report-header {
+  background-color: #f9fbe7;
+  /* pale yellow background */
+  border-left: 6px solid #9ccc65;
+  /* soft green border */
+  border-radius: 10px;
+  padding: 15px 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.report-header h3 {
+  color: #558b2f;
+  /* forest green */
+  font-weight: 600;
+}
+
+/* Search Box */
+#searchInput {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 2px solid #cddc39;
+  /* yellow-green border */
+  background-color: #fffff8;
+  /* off-white background */
+  color: #33691e;
+  /* dark green text */
+  outline: none;
+  transition: 0.3s;
+}
+
+#searchInput:focus {
+  border-color: #9ccc65;
+  box-shadow: 0 0 6px rgba(156, 204, 101, 0.5);
+}
+
+/* Table */
+.table-container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(97, 128, 77, 0.15);
+  overflow: hidden;
+}
+
+thead {
+  background-color: #aed581;
+  /* light green header */
+  color: #2e4600;
+  /* dark text */
+}
+
+thead th {
+  padding: 12px;
+  font-weight: 600;
+}
+
+tbody td {
+  padding: 10px;
+  border-bottom: 1px solid #dce775;
+}
+
+tr:hover {
+  background-color: #f1f8e9;
+  transition: 0.3s ease;
+}
+
+/* Buttons */
+.view-btn,
+.edit-btn,
+.delete-btn {
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.view-btn {
+  background-color: #689f38;
+}
+
+/* green */
+.edit-btn {
+  background-color: #fbc02d;
+}
+
+/* yellow */
+.delete-btn {
+  background-color: #d32f2f;
+}
+
+/* red */
+
+.view-btn:hover {
+  background-color: #558b2f;
+}
+
+.edit-btn:hover {
+  background-color: #f9a825;
+}
+
+.delete-btn:hover {
+  background-color: #b71c1c;
+}
+
+/* Modal */
+.modal-content {
+  background-color: #fcffed;
+  border: 2px solid #cddc39;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(85, 107, 47, 0.25);
+  padding: 20px;
+}
+
+/* Save Button */
+.save-btn {
+  background-color: #8bc34a;
+  /* flat green */
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 22px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.save-btn:hover {
+  background-color: #689f38;
+  transform: translateY(-2px);
+}
+
+/* Table Fade Animation */
+#employee-table tr {
+  animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.modal-body input,
+.modal-body select,
+.filter-box input {
+  background-color: #f9fbe7;
+  /* pale yellow background */
+  border: 2px solid #cddc39;
+  /* greenish-yellow border */
+  border-radius: 10px;
+  /* smoother rounded corners */
+  padding: 10px 12px;
+  color: #33691e;
+  /* dark green text */
+  font-weight: 500;
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(170, 200, 120, 0.2);
+}
+
+.modal-body input:focus,
+.modal-body select:focus,
+.filter-box input:focus {
+  border-color: #8bc34a;
+  /* bright green when focused */
+  box-shadow: 0 0 8px rgba(139, 195, 74, 0.6);
+  background-color: #fcffed;
+  /* slightly lighter background */
+}
+
+/* Placeholder style for cleaner look */
+.modal-body input::placeholder {
+  color: #7a9e5a;
+  opacity: 0.8;
+}
+
+
+.profile-section img {
+  width: "100%";
+  height: "100%";
+  justify-content: center;
+  border-radius: 50%;
+  /* perfect circle */
+  border: 4px solid #eaebe8;
+  /* soft yellow-green border */
+  box-shadow: 0 4px 10px rgba(97, 128, 77, 0.3);
+  transition: 0.3s;
+}
+
+.profile-section img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(85, 107, 47, 0.4);
+}
+
+/* 🌼 File Upload Button (if visible during edit) */
+#empProfileUpload {
+  display: block;
+  background-color: #9ccc65;
+  color: rgb(255, 255, 255);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.3s;
+}
+
+#empProfileUpload:hover {
+  background-color: #7cb342;
+}
+
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/*  Custom Nature Upload Button */
+.upload-wrapper {
+  text-align: center;
+  margin-top: 15px;
+  position: relative;
+}
+
+/* Hide the default file input completely */
+#empProfileUpload {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
+}
+
+/* Your custom button */
+.upload-label {
+  display: inline-block;
+  background-color: #cddc39;
+  /* flat yellow-green */
+  color: #2e4600;
+  /* dark earthy green */
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 6px rgba(97, 128, 77, 0.2);
+}
+
+.upload-label:hover {
+  background-color: #aed581;
+  /* lighter green */
+  box-shadow: 0 4px 10px rgba(85, 107, 47, 0.3);
+  transform: translateY(-2px);
+}
+
+/* 🌿 Delete Modal Base */
+.delete-modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal box */
+.delete-modal-content {
+  background-color: #f9fbe7;
+  /* soft yellow-green */
+  border: 2px solid #cddc39;
+  padding: 25px 30px;
+  border-radius: 10px;
+  text-align: center;
+  width: 350px;
+  box-shadow: 0 4px 10px rgba(85, 107, 47, 0.3);
+}
+
+/* Buttons */
+.delete-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.delete-btn-confirm {
+  background-color: #d32f2f;
+  /* red danger */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.delete-btn-confirm:hover {
+  background-color: #b71c1c;
+}
+
+.delete-btn-cancel {
+  background-color: #aed581;
+  /* calm green */
+  color: #2e4600;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.delete-btn-cancel:hover {
+  background-color: #9ccc65;
 }

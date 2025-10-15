@@ -128,9 +128,8 @@ $user = $_SESSION["user"];
       </div>
 
       <div class="modal-body">
-        <div class="profile-section">
-          <img id="empProfilePic" src="../../assets/user.jpg" alt="Profile Picture" width="500">
-          <input type="file" id="empProfileUpload" style="display:none;">
+       <div class="profile-section">
+          <img id="empProfilePic" src="../assets/user.jpg" alt="Profile Picture" width="100%">
         </div>
 
         <div class="form-grid">

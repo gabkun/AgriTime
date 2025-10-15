@@ -56,10 +56,10 @@ $user = $_SESSION["user"];
       <header class="header">
         <div class="logo">
           <img src="../assets/Agri.jpg" alt="Agri Logo" width="150">
-          <h2>Employee Database</h2>
+          <h2>🌾 HR Employee Management</h2>
         </div>
         <div class="user-profile">
-          <img src="../assets/user.png" alt="User" width="50">
+          <img src="../assets/grit.jpg" alt="User" width="50">
           <span><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></span>
         </div>
       </header>
@@ -68,7 +68,11 @@ $user = $_SESSION["user"];
         <div class="report-header">
           <div>
             <h3>🌿 Employee Overview</h3>
-            <p>Track all employee data</p>
+            <p>Track, search, and manage employee data</p>
+          </div>
+
+          <div class="filter-box">
+            <input type="text" id="searchInput" placeholder="🔍 Search employee...">
           </div>
         </div>
 
@@ -76,16 +80,15 @@ $user = $_SESSION["user"];
           <table id="employee-table">
             <thead>
               <tr>
-                <th onclick="sortTable(0)">Employee ID</th>
-                <th onclick="sortTable(1)">First Name</th>
-                <th onclick="sortTable(2)">Last Name</th>
-                <th onclick="sortTable(3)">Role</th>
+                <th onclick="sortTable(0)">Employee ID ⬍</th>
+                <th onclick="sortTable(1)">First Name ⬍</th>
+                <th onclick="sortTable(2)">Last Name ⬍</th>
+                <th onclick="sortTable(3)">Role ⬍</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
               <?php
-                // Placeholder data
                 $employees = [
                   ["EMP-001", "Juan", "Dela Cruz", "1"],
                   ["EMP-002", "Maria", "Santos", "2"],
@@ -125,8 +128,12 @@ $user = $_SESSION["user"];
 
       <div class="modal-body">
         <div class="profile-section">
-          <img id="empProfilePic" src="../../assets/user.jpg" alt="Profile Picture" width="500">
-          <input type="file" id="empProfileUpload" style="display:none;">
+          <img id="empProfilePic" src="../assets/user.jpg" alt="Profile Picture" width="100%">
+          <div class="upload-wrapper">
+              <label for="empProfileUpload" class="upload-label">📸 Upload Profile</label>
+              <input type="file" id="empProfileUpload" accept="image/*">
+            </div>
+
         </div>
 
         <div class="form-grid">
@@ -154,8 +161,45 @@ $user = $_SESSION["user"];
       </div>
     </div>
   </div>
+  <!--   DELETE CONFIRM MODAL -->
+    <div id="deleteModal" class="delete-modal">
+      <div class="delete-modal-content">
+        <h3>Confirm Delete</h3>
+        <p>Are you sure you want to delete this employee?</p>
+        <div class="delete-actions">
+          <button id="confirmDeleteBtn" class="delete-btn-confirm">Yes, Delete</button>
+          <button id="cancelDeleteBtn" class="delete-btn-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
 
+
+  
   <script>
+    // ===== Sorting Function =====
+    function sortTable(n) {
+      const table = document.getElementById("employee-table");
+      let rows = Array.from(table.rows).slice(1);
+      let asc = table.getAttribute("data-sort") !== "asc";
+      rows.sort((a, b) => {
+        const valA = a.cells[n].innerText.toLowerCase();
+        const valB = b.cells[n].innerText.toLowerCase();
+        return asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      });
+      table.tBodies[0].append(...rows);
+      table.setAttribute("data-sort", asc ? "asc" : "desc");
+    }
+
+    // ===== Search Function =====
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+      const filter = this.value.toLowerCase();
+      const rows = document.querySelectorAll("#employee-table tbody tr");
+      rows.forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(filter) ? "" : "none";
+      });
+    });
+
+    // ===== Modal Logic =====
     let modal = document.getElementById("employeeModal");
     let saveBtn = document.getElementById("saveChanges");
 
@@ -168,14 +212,11 @@ $user = $_SESSION["user"];
 
       const isEdit = mode === "edit";
       document.getElementById("modalTitle").innerText = isEdit ? "Edit Employee" : "View Employee";
-
-      // Toggle readonly inputs
       document.querySelectorAll('.form-grid input, .form-grid select').forEach(el => {
         el.readOnly = !isEdit;
         el.disabled = !isEdit;
       });
 
-      // Profile upload toggle
       document.getElementById("empProfileUpload").style.display = isEdit ? "block" : "none";
       saveBtn.style.display = isEdit ? "inline-block" : "none";
     }
@@ -184,17 +225,40 @@ $user = $_SESSION["user"];
       modal.style.display = "none";
     }
 
-    function deleteEmployee(id) {
-      if (confirm(`Are you sure you want to delete ${id}?`)) {
-        alert(`${id} deleted successfully (placeholder only).`);
-      }
-    }
+          // ===== Delete Modal Logic =====
+        let deleteModal = document.getElementById("deleteModal");
+        let confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+        let cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+        let deleteTargetId = null;
 
-    window.onclick = function(event) {
-      if (event.target === modal) {
-        modal.style.display = "none";
-      }
+        function deleteEmployee(id) {
+          deleteTargetId = id; // store which employee to delete
+          deleteModal.style.display = "flex"; // show modal
+        }
+
+        confirmDeleteBtn.onclick = function() {
+          alert(`Employee ${deleteTargetId} deleted successfully!`);
+          deleteModal.style.display = "none";
+          deleteTargetId = null;
+        }
+
+        cancelDeleteBtn.onclick = function() {
+          deleteModal.style.display = "none";
+          deleteTargetId = null;
+        }
+
+        // close modal if clicked outside
+        window.onclick = function(event) {
+          if (event.target === deleteModal) {
+            deleteModal.style.display = "none";
+          }
+        }
+
+
+    window.onclick = function (event) {
+      if (event.target === modal) modal.style.display = "none";
     }
   </script>
 </body>
+
 </html>
