@@ -169,4 +169,33 @@ export const facialLogin = async (req, res) => {
   }
 };
 
+export const updateSalaryInfo = async (req, res) => {
+  try {
+    const { employeeID, basicPay, allowances } = req.body;
+
+    if (!employeeID || basicPay == null || allowances == null) {
+      return res.status(400).json({ message: "Employee ID, basic pay, and allowances are required" });
+    }
+
+    const result = await User.updateSalaryByEmployeeID(employeeID, { basicPay, allowances });
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    res.status(200).json({ message: "Salary information updated successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Error updating salary information", error: err.message });
+  }
+};
+
+
+export const getAllUserData = async (req, res) => {
+  try {
+    const users = await User.getAllUserData();
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching all user data", error: err.message });
+  }
+};
 
