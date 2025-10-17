@@ -1,4 +1,6 @@
 import AttendanceModel from '../models/attendanceModel.js';
+import PDFDocument from "pdfkit";
+import fs from "fs";
 
 export const timein = async (req, res) => {
   const { employeeID } = req.body;
@@ -325,5 +327,99 @@ export const getAllDailyStatus = async (req, res) => {
       message: "Error fetching all daily statuses.",
       error: err.message,
     });
+  }
+};
+
+export const downloadPayslip = async (req, res) => {
+  const { employeeID } = req.params;
+
+  if (!employeeID) {
+    return res.status(400).json({ message: "Employee ID is required" });
+  }
+
+  try {
+    // 1️⃣ Get the latest payslip record using a helper model method
+    const payslipRecords = await AttendanceModel.getLatestPayslip(employeeID);
+
+    if (payslipRecords.length === 0) {
+      return res.status(404).json({ message: "No payslip found for this employee." });
+    }
+
+    const payslip = payslipRecords[0];
+
+    // 2️⃣ Fetch user details using another model helper
+    const user = await AttendanceModel.getEmployeeDetails(employeeID);
+    if (!user) {
+      return res.status(404).json({ message: "Employee not found." });
+    }
+
+    // 3️⃣ Create PDF
+    const doc = new PDFDocument({ margin: 50 });
+    const fileName = `Payslip_${employeeID}_${Date.now()}.pdf`;
+    const filePath = `./uploads/${fileName}`;
+    const writeStream = fs.createWriteStream(filePath);
+    doc.pipe(writeStream);
+
+    // HEADER
+    doc.fontSize(20).text("AgriTime Payroll Payslip", { align: "center" });
+    doc.moveDown();
+
+    // EMPLOYEE INFO
+    doc.fontSize(12)
+      .text(`Employee ID: ${employeeID}`)
+      .text(`Employee Name: ${user.firstName} ${user.lastName}`)
+      .text(`Period Covered: ${payslip.startDate} to ${payslip.endDate}`)
+      .text(`Date Generated: ${payslip.created}`)
+      .moveDown();
+
+    // SALARY DETAILS
+    doc.fontSize(14).text("EARNINGS", { underline: true });
+    doc.fontSize(12)
+      .text(`Basic Pay: ₱${user.basicPay}`)
+      .text(`Allowances: ₱${user.allowances}`)
+      .text(`Total Hours Worked: ${payslip.totalHours}`)
+      .text(`Overtime Hours: ${payslip.overtimeHours}`)
+      .moveDown();
+
+    // DEDUCTIONS
+    doc.fontSize(14).text("DEDUCTIONS", { underline: true });
+    doc.fontSize(12)
+      .text(`SSS Deduction: ₱${payslip.sssDeduction}`)
+      .text(`Pag-IBIG Deduction: ₱${payslip.pagibigDeduction}`)
+      .text(`PhilHealth Deduction: ₱${payslip.philhealthDeduction}`)
+      .moveDown();
+
+    // COMPUTATIONS
+    const grossPay = Number(user.basicPay) + Number(user.allowances);
+    const totalDeductions =
+      Number(payslip.sssDeduction) +
+      Number(payslip.pagibigDeduction) +
+      Number(payslip.philhealthDeduction);
+    const netPay = grossPay - totalDeductions;
+
+    doc.fontSize(14).text("SUMMARY", { underline: true });
+    doc.fontSize(12)
+      .text(`Gross Pay: ₱${grossPay.toFixed(2)}`)
+      .text(`Total Deductions: ₱${totalDeductions.toFixed(2)}`)
+      .text(`Net Pay: ₱${netPay.toFixed(2)}`)
+      .moveDown();
+
+    doc.text("This is a system-generated payslip. No signature required.", {
+      align: "center",
+    });
+
+    doc.end();
+
+    // 4️⃣ Send the file
+    writeStream.on("finish", () => {
+      res.download(filePath, fileName, (err) => {
+        if (err) console.error(err);
+        fs.unlinkSync(filePath); // delete after sending
+      });
+    });
+
+  } catch (err) {
+    console.error("❌ Error generating payslip PDF:", err);
+    res.status(500).json({ message: "Error generating PDF", error: err.message });
   }
 };

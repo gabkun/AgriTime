@@ -11,9 +11,42 @@ if (!isset($_SESSION["user"])) {
 $user = $_SESSION["user"];
 $currentTime = date('g : i A');
 
-// ✅ API base URL
-$apiBaseUrl = "http://localhost:8080/api/attendance";
+$employeeID = $user["employeeID"];
+echo "<script>console.log('Employee ID: " . addslashes($employeeID) . "');</script>";
 
+
+// ✅ API base URLs
+$apiBaseUrl = "http://localhost:8080/api/attendance";
+$payslipBaseUrl = "http://localhost:8080/api/attendance";
+
+// ✅ PAYSLIP DOWNLOAD REQUEST (no cURL)
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["download"])) {
+    $employeeID = $user["employeeID"];
+    $downloadUrl = "http://localhost:8080/api/attendance/download/" . urlencode($employeeID);
+
+    $tempFile = tempnam(sys_get_temp_dir(), "payslip_") . ".pdf";
+
+    $context = stream_context_create([
+        "http" => [
+            "method" => "GET",
+            "header" => "Accept: application/pdf\r\n"
+        ]
+    ]);
+
+    $pdfContent = @file_get_contents($downloadUrl, false, $context);
+
+    if ($pdfContent === false) {
+        echo "<script>alert('Error downloading payslip. Please try again.');</script>";
+    } else {
+        file_put_contents($tempFile, $pdfContent);
+
+        header("Content-Type: application/pdf");
+        header("Content-Disposition: attachment; filename=\"Payslip_{$employeeID}.pdf\"");
+        readfile($tempFile);
+        unlink($tempFile);
+        exit;
+    }
+}
 // ✅ Fetch Daily Status
 $employeeID = $user["employeeID"];
 $statusUrl = "$apiBaseUrl/status/$employeeID";
@@ -24,12 +57,9 @@ $dailyStatus = null;
 if ($statusResponse !== FALSE) {
     $decoded = json_decode($statusResponse, true);
     $dailyStatus = $decoded["attendance_status"] ?? null;
-} else {
-    $dailyStatus = null;
 }
 
-$timestampUrl = "$apiBaseUrl/status/$employeeID";
-$timestampResponse = @file_get_contents($timestampUrl);
+$timestampResponse = @file_get_contents($statusUrl);
 $dailyTimestamp = null;
 
 if ($timestampResponse !== FALSE) {
@@ -60,12 +90,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
 
         if ($result === FALSE) {
-            echo "<script>alert('Done, navigating to dashboard');</script>";
+            echo "<script>alert('Error connecting to server.');</script>";
         } else {
             $response = json_decode($result, true);
             $message = $response["message"] ?? "Unknown response";
 
-            // ✅ Reload after success
             if (strpos(strtolower($message), 'success') !== false) {
                 echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
             } else {
@@ -80,12 +109,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
 
         if ($result === FALSE) {
-            echo "<script>alert('Done, navigating to dashboard');</script>";
+            echo "<script>alert('Error connecting to server.');</script>";
         } else {
             $response = json_decode($result, true);
             $message = $response["message"] ?? "Unknown response";
 
-            // ✅ Reload only if success
             if (strpos(strtolower($message), 'success') !== false) {
                 echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
             } else {
@@ -103,43 +131,35 @@ $roleName = match($user['role']) {
     default => 'Unknown'
 };
 
-// ✅ Button states
+// ✅ Button States
 $timeInDisabled = '';
 $timeOutDisabled = '';
 $breakDisabled = '';
 
 if ($dailyStatus === null) {
-    // No record today → enable time in only
     $timeOutDisabled = 'disabled';
     $breakDisabled = 'disabled';
 } elseif ($dailyStatus == 1) {
-    // Already timed in → disable time in, enable time out and break
     $timeInDisabled = 'disabled';
 } elseif ($dailyStatus == 0) {
-    // Already timed out → disable everything
     $timeInDisabled = 'disabled';
     $timeOutDisabled = 'disabled';
     $breakDisabled = 'disabled';
 } elseif ($dailyStatus == 2) {
-    // On break → disable time in, disable break, enable time out
     $timeInDisabled = 'disabled';
     $breakDisabled = 'disabled';
 }
 
-
-  date_default_timezone_set('Asia/Manila');
-
-  $month = date('n'); // 1-12
-  $year = date('Y');
-  $today = date('j');
-  $monthName = date('F');
-
-  // First day of the month (0 = Sunday)
-  $firstDayOfWeek = date('w', strtotime("$year-$month-01"));
-  $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-
-  $dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+// ✅ Calendar Setup
+$month = date('n'); // 1–12
+$year = date('Y');
+$today = date('j');
+$monthName = date('F');
+$firstDayOfWeek = date('w', strtotime("$year-$month-01"));
+$daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+$dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 ?>
+
 
 
 <!DOCTYPE html>

@@ -212,6 +212,37 @@ const AttendanceModel = {
   });
 },
 
+// ✅ Get latest payslip
+getLatestPayslip: (employeeID) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT * FROM pay_slip
+      WHERE employeeID = ?
+      ORDER BY created DESC
+      LIMIT 1
+    `;
+    db.query(query, [employeeID], (err, results) => {
+      if (err) return reject(err);
+      resolve(results);
+    });
+  });
+},
+
+// ✅ Get employee details (for PDF generation)
+getEmployeeDetails: (employeeID) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT firstName, lastName, basicPay, allowances 
+      FROM users 
+      WHERE employeeID = ?
+    `;
+    db.query(query, [employeeID], (err, results) => {
+      if (err) return reject(err);
+      resolve(results.length > 0 ? results[0] : null);
+    });
+  });
+},
+
 };
 
 export default AttendanceModel;
