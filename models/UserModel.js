@@ -123,6 +123,35 @@ getAllUserData: () => {
     });
   });
 },
+getRecentUsers: () => { 
+  return new Promise((resolve, reject) => {
+    const sql = `
+      SELECT 
+        id,
+        firstName,
+        lastName,
+        dob,
+        email,
+        contactNo,
+        role,
+        nationality,
+        maritalStatus,
+        emergencyContact,
+        employeeID,
+        basicPay,
+        allowances,
+        profilePic,
+        created_at
+      FROM users
+      WHERE YEARWEEK(created_at, 1) = YEARWEEK(CURDATE(), 1)
+      ORDER BY created_at DESC
+    `;
+    db.query(sql, (err, results) => {
+      if (err) return reject(err);
+      resolve(results);
+    });
+  });
+},
 
 
 };

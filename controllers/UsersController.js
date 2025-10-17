@@ -199,3 +199,14 @@ export const getAllUserData = async (req, res) => {
   }
 };
 
+export const getRecentUsers = async (req, res) => {
+  try {
+    const users = await User.getRecentUsers();
+    if (users.length === 0) {
+      return res.status(200).json({ message: "No users created this week." });
+    }
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching recent users", error: err.message });
+  }
+};

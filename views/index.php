@@ -47,6 +47,14 @@ switch ($request) {
     case '/admin/dashboard':
         require __DIR__ . '/pages/Admin/dashboard.php';
         break;
+
+    case '/admin/employeetrack':
+        require __DIR__ . '/pages/Admin/employeetracking.php';
+        break;
+
+    case '/admin/allusers':
+        require __DIR__ . '/pages/Admin/allusers.php';
+        break;
   
     default:
         http_response_code(404);

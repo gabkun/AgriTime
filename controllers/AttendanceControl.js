@@ -286,3 +286,44 @@ export const generatePayslip = async (req, res) => {
     });
   }
 };
+
+export const getAllDailyStatus = async (req, res) => {
+  try {
+    // ✅ Fetch all daily statuses for today
+    const allStatus = await AttendanceModel.getAllDailyStatus();
+
+    if (allStatus.length === 0) {
+      return res.status(404).json({
+        message: "No attendance records found for today.",
+        data: [],
+      });
+    }
+
+    // ✅ Format timestamps to Philippine time
+    const formattedStatus = allStatus.map((record) => {
+      const formattedTime = new Date(record.timestamp).toLocaleTimeString("en-PH", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: "Asia/Manila",
+      });
+      return {
+        employeeID: record.employeeID,
+        name: record.name,
+        attendance_status: record.attendance_status,
+        time: formattedTime,
+      };
+    });
+
+    return res.status(200).json({
+      message: "Fetched all employees' daily status successfully.",
+      data: formattedStatus,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching all daily statuses:", err);
+    return res.status(500).json({
+      message: "Error fetching all daily statuses.",
+      error: err.message,
+    });
+  }
+};

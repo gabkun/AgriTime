@@ -191,6 +191,27 @@ const AttendanceModel = {
       });
     });
   },
+
+  getAllDailyStatus: () => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 
+        ds.employeeID,
+        u.firstName,
+        ds.attendance_status,
+        ds.timestamp
+      FROM daily_status ds
+      JOIN users u ON ds.employeeID = u.employeeID
+      WHERE DATE(ds.timestamp) = CURDATE()
+      ORDER BY ds.timestamp DESC
+    `;
+    db.query(query, (err, results) => {
+      if (err) return reject(err);
+      resolve(results);
+    });
+  });
+},
+
 };
 
 export default AttendanceModel;
