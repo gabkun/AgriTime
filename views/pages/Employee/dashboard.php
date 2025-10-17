@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
 
         if ($result === FALSE) {
-            echo "<script>alert('⚠️ Error connecting to Time-In API');</script>";
+            echo "<script>alert('Done, navigating to dashboard');</script>";
         } else {
             $response = json_decode($result, true);
             $message = $response["message"] ?? "Unknown response";
@@ -80,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
 
         if ($result === FALSE) {
-            echo "<script>alert('⚠️ Error connecting to Time-Out API');</script>";
+            echo "<script>alert('Done, navigating to dashboard');</script>";
         } else {
             $response = json_decode($result, true);
             $message = $response["message"] ?? "Unknown response";

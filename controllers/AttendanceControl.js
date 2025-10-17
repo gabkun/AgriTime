@@ -220,3 +220,69 @@ export const getAttendanceReport = async (req, res) => {
     });
   }
 };
+
+export const generatePayslip = async (req, res) => {
+  const { employeeID, startDate, endDate, sssDeduction, pagibigDeduction, philhealthDeduction } = req.body;
+
+  if (!employeeID || !startDate || !endDate) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  try {
+    // ✅ 1. Fetch all attendance records
+    const records = await AttendanceModel.getAttendanceReport(employeeID);
+
+    if (!records || records.length === 0) {
+      return res.status(404).json({ message: "No attendance records found for this employee." });
+    }
+
+    // ✅ 2. Filter records by date range (exclude weekends)
+    const filteredRecords = records.filter((r) => {
+      const date = new Date(r.date);
+      const day = date.getDay(); // 0 = Sunday, 6 = Saturday
+      return date >= new Date(startDate) && date <= new Date(endDate) && day !== 0 && day !== 6;
+    });
+
+    if (filteredRecords.length === 0) {
+      return res.status(404).json({ message: "No valid working days found in the selected date range." });
+    }
+
+    // ✅ 3. Calculate totalHours and overtimeHours
+    let totalHours = 0;
+    let overtimeHours = 0;
+
+    filteredRecords.forEach((r) => {
+      if (r.total_time) {
+        const [hours, minutes, seconds] = r.total_time.split(":").map(Number);
+        const workedHours = hours + minutes / 60 + seconds / 3600;
+        totalHours += workedHours;
+
+        if (workedHours > 8) {
+          overtimeHours += workedHours - 8; // overtime = hours beyond 8
+        }
+      }
+    });
+
+    // ✅ 4. Generate payslip using model
+    const payslip = await AttendanceModel.generatePayslip(
+      employeeID,
+      startDate,
+      endDate,
+      totalHours.toFixed(2),
+      overtimeHours.toFixed(2),
+      sssDeduction || 0,
+      pagibigDeduction || 0,
+      philhealthDeduction || 0
+    );
+
+    // ✅ 5. Send response
+    res.status(200).json(payslip);
+
+  } catch (err) {
+    console.error("❌ Error generating payslip:", err);
+    res.status(500).json({
+      message: "Error generating payslip",
+      error: err.message,
+    });
+  }
+};
