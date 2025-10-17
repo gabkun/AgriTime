@@ -423,3 +423,22 @@ export const downloadPayslip = async (req, res) => {
     res.status(500).json({ message: "Error generating PDF", error: err.message });
   }
 };
+
+export const getAllpayslip = async (req, res) => {
+  try {
+    const payslips = await AttendanceModel.getAllpayslip();
+    if (payslips.length === 0) {
+      return res.status(404).json({ message: "No payslips found." });
+    }
+    res.status(200).json({
+      message: "Fetched all payslips successfully.",
+      data: payslips,
+    });
+  } catch (error) {
+    console.error("Error fetching payslips:", error);
+    res.status(500).json({
+      message: "Internal Server Error.",
+      error: error.message,
+    });
+  }
+};

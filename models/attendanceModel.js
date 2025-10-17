@@ -114,6 +114,18 @@ const AttendanceModel = {
     });
   },
 
+ getAllpayslip: () => {
+    return new Promise((resolve, reject) => {
+      const query = `
+        SELECT * FROM pay_slip
+      `;
+      db.query(query, (err, results) => {
+        if (err) return reject(err);
+        resolve(results);
+      });
+    });
+  },
+
   // ✅ Generate Payslip (NEW FUNCTION)
   generatePayslip: (
     employeeID,

@@ -1,4 +1,4 @@
-<?php 
+<?php  
 session_start();
 date_default_timezone_set("Asia/Manila");
 
@@ -9,6 +9,17 @@ if (!isset($_SESSION["user"])) {
 }
 
 $user = $_SESSION["user"];
+
+// ✅ Fetch payslip data from backend API
+$apiUrl = "http://localhost:8080/api/attendance/get/all/payslip";
+
+$response = @file_get_contents($apiUrl);
+$payslips = [];
+
+if ($response !== FALSE) {
+  $decoded = json_decode($response, true);
+  $payslips = $decoded["data"] ?? [];
+}
 ?>
 
 <!DOCTYPE html>
@@ -16,7 +27,7 @@ $user = $_SESSION["user"];
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Employee Database | AgriTime</title>
+  <title>Employee Payslip | AgriTime</title>
   <link rel="stylesheet" href="../../styles/generate.css">
 </head>
 
@@ -64,62 +75,63 @@ $user = $_SESSION["user"];
         </div>
       </header>
 
-            <section class="attendance-section">
-            <div class="report-header">
-                <div>
-                <h3>🌿 Payslip Overview</h3>
-                <p>Track all employee payslip data</p>
-                </div>
-                <button class="generate-btn">Generate Employee Payslip</button>
-            </div>
-            </section>
-
-        <div class="table-container">
-          <table id="employee-table">
-            <thead>
-              <tr>
-                <th onclick="sortTable(0)">Created At</th>
-                <th onclick="sortTable(1)">Start Date</th>
-                <th onclick="sortTable(2)">End Date</th>
-                <th onclick="sortTable(2)">Employee ID</th>
-                <th onclick="sortTable(2)">Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-                // Placeholder data
-                $employees = [
-                  ["October 15, 2025", "October 1, 2025", "October 14, 2025", "EMP-12321", "Approved"],
-                  ["October 15, 2025", "October 1, 2025", "October 14, 2025", "EMP-23323", "Declined"],
-                  ["October 15, 2025", "October 1, 2025", "October 14, 2025", "EMP-56565", "Approved"],
-                  ["October 15, 2025", "October 1, 2025", "October 14, 2025", "EMP-44586", "Declined"],
-                ];
-
-                foreach ($employees as $emp) {
-                  $roleName = $emp[3] == "1" ? "Employee" : "HR";
-                  echo "<tr>
-                          <td>{$emp[0]}</td>
-                          <td>{$emp[1]}</td>
-                          <td>{$emp[2]}</td>
-                          <td>{$emp[3]}</td>
-                          <td>{$emp[4]}</td>
-                          <td class='action-btns'>
-                            <button class='view-btn' onclick=\"openModal('view', '{$emp[0]}', '{$emp[1]}', '{$emp[2]}', '{$emp[3]}')\">View</button>
-                            <button class='edit-btn' onclick=\"openModal('edit', '{$emp[0]}', '{$emp[1]}', '{$emp[2]}', '{$emp[3]}')\">Edit</button>
-                            <button class='delete-btn' onclick=\"deleteEmployee('{$emp[0]}')\">Delete</button>
-                          </td>
-                        </tr>";
-                }
-              ?>
-            </tbody>
-          </table>
+      <section class="attendance-section">
+        <div class="report-header">
+          <div>
+            <h3>🌿 Payslip Overview</h3>
+            <p>Track all employee payslip data</p>
+          </div>
+          <button class="generate-btn">Generate Employee Payslip</button>
         </div>
       </section>
+
+      <div class="table-container">
+        <table id="employee-table">
+          <thead>
+            <tr>
+              <th onclick="sortTable(0)">Created At</th>
+              <th onclick="sortTable(1)">Start Date</th>
+              <th onclick="sortTable(2)">End Date</th>
+              <th onclick="sortTable(3)">Employee ID</th>
+              <th onclick="sortTable(4)">Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php if (!empty($payslips)): ?>
+              <?php foreach ($payslips as $p): ?>
+                <?php 
+                  $created = date("F d, Y", strtotime($p["created"]));
+                  $start = date("F d, Y", strtotime($p["startDate"]));
+                  $end = date("F d, Y", strtotime($p["endDate"]));
+                  $employeeID = htmlspecialchars($p["employeeID"]);
+                  $status = "Approved"; // You can modify if you have status field
+                ?>
+                <tr>
+                  <td><?= $created ?></td>
+                  <td><?= $start ?></td>
+                  <td><?= $end ?></td>
+                  <td><?= $employeeID ?></td>
+                  <td><?= $status ?></td>
+                  <td class="action-btns">
+                    <button class="view-btn" onclick="openModal('view', '<?= $employeeID ?>', '<?= $start ?>', '<?= $end ?>', '<?= $status ?>')">View</button>
+                    <button class="edit-btn" onclick="openModal('edit', '<?= $employeeID ?>', '<?= $start ?>', '<?= $end ?>', '<?= $status ?>')">Edit</button>
+                    <button class="delete-btn" onclick="deleteEmployee('<?= $employeeID ?>')">Delete</button>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <tr>
+                <td colspan="6" style="text-align:center;">No payslip data available.</td>
+              </tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <!-- ===== Modal ===== -->
+  <!-- ===== View/Edit Payslip Modal ===== -->
   <div id="employeeModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -128,27 +140,19 @@ $user = $_SESSION["user"];
       </div>
 
       <div class="modal-body">
-       <div class="profile-section">
+        <div class="profile-section">
           <img id="empProfilePic" src="../assets/user.jpg" alt="Profile Picture" width="100%">
         </div>
 
         <div class="form-grid">
           <input type="text" id="empID" placeholder="Employee ID" readonly>
-          <input type="text" id="empFName" placeholder="First Name">
-          <input type="text" id="empLName" placeholder="Last Name">
-          <input type="date" id="empDOB" placeholder="Date of Birth">
-          <input type="email" id="empEmail" placeholder="Email">
-          <input type="password" id="empPassword" placeholder="Password">
-          <input type="text" id="empContact" placeholder="Contact No">
-          <select id="empRole">
-            <option value="1">Employee</option>
-            <option value="2">HR</option>
-          </select>
-          <input type="text" id="empNationality" placeholder="Nationality">
-          <input type="text" id="empMarital" placeholder="Marital Status">
-          <input type="text" id="empEmergency" placeholder="Emergency Contact">
-          <input type="number" id="empBasic" placeholder="Basic Pay">
-          <input type="number" id="empAllowance" placeholder="Allowances">
+          <input type="text" id="empStartDate" placeholder="Start Date">
+          <input type="text" id="empEndDate" placeholder="End Date">
+          <input type="number" id="empTotalHours" placeholder="Total Hours">
+          <input type="number" id="empOvertime" placeholder="Overtime Hours">
+          <input type="number" id="empSSS" placeholder="SSS Deduction">
+          <input type="number" id="empPagibig" placeholder="Pag-ibig Deduction">
+          <input type="number" id="empPhilhealth" placeholder="PhilHealth Deduction">
         </div>
       </div>
 
@@ -158,28 +162,50 @@ $user = $_SESSION["user"];
     </div>
   </div>
 
+  <!-- ===== Generate Payslip Modal ===== -->
+  <div id="generateModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Generate Employee Payslip</h3>
+        <span class="close-btn" onclick="closeGenerateModal()">&times;</span>
+      </div>
+
+      <div class="modal-body">
+        <form id="generateForm" onsubmit="generatePayslip(event)">
+          <div class="form-grid">
+            <input type="text" id="genEmployeeID" placeholder="Employee ID" required>
+            <input type="date" id="genStartDate" placeholder="Start Date" required>
+            <input type="date" id="genEndDate" placeholder="End Date" required>
+            <input type="number" id="genSSS" placeholder="SSS Deduction" required>
+            <input type="number" id="genPagibig" placeholder="Pag-ibig Deduction" required>
+            <input type="number" id="genPhilhealth" placeholder="PhilHealth Deduction" required>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="save-btn">Generate Payslip</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script>
     let modal = document.getElementById("employeeModal");
     let saveBtn = document.getElementById("saveChanges");
 
-    function openModal(mode, id, fname, lname, role) {
+    function openModal(mode, id, start, end, status) {
       modal.style.display = "block";
       document.getElementById("empID").value = id;
-      document.getElementById("empFName").value = fname;
-      document.getElementById("empLName").value = lname;
-      document.getElementById("empRole").value = role;
+      document.getElementById("empStartDate").value = start;
+      document.getElementById("empEndDate").value = end;
 
       const isEdit = mode === "edit";
-      document.getElementById("modalTitle").innerText = isEdit ? "Edit Employee" : "View Employee";
+      document.getElementById("modalTitle").innerText = isEdit ? "Edit Payslip" : "View Payslip";
 
-      // Toggle readonly inputs
-      document.querySelectorAll('.form-grid input, .form-grid select').forEach(el => {
+      document.querySelectorAll('.form-grid input').forEach(el => {
         el.readOnly = !isEdit;
-        el.disabled = !isEdit;
       });
 
-      // Profile upload toggle
-      document.getElementById("empProfileUpload").style.display = isEdit ? "block" : "none";
       saveBtn.style.display = isEdit ? "inline-block" : "none";
     }
 
@@ -188,15 +214,60 @@ $user = $_SESSION["user"];
     }
 
     function deleteEmployee(id) {
-      if (confirm(`Are you sure you want to delete ${id}?`)) {
-        alert(`${id} deleted successfully (placeholder only).`);
+      if (confirm(`Are you sure you want to delete payslip for ${id}?`)) {
+        alert(`Payslip for ${id} deleted successfully (placeholder only).`);
       }
     }
 
-    window.onclick = function(event) {
-      if (event.target === modal) {
-        modal.style.display = "none";
+    // ===== Generate Payslip Modal Functions =====
+    const generateModal = document.getElementById("generateModal");
+
+    document.querySelector(".generate-btn").addEventListener("click", () => {
+      generateModal.style.display = "block";
+    });
+
+    function closeGenerateModal() {
+      generateModal.style.display = "none";
+    }
+
+    async function generatePayslip(event) {
+      event.preventDefault();
+
+      const data = {
+        employeeID: document.getElementById("genEmployeeID").value,
+        startDate: document.getElementById("genStartDate").value,
+        endDate: document.getElementById("genEndDate").value,
+        sssDeduction: parseFloat(document.getElementById("genSSS").value),
+        pagibigDeduction: parseFloat(document.getElementById("genPagibig").value),
+        philhealthDeduction: parseFloat(document.getElementById("genPhilhealth").value)
+      };
+
+      try {
+        const response = await fetch("http://localhost:8080/api/attendance/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          alert("✅ Payslip generated successfully!");
+          closeGenerateModal();
+          location.reload();
+        } else {
+          alert("❌ Failed to generate payslip: " + (result.message || "Unknown error"));
+        }
+      } catch (error) {
+        console.error("Error generating payslip:", error);
+        alert("⚠️ An error occurred while generating payslip.");
       }
+    }
+
+    // Close modals on outside click
+    window.onclick = function(event) {
+      if (event.target === modal) modal.style.display = "none";
+      if (event.target === generateModal) generateModal.style.display = "none";
     }
   </script>
 </body>
