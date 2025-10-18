@@ -29,9 +29,9 @@
         <i class="icon">📊</i>
         <a href="/admin/allusers">All Employees</a>
       </li>
-      <li class="<?php echo $currentPage == 'generatepayslip' ? 'active' : ''; ?>">
+      <li class="<?php echo $currentPage == 'payslipdata' ? 'active' : ''; ?>">
         <i class="icon">📃</i>
-        <a href="/admin/generatepayslip">Payslip Data</a>
+        <a href="/admin/payslipdata">Payslip Data</a>
       </li>
     
     </ul>

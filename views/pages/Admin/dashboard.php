@@ -279,10 +279,10 @@ $recentUsers = array_slice($recentUsers, 0, 5);
 
                      </div>
                         <div class="secretary-board">
-                        <img src="../assets/secretary.png" alt="Secretary" class="secretary-illustration">
+                        <img src="../assets/admin.png" alt="Secretary" class="secretary-illustration">
                         <div class="secretary-text">
-                          <h2>Week-Ends?</h2>
-                          <p>Manage schedules • Assist teams • Keep things running</p>
+                          <h2>Money-Money!</h2>
+                          <p>Time is Money</p>
                           <button class="secretary-btn">View Schedule</button>
                         </div>
                       </div>

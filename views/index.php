@@ -55,6 +55,9 @@ switch ($request) {
     case '/admin/allusers':
         require __DIR__ . '/pages/Admin/allusers.php';
         break;
+    case '/admin/payslipdata':
+        require __DIR__ . '/pages/Admin/payslipdata.php';
+        break;
   
     default:
         http_response_code(404);

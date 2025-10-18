@@ -7,7 +7,7 @@
 }
 
 body {
-  background: linear-gradient(135deg, #e8f5e9, #f5f9ff);
+  background: linear-gradient(135deg, #e9fbe8, #f7fff7);
   color: #333;
   overflow-x: hidden;
 }
@@ -21,7 +21,7 @@ body {
 /* ===== SIDEBAR ===== */
 #sidebar {
   width: 240px;
-  background: #1a8f3c;
+  background: linear-gradient(180deg, #2e7d32, #1b5e20);
   color: #fff;
   transition: all 0.3s ease;
 }
@@ -48,13 +48,11 @@ body {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #ddd;
-  background: #ffffffc7;
+  background: #ffffffb0;
   backdrop-filter: blur(8px);
-  border-radius: 10px;
   padding: 15px 25px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
@@ -65,6 +63,12 @@ body {
 
 .logo img {
   width: 45px;
+  border-radius: 6px;
+}
+
+.logo h2 {
+  color: #2e7d32;
+  font-weight: 600;
 }
 
 .user-profile {
@@ -75,10 +79,10 @@ body {
 }
 
 .user-profile img {
-  width: 55px;
-  height: 55px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  border: 2px solid #43a047;
+  border: 3px solid #43a047;
   object-fit: cover;
 }
 
@@ -92,7 +96,12 @@ body {
   font-size: 0.9rem;
 }
 
-/* ===== DASHBOARD SECTION ===== */
+.user-profile h3 {
+  font-size: 0.85rem;
+  color: #388e3c;
+}
+
+/* ===== DASHBOARD ===== */
 .dashboard {
   display: flex;
   flex-direction: column;
@@ -100,216 +109,11 @@ body {
   margin-top: 25px;
 }
 
-/* ===== STAT CARDS ===== */
-.middle-section {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 20px;
-}
-
-.employee-middleboard {
-  background: #fff;
-  border-radius: 15px;
-  padding: 25px;
-  text-align: center;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.employee-middleboard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
-}
-
-.employee-middleboard h4 {
-  color: #4CAF50;
-  font-size: 1rem;
-}
-
-.employee-middleboard h1 {
-  font-size: 2.2rem;
-  color: #2e7d32;
-  margin-top: 10px;
-}
-
-/* Payslip Card */
-.employee-middleboard .buttons {
-  margin-top: 10px;
-}
-
-.employee-middleboard .timein-btn {
-  background: #43a047;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.employee-middleboard .timein-btn:hover {
-  background: #2e7d32;
-}
-
-/* ===== BOTTOM SECTION ===== */
-.bottom-section {
-  display: grid;
-  grid-template-columns: 2fr 1.5fr 1fr;
-  gap: 25px;
-  flex-wrap: wrap;
-}
-
-/* ===== CALENDAR CARD ===== */
-.calendar-board {
-  background: white;
-  border-radius: 15px;
-  padding: 20px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-}
-
-.calendar h2 {
-  text-align: center;
-  color: #1a8f3c;
-  margin-bottom: 10px;
-}
-
-.calendar table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: center;
-}
-
-.calendar th,
-.calendar td {
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.calendar td.today {
-  background: #4CAF50;
-  color: white;
-  font-weight: bold;
-}
-
-/* ===== EMPLOYEE TIMING CARD ===== */
-.employee-infoTimedIn {
-  background: #fff;
-  border-radius: 15px;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-}
-
-.employee-board {
-  background: #e8f5e9;
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 15px;
-}
-
-.employee-board h4 {
-  color: #2e7d32;
-}
-
-.employee-board p {
-  color: #555;
-  margin-top: 5px;
-}
-
-/* ===== BUTTONS ===== */
-.buttons form {
-  display: inline-block;
-  margin: 5px;
-}
-
-.timein-btn,
-.timeout-btn,
-.break-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  color: white;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.timein-btn {
-  background: #4CAF50;
-}
-
-.timeout-btn {
-  background: #e53935;
-}
-
-.break-btn {
-  background: #ffb300;
-}
-
-.timein-btn:hover {
-  background: #388e3c;
-}
-
-.timeout-btn:hover {
-  background: #c62828;
-}
-
-.break-btn:hover {
-  background: #fb8c00;
-}
-
-/* ===== PROFILE PICTURE ===== */
-.profile-pic {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #4CAF50;
-  margin-bottom: 10px;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 992px) {
-  .bottom-section {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .header {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .user-profile {
-    flex-direction: column;
-  }
-
-  .middle-section {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (max-width: 500px) {
-  .middle-section {
-    grid-template-columns: 1fr;
-  }
-
-  .calendar table th,
-  .calendar table td {
-    padding: 5px;
-    font-size: 0.8rem;
-  }
-}
-
-/* 🌿 Summary Section */
+/* ===== SUMMARY SECTION ===== */
 .summary-section {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
-  margin-top: 30px;
 }
 
 .summary-card {
@@ -341,13 +145,13 @@ body {
 }
 
 .card-icon.late {
-  background: #fff3e0;
-  color: #ff8c00;
+  background: #fff8e1;
+  color: #ff9800;
 }
 
 .card-icon.payslip-icon {
-  background: #e3f2fd;
-  color: #0284c7;
+  background: #e0f7fa;
+  color: #0097a7;
 }
 
 .card-info h4 {
@@ -358,216 +162,32 @@ body {
 
 .card-info p {
   font-size: 14px;
-  color: #888;
+  color: #777;
   margin-bottom: 8px;
 }
 
 .card-info h2 {
-  font-size: 26px;
-  color: #16a34a;
-  margin-top: 8px;
-}
-
-/* 🌿 Download Button */
-.download-btn {
-  background: linear-gradient(135deg, #16a34a, #22c55e);
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 15px;
-  transition: background 0.2s ease;
-}
-
-.download-btn:hover {
-  background: linear-gradient(135deg, #15803d, #1ca64e);
-}
-
-/* 🌿 Responsive Behavior */
-@media (max-width: 768px) {
-  .summary-section {
-    grid-template-columns: 1fr;
-  }
-
-  .summary-card {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .card-icon {
-    margin-bottom: 10px;
-  }
-}
-
-
-/* ==== FARMER IMAGE ANIMATION ==== */
-
-.farmer-illustration {
-  width: 50%;
-
-  justify-content: center;
-  align-content: center;
-  transform: translateX(-50%);
-  animation: farmerFloat 4s ease-in-out infinite;
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
-  pointer-events: none;
-}
-
-
-.farmer-illustration:hover {
-  transform: scale(1.05) rotate(-3deg);
-}
-
-/* wallking float animation */
-@keyframes farmerFloat {
-  0% {
-    transform: translateX(0) translateY(0) rotate(0deg);
-  }
-
-  25% {
-    transform: translateX(-8px) translateY(-6px) rotate(-2deg);
-  }
-
-  50% {
-    transform: translateX(0) translateY(-10px) rotate(0deg);
-  }
-
-  75% {
-    transform: translateX(8px) translateY(-6px) rotate(2deg);
-  }
-
-  100% {
-    transform: translateX(0) translateY(0) rotate(0deg);
-  }
-}
-
-.workwork {
-  text-align: center;
-  color: #1a8f3c;
-  margin-bottom: 10px;
-}
-
-/* ==== SECRETARY CARD ==== */
-.secretary-board {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  margin: 20px auto;
-  padding: 20px;
-  width: 320px;
-
-  background: #ffffff;
-  /* card background */
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.secretary-board:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
-}
-
-/* image on top */
-.secretary-illustration {
-  width: 70%;
-  max-width: 220px;
-  height: auto;
-  object-fit: contain;
-  background: transparent;
-  border-radius: 12px;
-  animation: secretaryFloat 4s ease-in-out infinite;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
-  pointer-events: none;
-}
-
-@keyframes secretaryFloat {
-  0% {
-    transform: translateY(0);
-  }
-
-  25% {
-    transform: translateY(-6px);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
-
-  75% {
-    transform: translateY(-6px);
-  }
-
-  100% {
-    transform: translateY(0);
-  }
-}
-
-/* text under image */
-.secretary-text {
-  text-align: center;
-}
-
-.secretary-text h2 {
+  font-size: 28px;
   color: #2e7d32;
-  /* deep green */
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin-bottom: 6px;
 }
 
-.secretary-text p {
-  color: #558b2f;
-  /* medium green */
-  font-size: 0.9rem;
-  margin-bottom: 10px;
+/* ===== BOTTOM SECTION ===== */
+.bottom-section {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr;
+  gap: 25px;
+  flex-wrap: wrap;
 }
 
-/* button (green-yellow theme) */
-.secretary-btn {
-  background-color: #d4e157;
-  /* yellow-green */
-  color: #2e4600;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 3px 6px rgba(97, 128, 77, 0.12);
-  transition: transform 0.12s ease, background 0.12s ease;
-}
-
-.secretary-btn:hover {
-  background-color: #aed581;
-  transform: translateY(-2px);
-}
-.employees-board {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 25px 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.employees-board:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-}
-
+/* ===== TABLE & EMPLOYEES ===== */
 .employees h2 {
   font-size: 1.4rem;
-  font-weight: 600;
-  color: #222;
-  margin-bottom: 20px;
-  border-left: 4px solid #007bff;
+  color: #2e7d32;
+  border-left: 4px solid #43a047;
   padding-left: 10px;
+  margin-bottom: 15px;
 }
 
-/* 🔹 Table Styling */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -579,7 +199,8 @@ thead tr {
   border-bottom: 2px solid #e0e0e0;
 }
 
-th, td {
+th,
+td {
   padding: 12px 15px;
   text-align: left;
 }
@@ -589,7 +210,6 @@ th {
   color: #444;
   text-transform: uppercase;
   font-size: 0.85rem;
-  letter-spacing: 0.5px;
 }
 
 tbody tr {
@@ -598,35 +218,158 @@ tbody tr {
 }
 
 tbody tr:hover {
-  background-color: #f9fcff;
+  background-color: #f1f8e9;
 }
 
-td {
-  color: #333;
-}
-
-/* 🔹 No Data Message */
 .no-data {
   text-align: center;
-  padding: 20px 10px;
-  color: #888;
-  font-style: italic;
+  padding: 20px;
+  color: #777;
   background-color: #fafafa;
   border-radius: 8px;
 }
 
-/* 🔹 Responsive Design */
+/* ===== EMPLOYEE TIMED IN CARD ===== */
+.employee-infoTimedIn {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.employee-board {
+  background: #e8f5e9;
+  border-radius: 12px;
+  padding: 15px;
+}
+
+.employee-board h4 {
+  color: #2e7d32;
+}
+
+.employee-board p {
+  color: #555;
+  margin-top: 5px;
+}
+
+.profile-pic {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #4caf50;
+  margin-bottom: 10px;
+}
+
+/* ===== SECRETARY CARD ===== */
+.secretary-board {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.secretary-board:hover {
+  transform: translateY(-5px);
+}
+
+.secretary-illustration {
+  width: 70%;
+  max-width: 200px;
+  animation: float 4s ease-in-out infinite;
+}
+
+.secretary-text h2 {
+  color: #2e7d32;
+  font-size: 1.2rem;
+  margin-top: 10px;
+}
+
+.secretary-text p {
+  color: #558b2f;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.secretary-btn {
+  background: linear-gradient(135deg, #aeea00, #76ff03);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #2e4600;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.secretary-btn:hover {
+  background: linear-gradient(135deg, #9ccc65, #7cb342);
+  transform: translateY(-2px);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .bottom-section {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 @media (max-width: 768px) {
-  .employees-board {
-    padding: 15px;
+  .header {
+    flex-direction: column;
+    text-align: center;
   }
 
-  th, td {
+  .user-profile {
+    flex-direction: column;
+  }
+
+  .bottom-section {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-section {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-card {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+
+  .main-content {
     padding: 10px;
-    font-size: 0.9rem;
   }
 
-  .employees h2 {
+  .header h2 {
     font-size: 1.2rem;
+  }
+
+  table th,
+  table td {
+    font-size: 0.8rem;
+    padding: 8px;
   }
 }
