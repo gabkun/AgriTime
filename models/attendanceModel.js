@@ -23,6 +23,48 @@ const AttendanceModel = {
     });
   },
 
+  recordBreakIn: (employeeID) => {
+  const sql = `
+    INSERT INTO break_time (employeeID, time_break)
+    VALUES (?, NOW())
+  `;
+  return new Promise((resolve, reject) => {
+    db.query(sql, [employeeID], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+},
+
+getActiveBreak: (employeeID) => {
+  const sql = `
+    SELECT * FROM break_time 
+    WHERE employeeID = ? AND stop_break IS NULL 
+    ORDER BY id DESC LIMIT 1
+  `;
+  return new Promise((resolve, reject) => {
+    db.query(sql, [employeeID], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+},
+
+recordBreakOut: (employeeID) => {
+  const sql = `
+    UPDATE break_time
+    SET stop_break = NOW(),
+        duration = TIMEDIFF(NOW(), time_break)
+    WHERE employeeID = ? AND stop_break IS NULL
+  `;
+  return new Promise((resolve, reject) => {
+    db.query(sql, [employeeID], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+},
+
   // Insert new daily status
   insertDailyStatus: (employeeID, status) => {
     const query = "INSERT INTO daily_status (employeeID, attendance_status, timestamp) VALUES (?, ?, NOW())";

@@ -210,3 +210,22 @@ export const getRecentUsers = async (req, res) => {
     res.status(500).json({ message: "Error fetching recent users", error: err.message });
   }
 };
+
+export const getTotalEmployeesThisMonth = async (req, res) => {
+  try {
+    const total = await User.getTotalEmployeesThisMonth();
+    res.status(200).json({ totalEmployees: total.totalEmployees });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching total employees", error: err.message });
+  }
+};
+
+// ✅ Total HR this month (role = 2)
+export const getTotalHRThisMonth = async (req, res) => {
+  try {
+    const total = await User.getTotalHRThisMonth();
+    res.status(200).json({ totalHR: total.totalHR });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching total HR", error: err.message });
+  }
+};

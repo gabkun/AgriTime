@@ -153,6 +153,37 @@ getRecentUsers: () => {
   });
 },
 
+  getTotalEmployeesThisMonth: () => {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        SELECT COUNT(*) AS totalEmployees
+        FROM users
+        WHERE role = 1
+        AND MONTH(created_at) = MONTH(CURRENT_DATE())
+        AND YEAR(created_at) = YEAR(CURRENT_DATE())
+      `;
+      db.query(sql, (err, result) => {
+        if (err) return reject(err);
+        resolve(result[0]);
+      });
+    });
+  },
+
+    getTotalHRThisMonth: () => {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        SELECT COUNT(*) AS totalHR
+        FROM users
+        WHERE role = 2
+        AND MONTH(created_at) = MONTH(CURRENT_DATE())
+        AND YEAR(created_at) = YEAR(CURRENT_DATE())
+      `;
+      db.query(sql, (err, result) => {
+        if (err) return reject(err);
+        resolve(result[0]);
+      });
+    });
+  },
 
 };
 

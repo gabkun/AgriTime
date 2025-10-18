@@ -1,5 +1,6 @@
 import AttendanceModel from '../models/attendanceModel.js';
 import PDFDocument from "pdfkit";
+import path from "path";
 import fs from "fs";
 
 export const timein = async (req, res) => {
@@ -42,6 +43,82 @@ export const timein = async (req, res) => {
   } catch (err) {
     console.error("❌ Error during time in process:", err);
     return res.status(500).json({ message: 'Error during time in process' });
+  }
+};
+
+export const breaktime = async (req, res) => {
+  const { employeeID } = req.body;
+  if (!employeeID)
+    return res.status(400).json({ message: 'Employee ID is required' });
+
+  try {
+    console.log("📥 Incoming employeeID:", employeeID);
+
+    // ✅ Check if employee exists
+    const employeeExists = await AttendanceModel.checkEmployeeExists(employeeID);
+    if (employeeExists.length === 0) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    // ✅ Check if already break in today
+    const statusExists = await AttendanceModel.checkDailyStatus(employeeID);
+    if (statusExists.length > 0 && statusExists[0].attendance_status == 3) {
+      return res.status(400).json({ message: 'Already on break.' });
+    }
+
+    // ✅ Record break-in
+    await AttendanceModel.recordBreakIn(employeeID);
+    console.log("✅ Break-in recorded for employee:", employeeID);
+
+    // ✅ Update or insert daily status to 3 (On Break)
+    if (statusExists.length === 0) {
+      await AttendanceModel.insertDailyStatus(employeeID, 3);
+    } else {
+      await AttendanceModel.updateDailyStatus(employeeID, 3);
+    }
+
+    if (req.io) req.io.emit('attendanceUpdated');
+
+    return res.status(200).json({ message: 'Break-in recorded successfully' });
+  } catch (err) {
+    console.error("❌ Error during break-in process:", err);
+    return res.status(500).json({ message: 'Error during break-in process' });
+  }
+};
+
+export const breakout = async (req, res) => {
+  const { employeeID } = req.body;
+  if (!employeeID)
+    return res.status(400).json({ message: 'Employee ID is required' });
+
+  try {
+    console.log("📤 Incoming employeeID:", employeeID);
+
+    // ✅ Check if employee exists
+    const employeeExists = await AttendanceModel.checkEmployeeExists(employeeID);
+    if (employeeExists.length === 0) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    // ✅ Find latest break record with no stop_break
+    const breakRecord = await AttendanceModel.getActiveBreak(employeeID);
+    if (breakRecord.length === 0) {
+      return res.status(400).json({ message: 'No active break found.' });
+    }
+
+    // ✅ Record break-out
+    await AttendanceModel.recordBreakOut(employeeID);
+    console.log("✅ Break-out recorded for employee:", employeeID);
+
+    // ✅ Update daily status back to 1 (Active)
+    await AttendanceModel.updateDailyStatus(employeeID, 1);
+
+    if (req.io) req.io.emit('attendanceUpdated');
+
+    return res.status(200).json({ message: 'Break-out recorded successfully' });
+  } catch (err) {
+    console.error("❌ Error during break-out process:", err);
+    return res.status(500).json({ message: 'Error during break-out process' });
   }
 };
 
@@ -338,7 +415,7 @@ export const downloadPayslip = async (req, res) => {
   }
 
   try {
-    // 1️⃣ Get the latest payslip record using a helper model method
+    // 1️⃣ Get the latest payslip record
     const payslipRecords = await AttendanceModel.getLatestPayslip(employeeID);
 
     if (payslipRecords.length === 0) {
@@ -347,49 +424,125 @@ export const downloadPayslip = async (req, res) => {
 
     const payslip = payslipRecords[0];
 
-    // 2️⃣ Fetch user details using another model helper
+    // 2️⃣ Get employee info
     const user = await AttendanceModel.getEmployeeDetails(employeeID);
     if (!user) {
       return res.status(404).json({ message: "Employee not found." });
     }
 
-    // 3️⃣ Create PDF
+    // 3️⃣ Initialize PDF
     const doc = new PDFDocument({ margin: 50 });
     const fileName = `Payslip_${employeeID}_${Date.now()}.pdf`;
-    const filePath = `./uploads/${fileName}`;
+    const filePath = path.join("./uploads", fileName);
     const writeStream = fs.createWriteStream(filePath);
     doc.pipe(writeStream);
 
-    // HEADER
-    doc.fontSize(20).text("AgriTime Payroll Payslip", { align: "center" });
-    doc.moveDown();
+      // =============================
+      // HEADER WITH LOGO
+      // =============================
+      const logoPath = path.join("./uploads", "logo.jpg"); // adjust path to your actual logo
+      if (fs.existsSync(logoPath)) {
+        doc.image(logoPath, 60, 40, { width: 60 }); // (x, y, size)
+      }
 
+      // Move text beside logo
+      doc
+        .fillColor("#64A70B")
+        .fontSize(18)
+        .font("Helvetica-Bold")
+        .text("AgriTime Payroll Attendance System", 130, 55) // shift right
+        .moveDown(2);
+
+      // Company info under title
+      doc
+        .fillColor("black")
+        .fontSize(10)
+        .font("Helvetica")
+        .text("Company Name Here Corp", { align: "right" })
+        .text("Barangay Taculing, Bacolod City,", { align: "right" })
+        .text("Negros Occidental, 6000", { align: "right" })
+        .moveDown(2);
+
+    // =============================
     // EMPLOYEE INFO
-    doc.fontSize(12)
-      .text(`Employee ID: ${employeeID}`)
-      .text(`Employee Name: ${user.firstName} ${user.lastName}`)
-      .text(`Period Covered: ${payslip.startDate} to ${payslip.endDate}`)
-      .text(`Date Generated: ${payslip.created}`)
-      .moveDown();
+    // =============================
+        doc
+        .fontSize(11)
+        .font("Helvetica")
+        .text(`Employee Number: ${employeeID}`)
+        .text(`Employee Name: ${user.firstName} ${user.lastName}`)
+        .text(
+          `Period Covered: ${new Date(payslip.startDate).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+          })} to ${new Date(payslip.endDate).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+          })}`
+        )
+        .text(
+          `Date Generated: ${new Date(payslip.created).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+          })}`
+        )
+        .moveDown(1.5);
 
-    // SALARY DETAILS
-    doc.fontSize(14).text("EARNINGS", { underline: true });
-    doc.fontSize(12)
-      .text(`Basic Pay: ₱${user.basicPay}`)
-      .text(`Allowances: ₱${user.allowances}`)
-      .text(`Total Hours Worked: ${payslip.totalHours}`)
-      .text(`Overtime Hours: ${payslip.overtimeHours}`)
-      .moveDown();
+    // =============================
+    // EARNINGS & DEDUCTIONS HEADER
+    // =============================
+    doc
+      .rect(50, doc.y, 500, 20)
+      .fill("#64A70B")
+      .fillColor("white")
+      .fontSize(11)
+      .font("Helvetica-Bold")
+      .text("EARNINGS", 70, doc.y + 5)
+      .text("DEDUCTIONS", 350, doc.y + 5);
+    doc.moveDown(2);
+    doc.fillColor("black").font("Helvetica").fontSize(10);
 
-    // DEDUCTIONS
-    doc.fontSize(14).text("DEDUCTIONS", { underline: true });
-    doc.fontSize(12)
-      .text(`SSS Deduction: ₱${payslip.sssDeduction}`)
-      .text(`Pag-IBIG Deduction: ₱${payslip.pagibigDeduction}`)
-      .text(`PhilHealth Deduction: ₱${payslip.philhealthDeduction}`)
-      .moveDown();
+    // =============================
+    // DATA SECTION
+    // =============================
+    const earningsStartY = doc.y;
 
-    // COMPUTATIONS
+    const earnings = [
+      { label: "Basic Pay", value: `₱${user.basicPay}` },
+      { label: "Allowances", value: `₱${user.allowances}` },
+      { label: "Total Hours Worked", value: `${payslip.totalHours} hrs` },
+      { label: "Overtime Hours", value: `${payslip.overtimeHours} hrs` },
+    ];
+
+    const deductions = [
+      { label: "SSS Deduction", value: `₱${payslip.sssDeduction}` },
+      { label: "Pag-IBIG Deduction", value: `₱${payslip.pagibigDeduction}` },
+      { label: "PhilHealth Deduction", value: `₱${payslip.philhealthDeduction}` },
+    ];
+
+    const maxRows = Math.max(earnings.length, deductions.length);
+    const rowHeight = 18;
+
+    for (let i = 0; i < maxRows; i++) {
+      const y = earningsStartY + i * rowHeight;
+
+      if (earnings[i]) {
+        doc.text(earnings[i].label, 70, y);
+        doc.text(earnings[i].value, 200, y);
+      }
+
+      if (deductions[i]) {
+        doc.text(deductions[i].label, 350, y);
+        doc.text(deductions[i].value, 480, y);
+      }
+    }
+
+    // =============================
+    // COMPUTATION
+    // =============================
     const grossPay = Number(user.basicPay) + Number(user.allowances);
     const totalDeductions =
       Number(payslip.sssDeduction) +
@@ -397,27 +550,36 @@ export const downloadPayslip = async (req, res) => {
       Number(payslip.philhealthDeduction);
     const netPay = grossPay - totalDeductions;
 
-    doc.fontSize(14).text("SUMMARY", { underline: true });
-    doc.fontSize(12)
-      .text(`Gross Pay: ₱${grossPay.toFixed(2)}`)
-      .text(`Total Deductions: ₱${totalDeductions.toFixed(2)}`)
-      .text(`Net Pay: ₱${netPay.toFixed(2)}`)
-      .moveDown();
+    doc.moveDown(3);
+    doc.font("Helvetica-Bold").fontSize(11);
+    doc.text(`TOTAL EARNINGS: ₱${grossPay.toFixed(2)}`, 70);
+    doc.text(`TOTAL DEDUCTIONS: ₱${totalDeductions.toFixed(2)}`, 350);
+    doc.moveDown(1.5);
 
-    doc.text("This is a system-generated payslip. No signature required.", {
-      align: "center",
-    });
+    // NET PAY
+    doc
+      .fontSize(14)
+      .fillColor("#64A70B")
+      .text(`NET PAY: ₱${netPay.toFixed(2)}`, { align: "center" })
+      .fillColor("black")
+      .moveDown(3);
+
+    // FOOTER
+    doc
+      .fontSize(9)
+      .text("This is a system-generated payslip. No signature required.", {
+        align: "center",
+      });
 
     doc.end();
 
-    // 4️⃣ Send the file
+    // 4️⃣ Send PDF file
     writeStream.on("finish", () => {
       res.download(filePath, fileName, (err) => {
         if (err) console.error(err);
         fs.unlinkSync(filePath); // delete after sending
       });
     });
-
   } catch (err) {
     console.error("❌ Error generating payslip PDF:", err);
     res.status(500).json({ message: "Error generating PDF", error: err.message });

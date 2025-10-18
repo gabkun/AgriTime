@@ -11,7 +11,7 @@ if (!isset($_SESSION["user"])) {
 $user = $_SESSION["user"];
 
 // ✅ API Base URL
-$apiUrl = "http://localhost:8080/api/user/get/all";
+$apiUrl = "http://localhost:8080/api/user/";
 
 // ✅ Fetch all users
 $userResponse = @file_get_contents($apiUrl);
@@ -20,7 +20,10 @@ $employees = [];
 if ($userResponse !== FALSE) {
   $decoded = json_decode($userResponse, true);
   if (is_array($decoded)) {
-    $employees = $decoded;
+    // ✅ FRONTEND ROLE FILTER: Show only role 1 and 2
+    $employees = array_filter($decoded, function($emp) {
+      return isset($emp["role"]) && in_array($emp["role"], [1, 2]);
+    });
   }
 } else {
   $employees = [];
@@ -78,7 +81,15 @@ if ($userResponse !== FALSE) {
               <?php if (!empty($employees)): ?>
                 <?php foreach ($employees as $emp): ?>
                   <?php 
-                    $roleName = $emp["role"] == "2" ? "HR" : "Employee";
+                    // ✅ Determine role name
+                    if ($emp["role"] == "1") {
+                      $roleName = "Employee";
+                    } elseif ($emp["role"] == "2") {
+                      $roleName = "HR";
+                    } else {
+                      continue; // Skip roles not 1 or 2 (safety)
+                    }
+
                     $empID = htmlspecialchars($emp["employeeID"] ?? '');
                     $firstName = htmlspecialchars($emp["firstName"] ?? '');
                     $lastName = htmlspecialchars($emp["lastName"] ?? '');
@@ -98,14 +109,14 @@ if ($userResponse !== FALSE) {
                     <td><?= $lastName ?></td>
                     <td><?= $roleName ?></td>
                     <td class="action-btns">
-                     <button class="view-btn" onclick="openModal('view', '<?= $empID ?>', '<?= $firstName ?>', '<?= $lastName ?>', '<?= $role ?>',  '<?= $dob ?>',  '<?= $email  ?>',  '<?= $contactNo  ?>',  '<?= $nationality  ?>',  '<?= $maritalStatus  ?>', '<?= $basicPay  ?>', '<?= $allowances   ?>',)">View</button>
+                      <button class="view-btn" onclick="openModal('view', '<?= $empID ?>', '<?= $firstName ?>', '<?= $lastName ?>', '<?= $role ?>', '<?= $dob ?>', '<?= $email ?>', '<?= $contactNo ?>', '<?= $nationality ?>', '<?= $maritalStatus ?>', '<?= $basicPay ?>', '<?= $allowances ?>')">View</button>
                       <button class="edit-btn" onclick="openModal('edit', '<?= $empID ?>', '<?= $firstName ?>', '<?= $lastName ?>', '<?= $role ?>')">Edit</button>
                       <button class="delete-btn" onclick="deleteEmployee('<?= $empID ?>')">Delete</button>
                     </td>
                   </tr>
                 <?php endforeach; ?>
               <?php else: ?>
-                <tr><td colspan="5" style="text-align:center;">No employees found.</td></tr>
+                <tr><td colspan="5" style="text-align:center;">No employees found with role 1 or 2.</td></tr>
               <?php endif; ?>
             </tbody>
           </table>
@@ -114,7 +125,7 @@ if ($userResponse !== FALSE) {
     </div>
   </div>
 
-  <!-- ===== Modal Section (unchanged) ===== -->
+  <!-- ===== Modal Section ===== -->
   <?php include('employee_modal.php'); ?>
 
   <script>

@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { createUser, getAllUsers, getUserById, updateUser, deleteUser, facialLogin, updateSalaryInfo, getAllUserData, getRecentUsers } from '../controllers/UsersController.js';
+import { createUser, getAllUsers, getUserById, updateUser, deleteUser, facialLogin, updateSalaryInfo, getAllUserData, getRecentUsers, getTotalEmployeesThisMonth, getTotalHRThisMonth } from '../controllers/UsersController.js';
 
 const router = express.Router();
 
@@ -16,5 +16,7 @@ router.put('/:id', updateUser);
 router.put('/update-salary/user', updateSalaryInfo);
 router.get('/recent/users', getRecentUsers);
 router.delete('/:id', deleteUser);
+router.get('/total/employees', getTotalEmployeesThisMonth);
+router.get('/total/hr', getTotalHRThisMonth);
 
 export default router;
