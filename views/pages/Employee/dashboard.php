@@ -121,6 +121,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     }
+
+    // ✅ BREAK IN
+if (isset($_POST["break_in"])) {
+    $url = "$apiBaseUrl/breakin";
+    $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
+
+    if ($result === FALSE) {
+        echo "<script>alert('Redirecting to Dashboard.');</script>";
+    } else {
+        $response = json_decode($result, true);
+        $message = $response["message"] ?? "Unknown response";
+
+        if (strpos(strtolower($message), 'success') !== false) {
+            echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
+        } else {
+            echo "<script>alert('" . addslashes($message) . "');</script>";
+        }
+    }
+}
+
+      // ✅ BREAK OUT
+      if (isset($_POST["break_out"])) {
+          $url = "$apiBaseUrl/breakout";
+          $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
+
+          if ($result === FALSE) {
+              echo "<script>alert('Redirecting to Dashboard.');</script>";
+          } else {
+              $response = json_decode($result, true);
+              $message = $response["message"] ?? "Unknown response";
+
+              if (strpos(strtolower($message), 'success') !== false) {
+                  echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
+              } else {
+                  echo "<script>alert('" . addslashes($message) . "');</script>";
+              }
+          }
+      }
 }
 
 // ✅ Role Mapping
@@ -211,7 +249,7 @@ $dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
               <!-- Total Days Worked -->
                   <div class="summary-card">
                     <div class="card-icon total">
-                       <img src="../assets/cal.png" alt="cal" class="dashboard-icon">
+                      <i>📅</i>
                     </div>
                     <div class="card-info">
                       <h4>Total Days Worked</h4>
@@ -223,7 +261,7 @@ $dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
                   <!-- Late Count -->
                   <div class="summary-card">
                     <div class="card-icon late">
-                        <img src="../assets/clock.png" alt="clock" class="dashboard-icon">
+                      <i>⏰</i>
                     </div>
                     <div class="card-info">
                       <h4>Late Arrivals</h4>
@@ -235,7 +273,7 @@ $dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
                   <!-- Payslip Board -->
                   <div class="summary-card payslip">
                     <div class="card-icon payslip-icon">
-                       <img src="../assets/money.png" alt="money" class="dashboard-icon">
+                      <i>💵</i>
                     </div>
                     <div class="card-info">
                       <h4>Payslip Request</h4>
@@ -295,22 +333,34 @@ $dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
                          <img src="../assets/grit.jpg" alt="Employee" class="profile-pic">
                           <h4><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></h4>
                         
-                          <p>Employeefff ID: <?php echo htmlspecialchars($user['employeeID']); ?></p>
+                          <p>Employee ID: <?php echo htmlspecialchars($user['employeeID']); ?></p>
                           <h3><?php echo $currentTime; ?></h3>
                         </div>
                         
-                      <div class="buttons">
-                        <form method="POST" style="display:inline;">
-                          <button type="submit" name="time_in" class="timein-btn" <?php echo $timeInDisabled; ?>>Time-In</button>
-                        </form>
+                     <div class="buttons">  
+                <form method="POST" style="display:inline;">
+                  <button type="submit" name="time_in" class="timein-btn" <?php echo $timeInDisabled; ?>>Time-In</button>
+                </form>
 
-                        <form method="POST" style="display:inline;">
-                          <button type="submit" name="time_out" class="timeout-btn" <?php echo $timeOutDisabled; ?>>Time-Out</button>
-                        </form>
+                <form method="POST" style="display:inline;">
+                  <button type="submit" name="time_out" class="timeout-btn" <?php echo $timeOutDisabled; ?>>Time-Out</button>
+                </form>
 
-                        <button class="break-btn" <?php echo $breakDisabled; ?>>Break</button>
-                      </div>
-
+                <?php if ($dailyStatus == 1): ?>
+                  <!-- ✅ Show Break In if Timed In -->
+                  <form method="POST" style="display:inline;">
+                    <button type="submit" name="break_in" class="break-btn">Break In</button>
+                  </form>
+                <?php elseif ($dailyStatus == 3): ?>
+                  <!-- ✅ Show Break Out if On Break -->
+                  <form method="POST" style="display:inline;">
+                    <button type="submit" name="break_out" class="break-btn">Break Out</button>
+                  </form>
+                <?php else: ?>
+                  <!-- ✅ Default Disabled Button -->
+                  <button class="break-btn" disabled>Break</button>
+                <?php endif; ?>
+              </div>
                       <!-- ✅ Display Daily Status -->
                       <p style="margin-top:10px;">
                         <strong>Status Today:</strong>
