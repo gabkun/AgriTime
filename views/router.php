@@ -79,7 +79,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
           <title>Login - AgriTime Payroll Attendance System</title>
-
           <!-- Face API scripts -->
           <script defer src="js/face-api.min.js"></script>
           <script defer src="js/loadFaceDetection.js"></script>
@@ -90,8 +89,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
           <!-- LEFT: Facial Recognition -->
           <div class="left">
-            <h2 class="login-title">🌱 Login</h2>
-            <p class="login-subtext">Welcome Back<br>Pleasess Scan Face for Login</p>
+            <h2 class="login-title">Login</h2>
+            <p class="login-subtext">Welcome Back
+                <br>Pleasess Scan Face for Login 
+                </p>
 
 
             <div id="video-container">

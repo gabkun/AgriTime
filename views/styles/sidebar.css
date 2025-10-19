@@ -128,3 +128,9 @@
         display: block;
     }
 }
+
+.sidebar-icon {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+}

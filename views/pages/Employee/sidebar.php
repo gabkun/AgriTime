@@ -11,22 +11,22 @@
   <!-- ✅ Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-user">
-      <h3>🌿 AgriTime</h3>
+      <h3> AgriTime</h3>
       <p>Attendance System</p>
     </div>
 
     <ul class="nav-links">
       <?php $currentPage = basename($_SERVER['REQUEST_URI']); ?>
       <li class="<?php echo $currentPage == 'dashboard' ? 'active' : ''; ?>">
-        <i class="icon">🏠</i>
+         <i class="icon"><img src="../assets/house.png" alt="money" class="sidebar-icon"></i>
         <a href="/employee/dashboard">Dashboard</a>
       </li>
       <li class="<?php echo $currentPage == 'attendancereport' ? 'active' : ''; ?>">
-        <i class="icon">📊</i>
+        <i class="icon"><img src="../assets/summary.png" alt="money" class="sidebar-icon"></i>
         <a href="/employee/attendancereport">Attendance Report</a>
       </li>
       <li class="<?php echo $currentPage == 'myaccount' ? 'active' : ''; ?>">
-        <i class="icon">👤</i>
+          <i class="icon"><img src="../assets/bworker.png" alt="money" class="sidebar-icon"></i>
         <a href="/employee/myaccount">My Account</a>
       </li>
     </ul>

@@ -18,24 +18,24 @@
     <ul class="nav-links">
       <?php $currentPage = basename($_SERVER['REQUEST_URI']); ?>
       <li class="<?php echo $currentPage == 'dashboard' ? 'active' : ''; ?>">
-        <i class="icon">🏠</i>
+          <i class="icon"><img src="../assets/house.png" alt="money" class="sidebar-icon"></i>
         <a href="/hr/dashboard">Dashboard</a>
       </li>
       <li class="<?php echo $currentPage == 'employeedb' ? 'active' : ''; ?>">
-        <i class="icon">🧑‍🌾</i>
+       <i class="icon"><img src="../assets/people.png" alt="money" class="sidebar-icon"></i>
         <a href="/hr/employeedb">Employee Database</a>
       </li>
       <li class="<?php echo $currentPage == 'attendancereport' ? 'active' : ''; ?>">
-        <i class="icon">📊</i>
+      <i class="icon"><img src="../assets/summary.png" alt="money" class="sidebar-icon"></i>
         <a href="/hr/attendancereport">Attendance Report</a>
       </li>
       <li class="<?php echo $currentPage == 'generatepayslip' ? 'active' : ''; ?>">
-        <i class="icon">📃</i>
+          <i class="icon"><img src="../assets/payslip2.png" alt="money" class="sidebar-icon"></i>
         <a href="/hr/generatepayslip">Generate Employee Payslip</a>
       </li>
-      <li class="<?php echo $currentPage == 'myaccount' ? 'active' : ''; ?>">
-        <i class="icon">👤</i>
-        <a href="/hr/myaccount">My Account</a>
+      <li class="<?php echo $currentPage == 'hraccount' ? 'active' : ''; ?>">
+         <i class="icon"><img src="../assets/person.png" alt="money" class="sidebar-icon"></i>
+        <a href="/hr/hraccount">My Account</a>
       </li>
     </ul>
   </div>

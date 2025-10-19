@@ -36,8 +36,8 @@ switch ($request) {
         require __DIR__ . '/pages/HR/employeedb.php';
         break;        
 
-    case '/hr/myaccount':
-        require __DIR__ . '/pages/HR/myaccount.php';
+    case '/hr/hraccount':
+        require __DIR__ . '/pages/HR/hraccount.php';
         break;  
     
     case '/hr/generatepayslip':

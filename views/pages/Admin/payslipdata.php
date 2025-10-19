@@ -24,7 +24,7 @@
       <section class="attendance-section">
         <div class="report-header">
           <div>
-            <h3>💼 Employee Payslip Overview</h3>
+            <h3> Employee Payslip Overview</h3>
             <p>Manage and view all employees’ payslip records</p>
           </div>
 

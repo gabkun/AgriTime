@@ -373,3 +373,11 @@ tbody tr:hover {
     padding: 8px;
   }
 }
+
+.dashboard-icon {
+  width: 80px;
+  height: 80px;
+
+  object-fit: cover;
+  margin-bottom: 10px;
+}

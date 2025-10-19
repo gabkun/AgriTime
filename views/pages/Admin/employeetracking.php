@@ -82,7 +82,7 @@ if ($response !== FALSE) {
       <section class="attendance-section">
         <div class="report-header">
           <div>
-            <h3>🌿 Employee Daily Status Overview</h3>
+            <h3>Employee Daily Status Overview</h3>
             <p>Track all employees’ current attendance status</p>
           </div>
           <div class="filter-box">

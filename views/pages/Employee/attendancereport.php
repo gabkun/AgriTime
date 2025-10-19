@@ -83,7 +83,7 @@ if ($reportResponse !== FALSE) {
       <section class="attendance-section">
         <div class="report-header">
           <div>
-            <h3>🌿 Attendance Overview</h3>
+            <h3>Attendance Overview</h3>
             <p>Track employee daily attendance record</p>
           </div>
           <div class="filter-box">

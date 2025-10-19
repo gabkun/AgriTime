@@ -174,7 +174,7 @@ if ($dailyStatus === null) {
       <header class="header">
         <div class="logo">
       <img src="../assets/Agri.jpg" alt="Agri Logo" width="150">
-          <h2>AgriTime Payroll Attendance sssSystem</h2>
+          <h2>AgriTime Payroll Attendance System</h2>
         </div>
         <div class="user-profile">
                 <img src="../assets/grit.jpg" alt="Agri Logo" width="120">
@@ -191,7 +191,7 @@ if ($dailyStatus === null) {
               <!-- Total Days Worked -->
                   <div class="summary-card">
                     <div class="card-icon total">
-                      <i>📅</i>
+                        <img src="../assets/cal.png" alt="cal" class="dashboard-icon">
                     </div>
                     <div class="card-info">
                       <h4>Total Days Worked</h4>
@@ -203,7 +203,7 @@ if ($dailyStatus === null) {
                   <!-- Late Count -->
                   <div class="summary-card">
                     <div class="card-icon late">
-                      <i>⏰</i>
+                      <img src="../assets/clock.png" alt="clock" class="dashboard-icon">
                     </div>
                     <div class="card-info">
                       <h4>Late Arrivals</h4>
@@ -215,7 +215,7 @@ if ($dailyStatus === null) {
                   <!-- Payslip Board -->
                   <div class="summary-card payslip">
                     <div class="card-icon payslip-icon">
-                      <i>💵</i>
+                        <img src="../assets/money.png" alt="money" class="dashboard-icon">
                     </div>
                     <div class="card-info">
                       <h4>Payslip Request</h4>

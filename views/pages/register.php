@@ -118,7 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <div class="container">
   <div class="card">
     <div class="card-left">
-      <h1>🌱 AgriTime</h1>
+      <h1>AgriTime</h1>
       <p>Join our nature-driven attendance system.</p>
       <img src="assets/Agri.jpg" alt="Farm Illustration">
     </div>

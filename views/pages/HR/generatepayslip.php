@@ -78,7 +78,7 @@ if ($response !== FALSE) {
       <section class="attendance-section">
         <div class="report-header">
           <div>
-            <h3>🌿 Payslip Overview</h3>
+            <h3>Payslip Overview</h3>
             <p>Track all employee payslip data</p>
           </div>
           <button class="generate-btn">Generate Employee Payslip</button>

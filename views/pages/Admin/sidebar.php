@@ -11,26 +11,26 @@
   <!-- ✅ Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-user">
-      <h3>🌿 AgriTime</h3>
+      <h3>AgriTime</h3>
       <p>Attendance System</p>
     </div>
 
     <ul class="nav-links">
       <?php $currentPage = basename($_SERVER['REQUEST_URI']); ?>
       <li class="<?php echo $currentPage == 'dashboard' ? 'active' : ''; ?>">
-        <i class="icon">🏠</i>
+        <i class="icon"><img src="../assets/house.png" alt="money" class="sidebar-icon"></i>
         <a href="/admin/dashboard">Dashboard</a>
       </li>
       <li class="<?php echo $currentPage == 'employeetrack' ? 'active' : ''; ?>">
-        <i class="icon">🧑‍🌾</i>
+          <i class="icon"><img src="../assets/people.png" alt="money" class="sidebar-icon"></i>
         <a href="/admin/employeetrack">Employee Tracker</a>
       </li>
       <li class="<?php echo $currentPage == 'allusers' ? 'active' : ''; ?>">
-        <i class="icon">📊</i>
+       <i class="icon"><img src="../assets/pie-chart.png" alt="money" class="sidebar-icon"></i>
         <a href="/admin/allusers">All Employees</a>
       </li>
       <li class="<?php echo $currentPage == 'payslipdata' ? 'active' : ''; ?>">
-        <i class="icon">📃</i>
+        <i class="icon"><img src="../assets/payslip2.png" alt="money" class="sidebar-icon"></i>
         <a href="/admin/payslipdata">Payslip Data</a>
       </li>
     

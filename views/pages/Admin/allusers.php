@@ -44,7 +44,7 @@ if ($userResponse !== FALSE) {
       <header class="header">
         <div class="logo">
           <img src="../assets/Agri.jpg" alt="Agri Logo" width="150">
-          <h2>🌾 Employee Management</h2>
+          <h2> Employee Management</h2>
         </div>
         <div class="user-profile">
           <img src="../assets/grit.jpg" alt="User" width="50">
@@ -55,11 +55,11 @@ if ($userResponse !== FALSE) {
       <section class="attendance-section">
         <div class="report-header">
           <div>
-            <h3>🌿 Employee Overview</h3>
+            <h3> Employee Overview</h3>
             <p>Track, search, and manage employee data</p>
           </div>
           <div class="filter-box">
-            <input type="text" id="searchInput" placeholder="🔍 Search employee...">
+            <input type="text" id="searchInput" placeholder="Search employee...">
           </div>
         </div>
 

@@ -192,7 +192,7 @@ $recentUsers = array_slice($recentUsers, 0, 5);
               <!-- Total Days Worked -->
                   <div class="summary-card">
                     <div class="card-icon total">
-                      <i>📅</i>
+                       <img src="../assets/cal.png" alt="cal" class="dashboard-icon">
                     </div>
                     <div class="card-info">
                       <h4>Total Employees as of</h4>
@@ -204,7 +204,7 @@ $recentUsers = array_slice($recentUsers, 0, 5);
                   <!-- Late Count -->
                   <div class="summary-card">
                     <div class="card-icon late">
-                      <i>⏰</i>
+                      <img src="../assets/clock.png" alt="clock" class="dashboard-icon">
                     </div>
                     <div class="card-info">
                       <h4>Total HR as of</h4>
@@ -216,7 +216,7 @@ $recentUsers = array_slice($recentUsers, 0, 5);
                   <!-- Payslip Board -->
                   <div class="summary-card payslip">
                     <div class="card-icon payslip-icon">
-                      <i>💵</i>
+                         <img src="../assets/money.png" alt="money" class="dashboard-icon">
                     </div>
                     <div class="card-info">
                       <h4>Total Payslip Generated</h4>
@@ -271,8 +271,9 @@ $recentUsers = array_slice($recentUsers, 0, 5);
                          <img src="../assets/grit.jpg" alt="Employee" class="profile-pic">
                           <h4><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></h4>
                         
-                          <p>Employee ID: <?php echo htmlspecialchars($user['employeeID']); ?></p>
+                          <p>Admin ID: <?php echo htmlspecialchars($user['employeeID']); ?></p>
                           <h3><?php echo $currentTime; ?></h3>
+                          <img src="../assets/stat.png" alt="stat" class="dashboard-icon">
                         </div>
                         
 

@@ -125,7 +125,7 @@ $user = $_SESSION["user"];
         inputs.forEach(input => input.disabled = !isEditing);
         saveBtn.disabled = !isEditing;
 
-        editBtn.textContent = isEditing ? "🔒   Cancel Edit" : "✏️ Edit Profile";
+        editBtn.textContent = isEditing ? "🔒 Cancel Edit" : "✏️ Edit Profile";
         editBtn.style.backgroundColor = isEditing ? "#e53935" : "#66bb6a";
       });
     });
