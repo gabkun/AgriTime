@@ -252,7 +252,6 @@ if ($lateResponse !== FALSE) {
         <div class="logo">
       <img src="../assets/Agri.jpg" alt="Agri Logo" width="150">
           <h2>AgriTime Payroll Attendance System</h2>
-          <h2>AgriTime Payroll Attendance System</h2>
         </div>
         <div class="user-profile">
                 <img src="../assets/grit.jpg" alt="Agri Logo" width="120">
