@@ -1,9 +1,11 @@
 import express from 'express';
-import { timein, timeout, getDailyStatus, getDailyTimestamp, getAttendanceReport, generatePayslip, getAllDailyStatus, downloadPayslip, getAllpayslip   } from '../controllers/AttendanceControl.js';
+import { timein, timeout, breaktime, breakout, getDailyStatus, getDailyTimestamp, getAttendanceReport, generatePayslip, getAllDailyStatus, downloadPayslip, getAllpayslip   } from '../controllers/AttendanceControl.js';
 
 const router = express.Router();
 
 router.post('/timein', timein);
+router.post('/breakin', breaktime);
+router.post('/breakout', breakout);
 router.post('/timeout', timeout);
 router.get('/status/:employeeID', getDailyStatus);
 router.get("/timestamp/:employeeID", getDailyTimestamp);

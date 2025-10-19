@@ -11,12 +11,13 @@ if (!isset($_SESSION["user"])) {
 $user = $_SESSION["user"];
 $currentTime = date('g : i A');
 
-// ✅ API base URL
-$apiBaseUrl = "http://localhost:8080/api/attendance";
+// ✅ API base URLs
+$attendanceApi = "http://localhost:8080/api/attendance";
+$userApi = "http://localhost:8080/api/user";
 
 // ✅ Fetch Daily Status
 $employeeID = $user["employeeID"];
-$statusUrl = "$apiBaseUrl/status/$employeeID";
+$statusUrl = "$attendanceApi/status/$employeeID";
 
 $statusResponse = @file_get_contents($statusUrl);
 $dailyStatus = null;
@@ -28,7 +29,8 @@ if ($statusResponse !== FALSE) {
     $dailyStatus = null;
 }
 
-$timestampUrl = "$apiBaseUrl/status/$employeeID";
+// ✅ Fetch Timestamp
+$timestampUrl = "$attendanceApi/status/$employeeID";
 $timestampResponse = @file_get_contents($timestampUrl);
 $dailyTimestamp = null;
 
@@ -56,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // ✅ TIME IN
     if (isset($_POST["time_in"])) {
-        $url = "$apiBaseUrl/timein";
+        $url = "$attendanceApi/timein";
         $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
 
         if ($result === FALSE) {
@@ -75,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // ✅ TIME OUT
     if (isset($_POST["time_out"])) {
-        $url = "$apiBaseUrl/timeout";
+        $url = "$attendanceApi/timeout";
         $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
 
         if ($result === FALSE) {
@@ -130,7 +132,7 @@ $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 $dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
 // ✅ Fetch recent users
-$recentUsersUrl = "http://localhost:8080/api/user/recent/users";
+$recentUsersUrl = "$userApi/recent/users";
 $recentUsersResponse = @file_get_contents($recentUsersUrl);
 $recentUsers = [];
 
@@ -141,7 +143,28 @@ if ($recentUsersResponse !== FALSE) {
     }
 }
 $recentUsers = array_slice($recentUsers, 0, 5);
+
+// ✅ Fetch total employees this month
+$totalEmployeesUrl = "$userApi/total/employees";
+$totalEmployeesResponse = @file_get_contents($totalEmployeesUrl);
+$totalEmployees = 0;
+
+if ($totalEmployeesResponse !== FALSE) {
+    $decoded = json_decode($totalEmployeesResponse, true);
+    $totalEmployees = $decoded["totalEmployees"] ?? 0;
+}
+
+// ✅ Fetch total HR this month
+$totalHRUrl = "$userApi/total/hr";
+$totalHRResponse = @file_get_contents($totalHRUrl);
+$totalHR = 0;
+
+if ($totalHRResponse !== FALSE) {
+    $decoded = json_decode($totalHRResponse, true);
+    $totalHR = $decoded["totalHR"] ?? 0;
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -224,6 +247,7 @@ $recentUsers = array_slice($recentUsers, 0, 5);
                     </div>
                   </div>
                 </div>
+
 
  
                   <div class="bottom-section">

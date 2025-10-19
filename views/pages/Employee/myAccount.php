@@ -70,7 +70,12 @@ $user = $_SESSION["user"];
 
             <div class="form-group">
               <label>Shift Time</label>
-              <input type="text" name="shiftTime" value="<?php echo htmlspecialchars($user['shiftTime'] ?? ''); ?>" disabled>
+              <input 
+              type="text" 
+              name="shiftTime" 
+              value="<?php echo htmlspecialchars($user['shiftTime'] ?? '8:00AM - 5:00PM'); ?>" 
+              disabled
+            >
             </div>
           </div>
 
@@ -86,14 +91,16 @@ $user = $_SESSION["user"];
             </div>
           </div>
 
-          <div class="form-group address-box">
+          <!-- <div class="form-group address-box">
             <label>Address</label>
             <textarea name="address" disabled><?php echo htmlspecialchars($user['address'] ?? ''); ?></textarea>
-          </div>
+          </div> -->
 
           <div class="form-group">
             <label>Date Joined</label>
-            <input type="text" name="dateJoined" value="<?php echo htmlspecialchars($user['dateJoined'] ?? ''); ?>" readonly>
+        <input type="text" name="dateJoined" 
+          value="<?php echo htmlspecialchars(date('Y-m-d', strtotime($user['created_at'] ?? ''))); ?>" 
+          disabled>
           </div>
 
           <div class="form-buttons">

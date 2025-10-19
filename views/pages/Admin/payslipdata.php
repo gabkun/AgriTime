@@ -1,4 +1,32 @@
-<!DOCTYPE html>
+<?php 
+session_start();
+date_default_timezone_set("Asia/Manila");
+
+// ✅ Redirect if not logged in
+if (!isset($_SESSION["user"])) {
+  header("Location: /");
+  exit;
+}
+
+$user = $_SESSION["user"];
+
+// ✅ API Base URL
+$apiUrl = "http://localhost:8080/api/attendance/get/all/payslip";
+
+// ✅ Fetch all payslips
+$payslipResponse = @file_get_contents($apiUrl);
+$payslips = [];
+
+if ($payslipResponse !== FALSE) {
+  $decoded = json_decode($payslipResponse, true);
+  if (isset($decoded["data"]) && is_array($decoded["data"])) {
+    $payslips = $decoded["data"];
+  }
+} else {
+  $payslips = [];
+}
+?>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -55,72 +83,27 @@
               </tr>
             </thead>
             <tbody>
-              <!-- ✅ 5 Sample Records -->
-              <tr>
-                <td>1</td>
-                <td>EMP001</td>
-                <td>2025-10-01</td>
-                <td>2025-10-15</td>
-                <td>80</td>
-                <td>5</td>
-                <td>₱500.00</td>
-                <td>₱300.00</td>
-                <td>₱350.00</td>
-                <td>2025-10-16</td>
-                <td><button class="view-btn" onclick="viewPayslip('EMP001')"> View Payslip</button></td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>EMP002</td>
-                <td>2025-10-01</td>
-                <td>2025-10-15</td>
-                <td>82</td>
-                <td>2</td>
-                <td>₱480.00</td>
-                <td>₱300.00</td>
-                <td>₱320.00</td>
-                <td>2025-10-16</td>
-                <td><button class="view-btn" onclick="viewPayslip('EMP002')">View Payslip</button></td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>EMP003</td>
-                <td>2025-10-01</td>
-                <td>2025-10-15</td>
-                <td>76</td>
-                <td>3</td>
-                <td>₱450.00</td>
-                <td>₱280.00</td>
-                <td>₱310.00</td>
-                <td>2025-10-16</td>
-                <td><button class="view-btn" onclick="viewPayslip('EMP003')"> View Payslip</button></td>
-              </tr>
-              <tr>
-                <td>4</td>
-                <td>EMP004</td>
-                <td>2025-10-01</td>
-                <td>2025-10-15</td>
-                <td>88</td>
-                <td>6</td>
-                <td>₱520.00</td>
-                <td>₱310.00</td>
-                <td>₱360.00</td>
-                <td>2025-10-16</td>
-                <td><button class="view-btn" onclick="viewPayslip('EMP004')"> View Payslip</button></td>
-              </tr>
-              <tr>
-                <td>5</td>
-                <td>EMP005</td>
-                <td>2025-10-01</td>
-                <td>2025-10-15</td>
-                <td>79</td>
-                <td>4</td>
-                <td>₱500.00</td>
-                <td>₱290.00</td>
-                <td>₱340.00</td>
-                <td>2025-10-16</td>
-                <td><button class="view-btn" onclick="viewPayslip('EMP005')"> View Payslip</button></td>
-              </tr>
+              <?php if (!empty($payslips)): ?>
+                <?php foreach ($payslips as $p): ?>
+                  <tr>
+                    <td><?= htmlspecialchars($p["id"]) ?></td>
+                    <td><?= htmlspecialchars($p["employeeID"]) ?></td>
+                    <td><?= date("Y-m-d", strtotime($p["startDate"])) ?></td>
+                    <td><?= date("Y-m-d", strtotime($p["endDate"])) ?></td>
+                    <td><?= htmlspecialchars($p["totalHours"]) ?></td>
+                    <td><?= htmlspecialchars($p["overtimeHours"]) ?></td>
+                    <td>₱<?= number_format($p["sssDeduction"], 2) ?></td>
+                    <td>₱<?= number_format($p["pagibigDeduction"], 2) ?></td>
+                    <td>₱<?= number_format($p["philhealthDeduction"], 2) ?></td>
+                    <td><?= date("Y-m-d", strtotime($p["created"])) ?></td>
+                    <td><button class="view-btn" onclick="viewPayslip('<?= $p['employeeID'] ?>')">View Payslip</button></td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <tr>
+                  <td colspan="11" style="text-align:center;">No payslip records found.</td>
+                </tr>
+              <?php endif; ?>
             </tbody>
           </table>
         </div>
@@ -131,7 +114,7 @@
   <script>
     function viewPayslip(employeeID) {
       alert("Viewing payslip for: " + employeeID);
-      // Redirect or modal logic can go here
+      // You can add modal or redirect here:
       // window.location.href = "viewPayslip.php?id=" + encodeURIComponent(employeeID);
     }
 
