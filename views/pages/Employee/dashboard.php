@@ -196,6 +196,25 @@ $monthName = date('F');
 $firstDayOfWeek = date('w', strtotime("$year-$month-01"));
 $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
 $dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+$attendanceReportUrl = "$apiBaseUrl/report/" . urlencode($employeeID);
+$attendanceResponse = @file_get_contents($attendanceReportUrl);
+$totalDays = 0;
+
+if ($attendanceResponse !== FALSE) {
+    $decodedReport = json_decode($attendanceResponse, true);
+    $totalDays = $decodedReport["totalDays"] ?? 0;
+}
+
+// ✅ Fetch Late Report (Late Count)
+$lateReportUrl = "$apiBaseUrl/report/late/" . urlencode($employeeID);
+$lateResponse = @file_get_contents($lateReportUrl);
+$totalLateDays = 0;
+
+if ($lateResponse !== FALSE) {
+    $decodedLate = json_decode($lateResponse, true);
+    $totalLateDays = $decodedLate["totalLateDays"] ?? 0;
+}
 ?>
 
 
@@ -247,28 +266,28 @@ $dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
           <!--   Dashboard Summary Section -->
             <div class="summary-section">
               <!-- Total Days Worked -->
-                  <div class="summary-card">
-                    <div class="card-icon total">
-                      <i>📅</i>
-                    </div>
-                    <div class="card-info">
-                      <h4>Total Days Worked</h4>
-                      <p>This Month</p>
-                      <h2>10 Days</h2>
-                    </div>
+                <div class="summary-card">
+                  <div class="card-icon total">
+                    <i>📅</i>
                   </div>
+                  <div class="card-info">
+                    <h4>Total Days Worked</h4>
+                    <p>This Month</p>
+                    <h2><?php echo htmlspecialchars($totalDays); ?> Days</h2>
+                  </div>
+                </div>
 
-                  <!-- Late Count -->
-                  <div class="summary-card">
-                    <div class="card-icon late">
-                      <i>⏰</i>
-                    </div>
-                    <div class="card-info">
-                      <h4>Late Arrivals</h4>
-                      <p>This Month</p>
-                      <h2>2</h2>
-                    </div>
+                <!-- ✅ Late Count -->
+                <div class="summary-card">
+                  <div class="card-icon late">
+                    <i>⏰</i>
                   </div>
+                  <div class="card-info">
+                    <h4>Late Arrivals</h4>
+                    <p>This Month</p>
+                    <h2><?php echo htmlspecialchars($totalLateDays); ?></h2>
+                  </div>
+                </div>
 
                   <!-- Payslip Board -->
                   <div class="summary-card payslip">

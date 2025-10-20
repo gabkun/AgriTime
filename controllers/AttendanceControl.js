@@ -300,6 +300,61 @@ export const getAttendanceReport = async (req, res) => {
   }
 };
 
+export const getLateDaysReport = async (req, res) => {
+  const { employeeID } = req.params;
+
+  if (!employeeID) {
+    return res.status(400).json({ message: "Employee ID is required" });
+  }
+
+  try {
+    const report = await AttendanceModel.getAttendanceReport(employeeID);
+
+    if (!report || report.length === 0) {
+      return res.status(404).json({ message: "No attendance records found" });
+    }
+
+    // Set reference time for 8:00 AM Manila time
+    const lateThreshold = new Date();
+    lateThreshold.setHours(8, 0, 0, 0);
+
+    const lateRecords = [];
+
+    report.forEach((r) => {
+      if (!r.time_in) return;
+
+      const timeIn = new Date(r.time_in);
+      const timeInPH = new Date(timeIn.toLocaleString("en-US", { timeZone: "Asia/Manila" }));
+
+      // If employee timed in after 8:00 AM
+      if (timeInPH.getHours() > 8 || (timeInPH.getHours() === 8 && timeInPH.getMinutes() > 0)) {
+        lateRecords.push({
+          date: new Date(r.date).toLocaleDateString("en-PH", { timeZone: "Asia/Manila" }),
+          time_in: timeInPH.toLocaleTimeString("en-PH", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+            timeZone: "Asia/Manila",
+          }),
+        });
+      }
+    });
+
+    res.status(200).json({
+      employeeID,
+      totalLateDays: lateRecords.length,
+      lateRecords,
+    });
+  } catch (err) {
+    console.error("❌ Error generating late days report:", err);
+    res.status(500).json({
+      message: "Error generating late days report",
+      error: err.message,
+    });
+  }
+};
+
+
 export const generatePayslip = async (req, res) => {
   const { employeeID, startDate, endDate, sssDeduction, pagibigDeduction, philhealthDeduction } = req.body;
 
