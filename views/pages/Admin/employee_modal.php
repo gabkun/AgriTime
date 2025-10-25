@@ -167,7 +167,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["updateUser"])) {
 
   async function fetchEmployees() {
     try {
-      const res = await fetch("http://localhost:8080/api/user/get/all");
+      const res = await fetch("http://localhost:8080/api/user/");
       const data = await res.json();
       return data;
     } catch (err) {

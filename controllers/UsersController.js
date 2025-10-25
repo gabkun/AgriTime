@@ -83,11 +83,94 @@ export const createUser = async (req, res) => {
   }
 };
 
+export const updateEmployee = async (req, res) => {
+  try {
+    const {
+      id,
+      firstName,
+      lastName,
+      dob,
+      email,
+      password,
+      contactNo,
+      nationality,
+      maritalStatus,
+      emergencyContact
+    } = req.body;
+
+    // ✅ Check if user exists
+    const user = await User.getById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // ⚠️ Preserve restricted fields
+    const restrictedFields = {
+      employeeID: user.employeeID,
+      role: user.role,
+      status: user.status,
+      created_at: user.created_at
+    };
+
+    // ✅ Manage folder name and path
+    const oldFolderPath = path.join(process.cwd(), 'views', 'labels', user.lastName);
+    const folderName = lastName || user.lastName;
+    const folderPath = path.join(process.cwd(), 'views', 'labels', folderName);
+
+    // ✅ Rename or create folder if needed
+    if (lastName && lastName !== user.lastName) {
+      if (fs.existsSync(oldFolderPath)) {
+        fs.renameSync(oldFolderPath, folderPath);
+      } else {
+        fs.mkdirSync(folderPath, { recursive: true });
+      }
+    } else if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath, { recursive: true });
+    }
+
+    // ✅ Move uploaded files if any
+    if (req.files && req.files.length > 0) {
+      req.files.forEach((file) => {
+        const destinationPath = path.join(folderPath, file.originalname);
+        fs.renameSync(file.path, destinationPath);
+      });
+    }
+
+    // ✅ Prepare updated data
+    const updatedData = {
+      firstName: firstName || user.firstName,
+      lastName: lastName || user.lastName,
+      dob: dob || user.dob,
+      email: email || user.email,
+      password: password || user.password,
+      contactNo: contactNo || user.contactNo,
+      nationality: nationality || user.nationality,
+      maritalStatus: maritalStatus || user.maritalStatus,
+      emergencyContact: emergencyContact || user.emergencyContact,
+      profilePic: `views/labels/${folderName}`,
+      ...restrictedFields
+    };
+
+    // ✅ Update user
+    const result = await User.update(id, updatedData);
+
+    if (result) {
+      res.status(200).json({ message: 'User updated successfully' });
+    } else {
+      res.status(500).json({ message: 'Failed to update user' });
+    }
+
+  } catch (err) {
+    console.error('Error updating user:', err);
+    res.status(500).json({ message: 'Error updating user', error: err.message });
+  }
+};
+
 
 // Update user
 export const updateUser = async (req, res) => {
   try {
-    await User.update(req.params.id, req.body);
+    await User.updateByEmployeeID(req.params.employeeID, req.body);
     res.status(200).json({ message: 'User updated successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Error updating user', error: err.message });
@@ -171,7 +254,8 @@ export const facialLogin = async (req, res) => {
 
 export const updateSalaryInfo = async (req, res) => {
   try {
-    const { employeeID, basicPay, allowances } = req.body;
+    const { employeeID } = req.params;
+    const { basicPay, allowances } = req.body;
 
     if (!employeeID || basicPay == null || allowances == null) {
       return res.status(400).json({ message: "Employee ID, basic pay, and allowances are required" });

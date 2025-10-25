@@ -103,7 +103,7 @@ if ($userResponse !== FALSE) {
                     <td><?= $roleName ?></td>
                     <td class="action-btns">
                       <button class="view-btn" onclick="openModal('view', '<?= $empID ?>', '<?= $firstName ?>', '<?= $lastName ?>', '<?= $role ?>',  '<?= $dob ?>',  '<?= $email  ?>',  '<?= $contactNo  ?>',  '<?= $nationality  ?>',  '<?= $maritalStatus  ?>', '<?= $basicPay  ?>', '<?= $allowances   ?>',)">View</button>
-                      <button class="edit-btn" onclick="openModal('edit', '<?= $empID ?>', '<?= $firstName ?>', '<?= $lastName ?>', '<?= $role ?>')">Edit</button>
+                      <button class="edit-btn" onclick="openModal('edit',  '<?= $empID ?>', '<?= $firstName ?>', '<?= $lastName ?>', '<?= $role ?>',  '<?= $dob ?>',  '<?= $email  ?>',  '<?= $contactNo  ?>',  '<?= $nationality  ?>',  '<?= $maritalStatus  ?>', '<?= $basicPay  ?>', '<?= $allowances   ?>',)">Edit</button>
                       <button class="delete-btn" onclick="deleteEmployee('<?= $empID ?>')">Delete</button>
                     </td>
                   </tr>

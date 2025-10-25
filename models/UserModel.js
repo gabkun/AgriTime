@@ -95,6 +95,16 @@ updateSalaryByEmployeeID: (employeeID, data) => {
   });
 },
 
+updateByEmployeeID: (employeeID, data) => {
+  return new Promise((resolve, reject) => {
+    const query = "UPDATE users SET ? WHERE employeeID = ?";
+    db.query(query, [data, employeeID], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+},
+
 
 // ✅ Get all users including salary information (for admin view)
 getAllUserData: () => {

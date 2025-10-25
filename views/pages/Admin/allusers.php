@@ -20,10 +20,7 @@ $employees = [];
 if ($userResponse !== FALSE) {
   $decoded = json_decode($userResponse, true);
   if (is_array($decoded)) {
-    // ✅ FRONTEND ROLE FILTER: Show only role 1 and 2
-    $employees = array_filter($decoded, function($emp) {
-      return isset($emp["role"]) && in_array($emp["role"], [1, 2]);
-    });
+    $employees = $decoded;
   }
 } else {
   $employees = [];
@@ -36,7 +33,7 @@ if ($userResponse !== FALSE) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Employee Database | AgriTime</title>
-  <link rel="stylesheet" href="../../styles/allusers.css">
+  <link rel="stylesheet" href="../../styles/employeedb.css">
 </head>
 
 <body>
@@ -47,7 +44,7 @@ if ($userResponse !== FALSE) {
       <header class="header">
         <div class="logo">
           <img src="../assets/Agri.jpg" alt="Agri Logo" width="150">
-          <h2> Employee Management</h2>
+          <h2>Employee Management</h2>
         </div>
         <div class="user-profile">
           <img src="../assets/grit.jpg" alt="User" width="50">
@@ -62,7 +59,7 @@ if ($userResponse !== FALSE) {
             <p>Track, search, and manage employee data</p>
           </div>
           <div class="filter-box">
-            <input type="text" id="searchInput" placeholder="Search employee...">
+            <input type="text" id="searchInput" placeholder=" Search employee...">
           </div>
         </div>
 
@@ -78,45 +75,47 @@ if ($userResponse !== FALSE) {
               </tr>
             </thead>
             <tbody>
-              <?php if (!empty($employees)): ?>
-                <?php foreach ($employees as $emp): ?>
-                  <?php 
-                    // ✅ Determine role name
-                    if ($emp["role"] == "1") {
-                      $roleName = "Employee";
-                    } elseif ($emp["role"] == "2") {
-                      $roleName = "HR";
-                    } else {
-                      continue; // Skip roles not 1 or 2 (safety)
-                    }
+            <?php 
+            $hasEmployees = false; // track if any employees exist
+            if (!empty($employees)): 
+              foreach ($employees as $emp): 
+                // ✅ Show both role 1 and role 2
+                if ($emp["role"] != "1" && $emp["role"] != "2") continue;
 
-                    $empID = htmlspecialchars($emp["employeeID"] ?? '');
-                    $firstName = htmlspecialchars($emp["firstName"] ?? '');
-                    $lastName = htmlspecialchars($emp["lastName"] ?? '');
-                    $dob = htmlspecialchars($emp["dob"] ?? '');
-                    $email = htmlspecialchars($emp["email"] ?? '');
-                    $contactNo = htmlspecialchars($emp["contactNo"] ?? '');
-                    $nationality = htmlspecialchars($emp["nationality"] ?? '');
-                    $maritalStatus = htmlspecialchars($emp["maritalStatus"] ?? '');
-                    $emergencyContact = htmlspecialchars($emp["emergencyContact"] ?? '');
-                    $basicPay = htmlspecialchars($emp["basicPay"] ?? '');
-                    $allowances = htmlspecialchars($emp["allowances"] ?? '');
-                    $role = htmlspecialchars($emp["role"] ?? '');
-                  ?>
+                $hasEmployees = true;
+
+                $roleName = ($emp["role"] == "1") ? "Employee" : "Supervisor";
+                $empID = htmlspecialchars($emp["employeeID"] ?? '');
+                $firstName = htmlspecialchars($emp["firstName"] ?? '');
+                $lastName = htmlspecialchars($emp["lastName"] ?? '');
+                $dob = htmlspecialchars($emp["dob"] ?? '');
+                $email = htmlspecialchars($emp["email"] ?? '');
+                $contactNo = htmlspecialchars($emp["contactNo"] ?? '');
+                $nationality = htmlspecialchars($emp["nationality"] ?? '');
+                $maritalStatus = htmlspecialchars($emp["maritalStatus"] ?? '');
+                $emergencyContact = htmlspecialchars($emp["emergencyContact"] ?? '');
+                $basicPay = htmlspecialchars($emp["basicPay"] ?? '');
+                $allowances = htmlspecialchars($emp["allowances"] ?? '');
+                $role = htmlspecialchars($emp["role"] ?? '');
+            ?>
                   <tr>
                     <td><?= $empID ?></td>
                     <td><?= $firstName ?></td>
                     <td><?= $lastName ?></td>
                     <td><?= $roleName ?></td>
                     <td class="action-btns">
-                      <button class="view-btn" onclick="openModal('view', '<?= $empID ?>', '<?= $firstName ?>', '<?= $lastName ?>', '<?= $role ?>', '<?= $dob ?>', '<?= $email ?>', '<?= $contactNo ?>', '<?= $nationality ?>', '<?= $maritalStatus ?>', '<?= $basicPay ?>', '<?= $allowances ?>')">View</button>
-                      <button class="edit-btn" onclick="openModal('edit', '<?= $empID ?>', '<?= $firstName ?>', '<?= $lastName ?>', '<?= $role ?>')">Edit</button>
+                      <button class="view-btn" onclick="openModal('view', '<?= $empID ?>', '<?= $firstName ?>', '<?= $lastName ?>', '<?= $role ?>',  '<?= $dob ?>',  '<?= $email  ?>',  '<?= $contactNo  ?>',  '<?= $nationality  ?>',  '<?= $maritalStatus  ?>', '<?= $basicPay  ?>', '<?= $allowances   ?>',)">View</button>
+                      <button class="edit-btn" onclick="openModal('edit',  '<?= $empID ?>', '<?= $firstName ?>', '<?= $lastName ?>', '<?= $role ?>',  '<?= $dob ?>',  '<?= $email  ?>',  '<?= $contactNo  ?>',  '<?= $nationality  ?>',  '<?= $maritalStatus  ?>', '<?= $basicPay  ?>', '<?= $allowances   ?>',)">Edit</button>
                       <button class="delete-btn" onclick="deleteEmployee('<?= $empID ?>')">Delete</button>
                     </td>
                   </tr>
-                <?php endforeach; ?>
-              <?php else: ?>
-                <tr><td colspan="5" style="text-align:center;">No employees found with role 1 or 2.</td></tr>
+              <?php 
+                endforeach; 
+              endif;
+
+              // ✅ Show message if no employees with role = 1
+              if (!$hasEmployees): ?>
+                <tr><td colspan="5" style="text-align:center;">No employees with role 1 found.</td></tr>
               <?php endif; ?>
             </tbody>
           </table>
@@ -125,7 +124,7 @@ if ($userResponse !== FALSE) {
     </div>
   </div>
 
-  <!-- ===== Modal Section ===== -->
+  <!-- ===== Modal Section (unchanged) ===== -->
   <?php include('employee_modal.php'); ?>
 
   <script>
