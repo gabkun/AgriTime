@@ -260,6 +260,7 @@ if ($totalHRResponse !== FALSE) {
                                         <th>Employee ID</th>
                                         <th>First Name</th>
                                         <th>Last Name</th>
+                                        <th>ROLE</th>
                                         <th>Date Created</th>
                                     </tr>
                                 </thead>
@@ -270,6 +271,7 @@ if ($totalHRResponse !== FALSE) {
                                                 <td><?= htmlspecialchars($emp['employeeID'] ?? 'N/A') ?></td>
                                                 <td><?= htmlspecialchars($emp['firstName'] ?? '') ?></td>
                                                 <td><?= htmlspecialchars($emp['lastName'] ?? '') ?></td>
+                                                <td><?= htmlspecialchars($emp['role'] ?? '') ?></td>
                                                 <td>
                                                     <?php 
                                                         if (!empty($emp['created_at'])) {

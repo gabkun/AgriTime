@@ -153,7 +153,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["updateUser"])) {
         <div class="modal-footer">
           <button type="button" class="edit-btn" onclick="enableUserEdit()">✏️ Edit User</button>
           <button type="submit" name="updateUser" class="save-btn" id="saveUserBtn" style="display:none; background:#2196F3;">🔄 Update User</button>
-          <button type="button" class="edit-salary-btn" onclick="enableSalaryEdit()">💰 Edit Salary</button>
+          <button type="button" class="save-btn" onclick="enableSalaryEdit()">💰 Edit Salary</button>
           <button type="submit" name="updateSalary" class="save-btn" id="saveSalaryBtn" style="display:none; background:#4CAF50;">Save Salary</button>
           <button type="submit" name="deleteEmployee" class="delete-btn" id="deleteBtn" style="background:#f44336;">Delete Employee</button>
         </div>

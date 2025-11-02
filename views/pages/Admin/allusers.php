@@ -84,7 +84,7 @@ if ($userResponse !== FALSE) {
 
                 $hasEmployees = true;
 
-                $roleName = ($emp["role"] == "1") ? "Employee" : "Supervisor";
+                $roleName = ($emp["role"] == "1") ? "Employee" : "HR";
                 $empID = htmlspecialchars($emp["employeeID"] ?? '');
                 $firstName = htmlspecialchars($emp["firstName"] ?? '');
                 $lastName = htmlspecialchars($emp["lastName"] ?? '');
