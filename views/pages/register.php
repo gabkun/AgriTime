@@ -4,6 +4,7 @@ date_default_timezone_set("Asia/Manila");
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $firstName = $_POST["firstName"];
     $lastName = $_POST["lastName"];
+    $gender = $_POST["gender"];
     $dob = $_POST["dob"];
     $email = $_POST["email"];
     $password = $_POST["password"];
@@ -40,6 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fields = [
         "firstName" => $firstName,
         "lastName" => $lastName,
+         "gender" => $gender,
         "dob" => $dob,
         "email" => $email,
         "password" => $password,
@@ -151,6 +153,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <option value="2">HR</option>
             </select>
           </div>
+          <div>
+        <label>Gender</label>
+        <select name="gender" required>
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+</div>
         </div>
 
         <label>Email Address</label>
@@ -174,7 +184,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
         <input type="text" name="emergencyContact" placeholder="Emergency Contact" required>
-        <input type="text" name="employeeID" placeholder="Employee ID" required>
+<input type="text" name="employeeID" id="employeeID" placeholder="Employee ID" required readonly>
+
 
         <div class="camera-section">
           <h3>📸 Capture 5 Profile Photos</h3>
@@ -193,6 +204,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </body>
 </html>
     <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Generate random employee ID like EMP-19232
+        const randomNum = Math.floor(10000 + Math.random() * 90000); 
+        const empID = `EMP-${randomNum}`;
+        document.getElementById("employeeID").value = empID;
+      });
+        // Disable Register button after first click
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("form");
+    const registerBtn = document.querySelector(".register-btn");
+
+    form.addEventListener("submit", () => {
+      registerBtn.disabled = true;
+      registerBtn.textContent = "Registering...";
+    });
+  });
     document.addEventListener("DOMContentLoaded", () => {
       const video = document.getElementById("video");
       const captureBtn = document.getElementById("captureBtn");

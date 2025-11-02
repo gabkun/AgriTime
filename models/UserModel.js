@@ -24,6 +24,7 @@ const User = {
     const {
       firstName,
       lastName,
+      gender,
       dob,
       email,
       password,
@@ -39,12 +40,12 @@ const User = {
     return new Promise((resolve, reject) => {
     const sql = `
       INSERT INTO users 
-      (firstName, lastName, dob, email, password, contactNo, role, profilePic, nationality, maritalStatus, emergencyContact, employeeID, created_at, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), 1)
+      (firstName, lastName, gender, dob, email, password, contactNo, role, profilePic, nationality, maritalStatus, emergencyContact, employeeID, created_at, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), 1)
     `;
       db.query(
         sql,
-        [firstName, lastName, dob, email, password, contactNo, role, profilePic, nationality, maritalStatus, emergencyContact, employeeID],
+        [firstName, lastName, gender, dob, email, password, contactNo, role, profilePic, nationality, maritalStatus, emergencyContact, employeeID],
         (err, results) => {
           if (err) return reject(err);
           resolve(results.insertId);

@@ -29,6 +29,7 @@ export const createUser = async (req, res) => {
     const {
       firstName,
       lastName,
+      gender,
       dob,
       email,
       password,
@@ -64,6 +65,7 @@ export const createUser = async (req, res) => {
     const userId = await User.create({
       firstName,
       lastName,
+      gender,
       dob,
       email,
       password,

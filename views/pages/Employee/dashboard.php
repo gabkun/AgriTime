@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["download"])) {
     $pdfContent = @file_get_contents($downloadUrl, false, $context);
 
     if ($pdfContent === false) {
-        echo "<script>alert('Redirecting to Dashboard.');</script>";
+        echo "<script>alert('No payslip as of the moment');</script>";
     } else {
         file_put_contents($tempFile, $pdfContent);
 
