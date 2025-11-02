@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["download"])) {
     $pdfContent = @file_get_contents($downloadUrl, false, $context);
 
     if ($pdfContent === false) {
-        echo "<script>alert('Error downloading payslip. Please try again.');</script>";
+        echo "<script>alert('Redirecting to Dashboard.');</script>";
     } else {
         file_put_contents($tempFile, $pdfContent);
 
@@ -90,10 +90,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
 
         if ($result === FALSE) {
-            echo "<script>alert('Error connecting to server.');</script>";
+            echo "<script>alert('Redirecting to Dashboard.');</script>";
         } else {
             $response = json_decode($result, true);
-            $message = $response["message"] ?? "Unknown response";
+            $message = $response["message"] ?? "Redirecting to Dashboard";
 
             if (strpos(strtolower($message), 'success') !== false) {
                 echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
@@ -109,10 +109,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
 
         if ($result === FALSE) {
-            echo "<script>alert('Error connecting to server.');</script>";
+            echo "<script>alert('Redirecting to Dashboard.');</script>";
         } else {
             $response = json_decode($result, true);
-            $message = $response["message"] ?? "Unknown response";
+            $message = $response["message"] ?? "Redirecting to Dashboard";
 
             if (strpos(strtolower($message), 'success') !== false) {
                 echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
@@ -131,7 +131,7 @@ if (isset($_POST["break_in"])) {
         echo "<script>alert('Redirecting to Dashboard.');</script>";
     } else {
         $response = json_decode($result, true);
-        $message = $response["message"] ?? "Unknown response";
+        $message = $response["message"] ?? "Redirecting to Dashboard";
 
         if (strpos(strtolower($message), 'success') !== false) {
             echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
@@ -150,7 +150,7 @@ if (isset($_POST["break_in"])) {
               echo "<script>alert('Redirecting to Dashboard.');</script>";
           } else {
               $response = json_decode($result, true);
-              $message = $response["message"] ?? "Unknown response";
+              $message = $response["message"] ?? "Redirecting to Dashboard";
 
               if (strpos(strtolower($message), 'success') !== false) {
                   echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";

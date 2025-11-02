@@ -256,11 +256,11 @@ if ($response !== FALSE) {
           closeGenerateModal();
           location.reload();
         } else {
-          alert("❌ Failed to generate payslip: " + (result.message || "Unknown error"));
+          alert("❌ Failed to generate payslip: " + (result.message || "Redirecting to Dashboard"));
         }
       } catch (error) {
-        console.error("Error generating payslip:", error);
-        alert("⚠️ An error occurred while generating payslip.");
+        console.error("Redirecting to Payslip:", error);
+        alert("Redirecting to Payslip:");
       }
     }
 

@@ -101,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["updateUser"])) {
         $response = @file_get_contents($url, false, $context);
 
         if ($response === FALSE) {
-            echo "<script>alert('❌ Failed to connect to backend API.');</script>";
+            echo "<script>alert('Redirecting to Dashboard.');</script>";
         } else {
             $decoded = json_decode($response, true);
             echo "<script>console.log('📨 Backend response:', " . json_encode($response) . ");</script>";
@@ -110,8 +110,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["updateUser"])) {
                 echo "<script>alert('✅ User updated successfully!');</script>";
                 exit;
             } else {
-                $error = isset($decoded["message"]) ? $decoded["message"] : "Unknown error.";
-                echo "<script>alert('❌ Failed to update user: " . htmlspecialchars($error) . "');</script>";
+                $error = isset($decoded["message"]) ? $decoded["message"] : "Redirecting to Dashboard";
+                echo "<script>alert('Redirecting to Dashboard " . htmlspecialchars($error) . "');</script>";
             }
         }
     }

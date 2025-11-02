@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
 
         if ($result === FALSE) {
-            echo "<script>alert('Error connecting to server.');</script>";
+            echo "<script>alert('Redirecting to Dashboard.');</script>";
         } else {
             $response = json_decode($result, true);
             $message = $response["message"] ?? "Unknown response";

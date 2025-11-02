@@ -62,10 +62,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
 
         if ($result === FALSE) {
-            echo "<script>alert('⚠️ Error connecting to Time-In API');</script>";
+            echo "<script>alert('Redirecting to Dashboard');</script>";
         } else {
             $response = json_decode($result, true);
-            $message = $response["message"] ?? "Unknown response";
+            $message = $response["message"] ?? "Redirecting to Dashboard";
 
             if (strpos(strtolower($message), 'success') !== false) {
                 echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
@@ -81,10 +81,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
 
         if ($result === FALSE) {
-            echo "<script>alert('⚠️ Error connecting to Time-Out API');</script>";
+            echo "<script>alert('Redirecting to Dashboard');</script>";
         } else {
             $response = json_decode($result, true);
-            $message = $response["message"] ?? "Unknown response";
+            $message = $response["message"] ?? "Redirecting to Dashboard";
 
             if (strpos(strtolower($message), 'success') !== false) {
                 echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
