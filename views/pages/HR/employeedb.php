@@ -41,13 +41,13 @@ if ($userResponse !== FALSE) {
     <?php include('sidebar.php'); ?>
 
     <div class="main-content">
-      <header class="header">
+            <header class="header">
         <div class="logo">
           <img src="../assets/Agri.jpg" alt="Agri Logo" width="150">
           <h2>Employee Management</h2>
         </div>
         <div class="user-profile">
-          <img src="../assets/grit.jpg" alt="User" width="50">
+          <img src="../assets/user.png" alt="User" width="50">
           <span><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></span>
         </div>
       </header>

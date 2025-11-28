@@ -70,14 +70,26 @@ $user = $_SESSION["user"];
 
             <div class="form-group">
               <label>Shift Time</label>
-              <input type="text" name="shiftTime" value="<?php echo htmlspecialchars($user['shiftTime'] ?? ''); ?>" disabled>
+              <input type="text" name="shiftTime" value="<?php echo htmlspecialchars($user['shiftTime'] ?? '8:00AM-10:00AM'); ?>" disabled>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label>Role</label>
-              <input type="text" name="role" value="<?php echo htmlspecialchars($user['roleName'] ?? 'Employee'); ?>" readonly>
+              <?php
+              $roleName = '';
+              if (($user['role'] ?? '') == 2) {
+                  $roleName = 'HR';
+              } elseif (($user['role'] ?? '') == 3) {
+                  $roleName = 'Employee';
+              } else {
+                  $roleName = 'Unknown';
+              }
+              ?>
+
+<input type="text" name="role" value="<?php echo htmlspecialchars($roleName); ?>" readonly>
+
             </div>
 
             <div class="form-group">
@@ -88,12 +100,24 @@ $user = $_SESSION["user"];
 
           <div class="form-group address-box">
             <label>Address</label>
-            <textarea name="address" disabled><?php echo htmlspecialchars($user['address'] ?? ''); ?></textarea>
+            <textarea name="address" disabled><?php echo htmlspecialchars($user['address'] ?? 'Bacolod City, Negros Occidental'); ?></textarea>
           </div>
 
           <div class="form-group">
+            <?php
+              $rawDate = $user['created_at'] ?? '';
+
+              $formattedDate = '';
+              if (!empty($rawDate)) {
+                  // Convert ISO date to PHP timestamp
+                  $timestamp = strtotime($rawDate);
+
+                  // Format it: October 29, 2025
+                  $formattedDate = date("F d, Y", $timestamp);
+              }
+              ?>
             <label>Date Joined</label>
-            <input type="text" name="dateJoined" value="<?php echo htmlspecialchars($user['dateJoined'] ?? ''); ?>" readonly>
+           <input type="text" name="dateJoined" value="<?php echo htmlspecialchars($formattedDate); ?>" readonly>
           </div>
 
           <div class="form-buttons">

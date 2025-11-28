@@ -317,7 +317,7 @@ tr:hover {
 
 /* 🌿 NATURE HR DESIGN — FLAT COLORS */
 body {
-  background-color: #f4fbe2;
+  background-color: #f7f7f7;
   /* soft light green background */
   color: #355e3b;
   /* dark leafy green text */
@@ -326,7 +326,7 @@ body {
 
 /* Header */
 .header {
-  background-color: #cddc39;
+
   /* warm yellow-green */
   padding: 20px;
   border-radius: 12px;
