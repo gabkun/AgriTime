@@ -296,6 +296,28 @@ getEmployeeDetails: (employeeID) => {
     });
   });
 },
+// Get payslip by PRIMARY ID
+getPayslipById: (id) => {
+  return new Promise((resolve, reject) => {
+    db.query(
+      "SELECT * FROM pay_slip  WHERE id = ?",
+      [id],
+      (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+
+        // ✅ SAFETY CHECK
+        if (!result || result.length === 0) {
+          return resolve(null); // no data found
+        }
+
+        resolve(result[0]);
+      }
+    );
+  });
+},
+
 
 };
 

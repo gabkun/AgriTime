@@ -11,15 +11,13 @@ if (!isset($_SESSION["user"])) {
 $user = $_SESSION["user"];
 $employeeID = $user["employeeID"];
 
-// ✅ Handle profile update
+// ✅ Handle profile update via POST
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["updateProfile"])) {
   $firstName = $_POST["firstName"] ?? '';
   $lastName = $_POST["lastName"] ?? '';
   $birthday = $_POST["birthday"] ?? '';
   $gender = $_POST["gender"] ?? '';
   $phone = $_POST["phone"] ?? '';
-
-  echo "<script>console.log('🪪 Updating Employee ID:', " . json_encode($employeeID) . ");</script>";
 
   if (!$firstName || !$lastName) {
     echo "<script>alert('❌ Missing required fields.');</script>";
@@ -33,8 +31,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["updateProfile"])) {
       "gender" => $gender,
       "contactNo" => $phone
     ]);
-
-    echo "<script>console.log('📦 Payload:', " . json_encode($data) . ");</script>";
 
     $options = [
       "http" => [
@@ -52,9 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["updateProfile"])) {
       echo "<script>alert('❌ Failed to connect to backend API.');</script>";
     } else {
       $decoded = json_decode($response, true);
-      echo "<script>console.log('📨 Backend response:', " . json_encode($response) . ");</script>";
-
-      if (isset($decoded["message"]) && str_contains(strtolower($decoded["message"]), "success")) {
+      if (isset($decoded["message"]) && str_contains(strtolower($decoded["message"]), "updated")) {
         // ✅ Update session values
         $_SESSION["user"]["firstName"] = $firstName;
         $_SESSION["user"]["lastName"] = $lastName;
@@ -104,24 +98,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["updateProfile"])) {
           <div class="form-row">
             <div class="form-group">
               <label>First Name</label>
-              <input type="text" name="firstName" value="<?php echo htmlspecialchars($user['firstName']); ?>" readonly required>
+              <input type="text" name="firstName" value="<?php echo htmlspecialchars($user['firstName']); ?>" readonly class="editable" required>
             </div>
-
             <div class="form-group">
               <label>Last Name</label>
-              <input type="text" name="lastName" value="<?php echo htmlspecialchars($user['lastName']); ?>" readonly required>
+              <input type="text" name="lastName" value="<?php echo htmlspecialchars($user['lastName']); ?>" readonly class="editable" required>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label>Birthday</label>
-              <input type="date" name="birthday" value="<?php echo htmlspecialchars($user['dob'] ?? ''); ?>" readonly>
+              <input type="date" name="birthday" value="<?php echo htmlspecialchars($user['dob'] ?? ''); ?>" readonly class="editable">
             </div>
-
             <div class="form-group">
               <label>Gender</label>
-              <select name="gender" disabled>
+              <select name="gender" disabled class="editable">
                 <option value="Male" <?php if(($user['gender'] ?? '') == 'Male') echo 'selected'; ?>>Male</option>
                 <option value="Female" <?php if(($user['gender'] ?? '') == 'Female') echo 'selected'; ?>>Female</option>
               </select>
@@ -131,34 +123,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["updateProfile"])) {
           <div class="form-row">
             <div class="form-group">
               <label>Phone Number</label>
-              <input type="text" name="phone" value="<?php echo htmlspecialchars($user['contactNo'] ?? ''); ?>" readonly>
+              <input type="text" name="phone" value="<?php echo htmlspecialchars($user['contactNo'] ?? ''); ?>" readonly class="editable">
             </div>
-
             <div class="form-group">
               <label>Shift Time</label>
-              <input type="text" name="shiftTime" value="<?php echo htmlspecialchars($user['shiftTime'] ?? '8:00AM - 5:00PM'); ?>" readonly>
+              <input type="text" name="shiftTime" value="<?php echo htmlspecialchars($user['shiftTime'] ?? '8:00AM-10:00AM'); ?>" readonly>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label>Role</label>
-              <input type="text" name="role" value="<?php echo htmlspecialchars($user['roleName'] ?? 'Employee'); ?>" readonly>
+              <?php
+                $roleName = '';
+                if (($user['role'] ?? '') == 2) $roleName = 'HR';
+                elseif (($user['role'] ?? '') == 3) $roleName = 'Employee';
+                else $roleName = 'Unknown';
+              ?>
+              <input type="text" name="role" value="<?php echo htmlspecialchars($roleName); ?>" readonly>
             </div>
-
             <div class="form-group">
               <label>Branch</label>
               <input type="text" name="branch" value="<?php echo htmlspecialchars($user['branch'] ?? 'Main Branch'); ?>" readonly>
             </div>
           </div>
 
+          <div class="form-group address-box">
+            <label>Address</label>
+            <textarea name="address" readonly><?php echo htmlspecialchars($user['address'] ?? 'Bacolod City, Negros Occidental'); ?></textarea>
+          </div>
+
           <div class="form-group">
             <label>Date Joined</label>
-            <input type="text" name="dateJoined" value="<?php echo htmlspecialchars(date('Y-m-d', strtotime($user['created_at'] ?? ''))); ?>" readonly>
+            <input type="text" name="dateJoined" value="<?php echo !empty($user['created_at']) ? date('F d, Y', strtotime($user['created_at'])) : ''; ?>" readonly>
           </div>
 
           <div class="form-buttons">
-            <button type="button" class="save-btn" id="saveBtn" style="display:none;" name="updateProfile">💾 Save Changes</button>
+            <button type="button" class="save-btn" id="saveBtn" disabled>💾 Save Changes</button>
             <button type="submit" name="updateProfile" id="hiddenSubmit" style="display:none;"></button>
             <a href="dashboard" class="cancel-btn">← Back</a>
           </div>
@@ -172,25 +173,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["updateProfile"])) {
       const editBtn = document.getElementById("editBtn");
       const saveBtn = document.getElementById("saveBtn");
       const hiddenSubmit = document.getElementById("hiddenSubmit");
-      const inputs = document.querySelectorAll(
-        "input[name='firstName'], input[name='lastName'], input[name='birthday'], select[name='gender'], input[name='phone']"
-      );
+      const inputs = document.querySelectorAll(".editable");
 
+      // Save original values
+      const originalValues = {};
+      inputs.forEach(input => originalValues[input.name] = input.value);
+
+      // Toggle edit mode
       editBtn.addEventListener("click", () => {
         const isEditing = editBtn.classList.toggle("active");
 
         inputs.forEach(input => {
-          input.readOnly = !isEditing;
-          input.disabled = false;
+          input.disabled = !isEditing;
+          input.readOnly = false;
           input.style.border = isEditing ? "1px solid #2196F3" : "none";
           input.style.backgroundColor = isEditing ? "#fff" : "transparent";
         });
 
+        saveBtn.disabled = !isEditing;
         saveBtn.style.display = isEditing ? "inline-block" : "none";
         editBtn.textContent = isEditing ? "🔒 Cancel Edit" : "✏️ Edit Profile";
         editBtn.style.backgroundColor = isEditing ? "#e53935" : "#66bb6a";
 
-        if (isEditing) {
+        if (!isEditing) {
+          inputs.forEach(input => input.value = originalValues[input.name]);
+        } else {
           saveBtn.onclick = () => hiddenSubmit.click();
           alert("You can now edit your profile. Click 'Save Changes' to update.");
         }

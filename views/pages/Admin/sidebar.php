@@ -33,7 +33,10 @@
         <i class="icon"><img src="../assets/payslip2.png" alt="money" class="sidebar-icon"></i>
         <a href="/admin/payslipdata">Payslip Data</a>
       </li>
-    
+          <li>
+    <i class="icon"><img src="../assets/logout.png" alt="logout" class="sidebar-icon"></i>
+    <a href="/logout">Logout</a>
+</li>
     </ul>
   </div>
 

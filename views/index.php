@@ -58,6 +58,10 @@ switch ($request) {
     case '/admin/payslipdata':
         require __DIR__ . '/pages/Admin/payslipdata.php';
         break;
+
+    case '/logout':
+        require __DIR__ . '/pages/logout.php';
+        break;
   
     default:
         http_response_code(404);

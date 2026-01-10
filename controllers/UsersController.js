@@ -102,9 +102,7 @@ export const updateEmployee = async (req, res) => {
 
     // ✅ Check if user exists
     const user = await User.getById(id);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
     // ⚠️ Preserve restricted fields
     const restrictedFields = {
@@ -114,12 +112,11 @@ export const updateEmployee = async (req, res) => {
       created_at: user.created_at
     };
 
-    // ✅ Manage folder name and path
+    // ✅ Manage folder name and path (only if lastName changes)
+    const folderName = lastName && lastName !== user.lastName ? lastName : user.lastName;
     const oldFolderPath = path.join(process.cwd(), 'views', 'labels', user.lastName);
-    const folderName = lastName || user.lastName;
     const folderPath = path.join(process.cwd(), 'views', 'labels', folderName);
 
-    // ✅ Rename or create folder if needed
     if (lastName && lastName !== user.lastName) {
       if (fs.existsSync(oldFolderPath)) {
         fs.renameSync(oldFolderPath, folderPath);
@@ -132,39 +129,40 @@ export const updateEmployee = async (req, res) => {
 
     // ✅ Move uploaded files if any
     if (req.files && req.files.length > 0) {
-      req.files.forEach((file) => {
+      req.files.forEach(file => {
         const destinationPath = path.join(folderPath, file.originalname);
         fs.renameSync(file.path, destinationPath);
       });
     }
 
-    // ✅ Prepare updated data
+    // ✅ Build updated data dynamically: only overwrite fields that exist in req.body
     const updatedData = {
-      firstName: firstName || user.firstName,
-      lastName: lastName || user.lastName,
-      dob: dob || user.dob,
-      email: email || user.email,
-      password: password || user.password,
-      contactNo: contactNo || user.contactNo,
-      nationality: nationality || user.nationality,
-      maritalStatus: maritalStatus || user.maritalStatus,
-      emergencyContact: emergencyContact || user.emergencyContact,
+      ...user, // keep existing data
+      ...(firstName !== undefined && { firstName }),
+      ...(lastName !== undefined && { lastName }),
+      ...(dob !== undefined && { dob }),
+      ...(email !== undefined && { email }),
+      ...(password !== undefined && { password }),
+      ...(contactNo !== undefined && { contactNo }),
+      ...(nationality !== undefined && { nationality }),
+      ...(maritalStatus !== undefined && { maritalStatus }),
+      ...(emergencyContact !== undefined && { emergencyContact }),
       profilePic: `views/labels/${folderName}`,
-      ...restrictedFields
+      ...restrictedFields // make sure restricted fields stay intact
     };
 
     // ✅ Update user
     const result = await User.update(id, updatedData);
 
     if (result) {
-      res.status(200).json({ message: 'User updated successfully' });
+      return res.status(200).json({ message: 'User updated successfully' });
     } else {
-      res.status(500).json({ message: 'Failed to update user' });
+      return res.status(500).json({ message: 'Failed to update user' });
     }
 
   } catch (err) {
     console.error('Error updating user:', err);
-    res.status(500).json({ message: 'Error updating user', error: err.message });
+    return res.status(500).json({ message: 'Error updating user', error: err.message });
   }
 };
 
@@ -172,9 +170,19 @@ export const updateEmployee = async (req, res) => {
 // Update user
 export const updateUser = async (req, res) => {
   try {
-    await User.updateByEmployeeID(req.params.employeeID, req.body);
+    const allowedFields = ['firstName', 'lastName', 'dob', 'gender', 'contactNo'];
+    const dataToUpdate = {};
+
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        dataToUpdate[field] = req.body[field];
+      }
+    });
+
+    await User.updateByEmployeeID(req.params.employeeID, dataToUpdate);
     res.status(200).json({ message: 'User updated successfully' });
   } catch (err) {
+    console.error('Error updating user:', err);
     res.status(500).json({ message: 'Error updating user', error: err.message });
   }
 };

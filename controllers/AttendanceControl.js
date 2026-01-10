@@ -659,3 +659,164 @@ export const getAllpayslip = async (req, res) => {
     });
   }
 };
+
+export const downloadPayslipData = async (req, res) => {
+  const { id } = req.params; // ✅ PAYSLIP ID
+
+  if (!id) {
+    return res.status(400).json({ message: "Payslip ID is required" });
+  }
+
+  try {
+    // 1️⃣ Get payslip by ID
+    const payslip = await AttendanceModel.getPayslipById(id);
+
+    if (!payslip) {
+      return res.status(404).json({ message: "Payslip not found." });
+    }
+
+    // 2️⃣ Get employee info USING employeeID from payslip
+    const user = await AttendanceModel.getEmployeeDetails(payslip.employeeID);
+
+    if (!user) {
+      return res.status(404).json({ message: "Employee not found." });
+    }
+
+    // 3️⃣ Initialize PDF
+    const doc = new PDFDocument({ margin: 50 });
+    const fileName = `Payslip_${id}_${Date.now()}.pdf`;
+    const filePath = path.join("./uploads", fileName);
+    const writeStream = fs.createWriteStream(filePath);
+
+    doc.pipe(writeStream);
+
+    // =============================
+    // HEADER WITH LOGO
+    // =============================
+    const logoPath = path.join("./uploads", "logo.jpg");
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, 60, 40, { width: 60 });
+    }
+
+    doc
+      .fillColor("#64A70B")
+      .fontSize(18)
+      .font("Helvetica-Bold")
+      .text("AgriTime Payroll Attendance System ADMIN COPY", 130, 55)
+      .moveDown(2);
+
+    doc
+      .fillColor("black")
+      .fontSize(10)
+      .font("Helvetica")
+      .text("Company Name Here Corp", { align: "right" })
+      .text("Barangay Taculing, Bacolod City", { align: "right" })
+      .text("Negros Occidental, 6000", { align: "right" })
+      .moveDown(2);
+
+    // =============================
+    // EMPLOYEE INFO
+    // =============================
+    doc
+      .fontSize(11)
+      .text(`Employee ID: ${payslip.employeeID}`)
+      .text(`Employee Name: ${user.firstName} ${user.lastName}`)
+      .text(
+        `Period Covered: ${new Date(payslip.startDate).toLocaleDateString()} 
+        to ${new Date(payslip.endDate).toLocaleDateString()}`
+      )
+      .text(`Date Generated: ${new Date(payslip.created).toLocaleDateString()}`)
+      .moveDown(1.5);
+
+    // =============================
+    // EARNINGS & DEDUCTIONS HEADER
+    // =============================
+    doc
+      .rect(50, doc.y, 500, 20)
+      .fill("#64A70B")
+      .fillColor("white")
+      .fontSize(11)
+      .font("Helvetica-Bold")
+      .text("EARNINGS", 70, doc.y + 5)
+      .text("DEDUCTIONS", 350, doc.y + 5);
+
+    doc.moveDown(2);
+    doc.fillColor("black").font("Helvetica").fontSize(10);
+
+    // =============================
+    // DATA
+    // =============================
+    const earnings = [
+      { label: "Basic Pay", value: `PHP ${user.basicPay}` },
+      { label: "Allowances", value: `PHP ${user.allowances}` },
+      { label: "Total Hours Worked", value: `${payslip.totalHours} hrs` },
+      { label: "Overtime Hours", value: `${payslip.overtimeHours} hrs` },
+    ];
+
+    const deductions = [
+      { label: "SSS Deduction", value: `PHP ${payslip.sssDeduction}` },
+      { label: "Pag-IBIG Deduction", value: `PHP ${payslip.pagibigDeduction}` },
+      { label: "PhilHealth Deduction", value: `PHP ${payslip.philhealthDeduction}` },
+    ];
+
+    const startY = doc.y;
+    const rowHeight = 18;
+
+    for (let i = 0; i < Math.max(earnings.length, deductions.length); i++) {
+      const y = startY + i * rowHeight;
+
+      if (earnings[i]) {
+        doc.text(earnings[i].label, 70, y);
+        doc.text(earnings[i].value, 200, y);
+      }
+
+      if (deductions[i]) {
+        doc.text(deductions[i].label, 350, y);
+        doc.text(deductions[i].value, 480, y);
+      }
+    }
+
+    // =============================
+    // TOTALS
+    // =============================
+    const grossPay = Number(user.basicPay) + Number(user.allowances);
+    const totalDeductions =
+      Number(payslip.sssDeduction) +
+      Number(payslip.pagibigDeduction) +
+      Number(payslip.philhealthDeduction);
+
+    const netPay = grossPay - totalDeductions;
+
+    doc.moveDown(3);
+    doc.font("Helvetica-Bold").fontSize(11);
+    doc.text(`TOTAL EARNINGS: PHP ${grossPay.toFixed(2)}`, 70);
+    doc.text(`TOTAL DEDUCTIONS: PHP ${totalDeductions.toFixed(2)}`, 350);
+
+    doc
+      .moveDown(1.5)
+      .fontSize(14)
+      .fillColor("#64A70B")
+      .text(`NET PAY: PHP ${netPay.toFixed(2)}`, { align: "center" })
+      .fillColor("black")
+      .moveDown(3);
+
+    doc
+      .fontSize(9)
+      .text("This is a system-generated payslip. No signature required.", {
+        align: "center",
+      });
+
+    doc.end();
+
+    // 4️⃣ Download
+    writeStream.on("finish", () => {
+      res.download(filePath, fileName, () => {
+        fs.unlinkSync(filePath);
+      });
+    });
+
+  } catch (err) {
+    console.error("❌ Error generating payslip:", err);
+    res.status(500).json({ message: "Error generating payslip" });
+  }
+};
