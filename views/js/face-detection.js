@@ -27,7 +27,7 @@ function getLabeledFaceDescriptions() {
         labels.map(async (label) => {
             const descriptions = [];
             // Load two images per label
-            for (let i = 1; i <= 5; i++) {
+            for (let i = 1; i <= 4; i++) {
                 const img = await faceapi.fetchImage(`labels/${label}/${i}.jpg`);
                 const detections = await faceapi
                     .detectSingleFace(img)

@@ -176,14 +176,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         detectionCounts[label] = (detectionCounts[label] || 0) + 1;
 
         // Calculate percentage based on 100 detections target
-        const progress = Math.min((detectionCounts[label] / 100) * 100, 100);
+        const progress = Math.min((detectionCounts[label] / 2) * 100, 100);
         progressBar.style.width = progress + "%";
         progressText.innerText = Math.floor(progress) + "%";
 
         // ✅ Optional funny status text update
-        if (progress < 30) progressText.innerText = "Scanning face 😎 (" + Math.floor(progress) + "%)";
-        else if (progress < 60) progressText.innerText = "Hold still 😁 (" + Math.floor(progress) + "%)";
-        else if (progress < 90) progressText.innerText = "Almost there 🤓 (" + Math.floor(progress) + "%)";
+        if (progress < 10) progressText.innerText = "Scanning face 😎 (" + Math.floor(progress) + "%)";
         else progressText.innerText = "Perfect match detected 😍 (" + Math.floor(progress) + "%)";
 
         console.log(`Detected: ${label} (${detectionCounts[label]}x)`);
@@ -196,7 +194,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           document.getElementById("scanBtn").style.display = "none";
           const feedback = document.getElementById("login-feedback");
           const messageEl = document.getElementById("welcome-message");
-          let countdown = 5;
+          let countdown = 1;
 
           feedback.style.display = "flex";
           document.getElementById("faceImage").value = label;
@@ -209,12 +207,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           const intervalId = setInterval(() => {
             countdown--;
             if (countdown > 0) {
-              messageEl.textContent = `Welcome back, ${label}! Logging you in ${countdown}...`;
+              messageEl.textContent = `Welcome back, ${label}! Logging you in ...`;
             } else {
               clearInterval(intervalId);
               document.getElementById("faceForm").submit();
             }
-          }, 1000);
+          }, 100);
         }
       },
     });

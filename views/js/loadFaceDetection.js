@@ -2,6 +2,7 @@ async function loadFaceDetection(videoElement, labels, options = {}) {
     const modelsPath = options.modelsPath || "models";
     const imagesPath = options.imagesPath || "labels";
     const onDetect = options.onDetect || (() => { });
+    const detectionInterval = options.detectionInterval || 20; 
 
     // 🔹 Loading overlay
     const loadingDiv = document.createElement("div");
@@ -61,7 +62,7 @@ async function loadFaceDetection(videoElement, labels, options = {}) {
         const labeledFaceDescriptors = await getLabeledFaceDescriptions();
         loadingDiv.remove();
 
-        const matcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
+        const matcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6); // Add lower threshold for faster matching
 
         // ✅ Ensure container exists
         const container = document.getElementById("video-container");
@@ -93,24 +94,17 @@ async function loadFaceDetection(videoElement, labels, options = {}) {
         // 🔹 Start face detection
         setInterval(async () => {
             const detections = await faceapi
-                .detectAllFaces(videoElement)
+                .detectSingleFace(videoElement) // Changed from detectAllFaces to detectSingleFace for speed
                 .withFaceLandmarks()
-                .withFaceDescriptors();
+                .withFaceDescriptor();
 
-            const displaySize = {
-                width: videoElement.videoWidth,
-                height: videoElement.videoHeight,
-            };
-            faceapi.matchDimensions(canvas, displaySize);
-
-            const resized = faceapi.resizeResults(detections, displaySize);
             const ctx = canvas.getContext("2d");
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            resized.forEach((result) => {
-                const bestMatch = matcher.findBestMatch(result.descriptor);
+            if (detections) { // Changed forEach to if statement since we detect only one face
+                const bestMatch = matcher.findBestMatch(detections.descriptor);
                 const label = bestMatch.label;
-                const drawBox = new faceapi.draw.DrawBox(result.detection.box, {
+                const drawBox = new faceapi.draw.DrawBox(detections.detection.box, {
                     label: label !== "unknown" ? label : "Unknown 🤨",
                     boxColor: label !== "unknown" ? "#00e676" : "#ff1744",
                     lineWidth: 3,
@@ -118,9 +112,9 @@ async function loadFaceDetection(videoElement, labels, options = {}) {
                 drawBox.draw(canvas);
 
                 if (label !== "unknown") {
-                    onDetect(label, result.detection);
+                    onDetect(label, detections.detection);
                 }
-            });
-        }, 100);
+            }
+        }, detectionInterval); // Use variable interval instead of hardcoded 100
     });
 }
