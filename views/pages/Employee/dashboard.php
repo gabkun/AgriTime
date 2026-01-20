@@ -59,6 +59,32 @@ if ($statusResponse !== FALSE) {
     $dailyStatus = $decoded["attendance_status"] ?? null;
 }
 
+// ✅ AUTO TIME-IN (NO BUTTON CLICK)
+if ($dailyStatus === null) {
+    $employeeID = $user["employeeID"];
+    $url = "$apiBaseUrl/timein";
+
+    $options = [
+        "http" => [
+            "header"  => "Content-Type: application/x-www-form-urlencoded\r\n",
+            "method"  => "POST",
+            "content" => http_build_query([
+                "employeeID" => $employeeID
+            ])
+        ]
+    ];
+
+    $context = stream_context_create($options);
+    $result = @file_get_contents($url, false, $context);
+
+    if ($result !== FALSE) {
+        // Reload page to update status
+        echo "<script>window.location.reload();</script>";
+        exit;
+    }
+}
+
+
 $timestampResponse = @file_get_contents($statusUrl);
 $dailyTimestamp = null;
 

@@ -22,8 +22,6 @@ $attendanceData = [];
 if ($reportResponse !== FALSE) {
     $decoded = json_decode($reportResponse, true);
     $attendanceData = $decoded["records"] ?? [];
-} else {
-    $attendanceData = [];
 }
 ?>
 
@@ -54,77 +52,97 @@ if ($reportResponse !== FALSE) {
     let table = document.getElementById("attendance-table");
     let rows = Array.from(table.rows).slice(1);
     let asc = table.dataset.sortOrder !== "asc";
+
     rows.sort((a, b) => {
-      let x = a.cells[n].innerText;
-      let y = b.cells[n].innerText;
+      let x = a.cells[n].innerText.toLowerCase();
+      let y = b.cells[n].innerText.toLowerCase();
       return asc ? x.localeCompare(y) : y.localeCompare(x);
     });
+
     table.dataset.sortOrder = asc ? "asc" : "desc";
     rows.forEach(r => table.tBodies[0].appendChild(r));
   }
 </script>
 
 <body>
-  <div class="container">
-    <?php include('sidebar.php'); ?>
+<div class="container">
+<?php include('sidebar.php'); ?>
 
-    <div class="main-content">
-      <header class="header">
-        <div class="logo">
-          <img src="../assets/Agri.jpg" alt="Agri Logo" width="150">
-          <h2>Attendance Report</h2>
-        </div>
-        <div class="user-profile">
-          <img src="../assets/user.png" alt="User" width="50">
-          <span><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></span>
-        </div>
-      </header>
-
-      <section class="attendance-section">
-        <div class="report-header">
-          <div>
-            <h3>Attendance Overview</h3>
-            <p>Track employee daily attendance record</p>
-          </div>
-          <div class="filter-box">
-            <label for="from-date">From:</label>
-            <input type="date" id="from-date">
-            <label for="to-date">To:</label>
-            <input type="date" id="to-date">
-            <button id="filter-btn">Filter</button>
-          </div>
-        </div>
-
-        <div class="table-container">
-          <table id="attendance-table" data-sort-order="asc">
-            <thead>
-              <tr>
-                <th onclick="sortTable(0)">Date ⬍</th>
-                <th onclick="sortTable(1)">Time In ⬍</th>
-                <th onclick="sortTable(2)">Time Out ⬍</th>
-                <th onclick="sortTable(3)">Total Hours ⬍</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php if (!empty($attendanceData)): ?>
-                <?php foreach ($attendanceData as $record): ?>
-                  <tr>
-                    <td><?php echo htmlspecialchars($record['date']); ?></td>
-                    <td class="time-in"><?php echo htmlspecialchars($record['time_in']); ?></td>
-                    <td class="time-out"><?php echo htmlspecialchars($record['time_out']); ?></td>
-                    <td class="total"><?php echo htmlspecialchars($record['total_hours']); ?></td>
-                  </tr>
-                <?php endforeach; ?>
-              <?php else: ?>
-                <tr>
-                  <td colspan="4" style="text-align:center; padding:15px;">No attendance records found.</td>
-                </tr>
-              <?php endif; ?>
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
+<div class="main-content">
+<header class="header">
+  <div class="logo">
+    <img src="../assets/Agri.jpg" alt="Agri Logo" width="150">
+    <h2>Attendance Report</h2>
   </div>
+  <div class="user-profile">
+    <img src="../assets/user.png" alt="User" width="50">
+    <span><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></span>
+  </div>
+</header>
+
+<section class="attendance-section">
+<div class="report-header">
+  <div>
+    <h3>Attendance Overview</h3>
+    <p>Track employee daily attendance record</p>
+  </div>
+</div>
+
+<div class="table-container">
+<table id="attendance-table" data-sort-order="asc">
+<thead>
+<tr>
+  <th onclick="sortTable(0)">Date ⬍</th>
+  <th onclick="sortTable(1)">Time In ⬍</th>
+  <th onclick="sortTable(2)">Time Out ⬍</th>
+  <th onclick="sortTable(3)">Total Hours ⬍</th>
+  <th onclick="sortTable(4)">Time In Status ⬍</th>
+</tr>
+</thead>
+
+<tbody>
+<?php if (!empty($attendanceData)): ?>
+<?php foreach ($attendanceData as $record): ?>
+
+<?php
+  // ✅ Time In Status Logic
+  $status = "N/A";
+
+  if (!empty($record['time_in'])) {
+      // Combine date + time for accurate comparison
+      $timeIn  = strtotime($record['date'] . ' ' . $record['time_in']);
+      $cutOff  = strtotime($record['date'] . ' 08:00 AM');
+
+      if ($timeIn > $cutOff) {
+          $status = "Late";
+      } else {
+          $status = "On Time";
+      }
+  }
+?>
+
+<tr>
+  <td><?php echo htmlspecialchars($record['date']); ?></td>
+  <td class="time-in"><?php echo htmlspecialchars($record['time_in']); ?></td>
+  <td class="time-out"><?php echo htmlspecialchars($record['time_out']); ?></td>
+  <td class="total"><?php echo htmlspecialchars($record['total_hours']); ?></td>
+  <td class="status"><?php echo $status; ?></td>
+</tr>
+
+<?php endforeach; ?>
+<?php else: ?>
+<tr>
+  <td colspan="5" style="text-align:center; padding:15px;">
+    No attendance records found.
+  </td>
+</tr>
+<?php endif; ?>
+</tbody>
+
+</table>
+</div>
+</section>
+</div>
+</div>
 </body>
 </html>
