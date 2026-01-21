@@ -16,7 +16,7 @@ echo "<script>console.log('Employee ID: " . addslashes($employeeID) . "');</scri
 
   // ✅ Function to get profile picture
 function getProfilePicture($employeeID, $lastName) {
-    $uploadsDir = "G:/projects-2025/test-reac/AgriTime/views/uploads";
+    $uploadsDir = "H:/AgriTime/views/uploads";
     $folderName = $employeeID . "_" . $lastName;
     $folderPath = $uploadsDir . "/" . $folderName;
     
@@ -319,7 +319,7 @@ if ($summaryResponse !== FALSE) {
           <h2>AgriTime Payroll Attendance System</h2>
         </div>
         <div class="user-profile">
-                <img src="../assets/grit.jpg" alt="Agri Logo" width="120">
+               <img src="<?php echo htmlspecialchars($profilePicPath); ?>" alt="Profile Picture" width="120">
           <span><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></span>
           <p><?php echo htmlspecialchars($roleName); ?></p>
           <h3><?php echo $currentTime; ?></h3>
@@ -350,7 +350,7 @@ if ($summaryResponse !== FALSE) {
                     <div class="card-info">
                       <h4>Late Arrivals</h4>
                       <p>This Month</p>
-    <h2><?php echo htmlspecialchars($totalLateComings); ?></h2>
+         <h2><?php echo htmlspecialchars($totalLateComings); ?></h2>
                     </div>
                   </div>
 
@@ -414,7 +414,7 @@ if ($summaryResponse !== FALSE) {
                     </div>
                     <div class="employee-infoTimedIn">
                        <div class="employee-board">             
-                         <img src="../assets/grit.jpg" alt="Employee" class="profile-pic">
+                          <img src="<?php echo htmlspecialchars($profilePicPath); ?>" alt="Profile Picture" width="120">
                           <h4><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></h4>
                         
                           <p>Employeefff ID: <?php echo htmlspecialchars($user['employeeID']); ?></p>

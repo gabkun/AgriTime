@@ -16,7 +16,7 @@ echo "<script>console.log('Employee ID: " . addslashes($employeeID) . "');</scri
 
   // ✅ Function to get profile picture
 function getProfilePicture($employeeID, $lastName) {
-    $uploadsDir = "G:/projects-2025/test-reac/AgriTime/views/uploads";
+    $uploadsDir = "H:/AgriTime/views/uploads";
     $folderName = $employeeID . "_" . $lastName;
     $folderPath = $uploadsDir . "/" . $folderName;
     
