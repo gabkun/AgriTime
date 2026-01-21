@@ -1,4 +1,3 @@
-
 <?php 
 session_start();
 date_default_timezone_set("Asia/Manila");
@@ -12,9 +11,70 @@ if (!isset($_SESSION["user"])) {
 $user = $_SESSION["user"];
 $currentTime = date('g : i A');
 
-// ✅ API base URL
-$apiBaseUrl = "http://localhost:8080/api/attendance";
+$employeeID = $user["employeeID"];
+echo "<script>console.log('Employee ID: " . addslashes($employeeID) . "');</script>";
 
+  // ✅ Function to get profile picture
+function getProfilePicture($employeeID, $lastName) {
+    $uploadsDir = "G:/projects-2025/test-reac/AgriTime/views/uploads";
+    $folderName = $employeeID . "_" . $lastName;
+    $folderPath = $uploadsDir . "/" . $folderName;
+    
+    // Check if folder exists
+    if (!is_dir($folderPath)) {
+        return "../assets/grit.jpg"; // Default image
+    }
+    
+    // Look for images in order: 1.jpg, 2.jpg, 3.jpg, etc.
+    for ($i = 1; $i <= 10; $i++) {
+        $imagePath = $folderPath . "/" . $i . ".jpg";
+        if (file_exists($imagePath)) {
+            // Return relative path for web access
+            return "../uploads/" . $folderName . "/" . $i . ".jpg";
+        }
+    }
+    
+    // If no image found, return default
+    return "../assets/grit.jpg";
+}
+
+// ✅ Get the profile picture path
+$profilePicPath = getProfilePicture($user['employeeID'], $user['lastName']);
+
+
+
+// ✅ API base URLs
+$apiBaseUrl = "http://localhost:8080/api/attendance";
+$payslipBaseUrl = "http://localhost:8080/api/attendance";
+
+// ✅ PAYSLIP DOWNLOAD REQUEST (no cURL)
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["download"])) {
+    $employeeID = $user["employeeID"];
+    $downloadUrl = "http://localhost:8080/api/attendance/download/" . urlencode($employeeID);
+
+    $tempFile = tempnam(sys_get_temp_dir(), "payslip_") . ".pdf";
+
+    $context = stream_context_create([
+        "http" => [
+            "method" => "GET",
+            "header" => "Accept: application/pdf\r\n"
+        ]
+    ]);
+
+    $pdfContent = @file_get_contents($downloadUrl, false, $context);
+
+    if ($pdfContent === false) {
+        echo "<script>alert('No payslip as of the moment');</script>";
+    } else {
+        file_put_contents($tempFile, $pdfContent);
+
+        header("Content-Type: application/pdf");
+        header("Content-Disposition: attachment; filename=\"Payslip_{$employeeID}.pdf\"");
+        readfile($tempFile);
+        unlink($tempFile);
+        exit;
+    }
+}
 // ✅ Fetch Daily Status
 $employeeID = $user["employeeID"];
 $statusUrl = "$apiBaseUrl/status/$employeeID";
@@ -25,12 +85,35 @@ $dailyStatus = null;
 if ($statusResponse !== FALSE) {
     $decoded = json_decode($statusResponse, true);
     $dailyStatus = $decoded["attendance_status"] ?? null;
-} else {
-    $dailyStatus = null;
 }
 
-$timestampUrl = "$apiBaseUrl/status/$employeeID";
-$timestampResponse = @file_get_contents($timestampUrl);
+// ✅ AUTO TIME-IN (NO BUTTON CLICK)
+if ($dailyStatus === null) {
+    $employeeID = $user["employeeID"];
+    $url = "$apiBaseUrl/timein";
+
+    $options = [
+        "http" => [
+            "header"  => "Content-Type: application/x-www-form-urlencoded\r\n",
+            "method"  => "POST",
+            "content" => http_build_query([
+                "employeeID" => $employeeID
+            ])
+        ]
+    ];
+
+    $context = stream_context_create($options);
+    $result = @file_get_contents($url, false, $context);
+
+    if ($result !== FALSE) {
+        // Reload page to update status
+        echo "<script>window.location.reload();</script>";
+        exit;
+    }
+}
+
+
+$timestampResponse = @file_get_contents($statusUrl);
 $dailyTimestamp = null;
 
 if ($timestampResponse !== FALSE) {
@@ -38,7 +121,6 @@ if ($timestampResponse !== FALSE) {
     $dailyTimestamp = $decodedTime["time"] ?? null;
 }
 
-// ✅ Handle Time-In and Time-Out actions
 // ✅ Handle Time-In and Time-Out actions
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $employeeID = $user["employeeID"];
@@ -65,7 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "<script>alert('Redirecting to Dashboard.');</script>";
         } else {
             $response = json_decode($result, true);
-            $message = $response["message"] ?? "Unknown response";
+            $message = $response["message"] ?? "Redirecting to Dashboard";
 
             if (strpos(strtolower($message), 'success') !== false) {
                 echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
@@ -81,10 +163,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = callAttendanceAPI($url, ["employeeID" => $employeeID]);
 
         if ($result === FALSE) {
-            echo "<script>alert('Error connecting to server.');</script>";
+            echo "<script>alert('Redirecting to Dashboard.');</script>";
         } else {
             $response = json_decode($result, true);
-            $message = $response["message"] ?? "Unknown response";
+            $message = $response["message"] ?? "Redirecting to Dashboard";
 
             if (strpos(strtolower($message), 'success') !== false) {
                 echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
@@ -103,7 +185,7 @@ if (isset($_POST["break_in"])) {
         echo "<script>alert('Redirecting to Dashboard.');</script>";
     } else {
         $response = json_decode($result, true);
-        $message = $response["message"] ?? "Unknown response";
+        $message = $response["message"] ?? "Redirecting to Dashboard";
 
         if (strpos(strtolower($message), 'success') !== false) {
             echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
@@ -122,7 +204,7 @@ if (isset($_POST["break_in"])) {
               echo "<script>alert('Redirecting to Dashboard.');</script>";
           } else {
               $response = json_decode($result, true);
-              $message = $response["message"] ?? "Unknown response";
+              $message = $response["message"] ?? "Redirecting to Dashboard";
 
               if (strpos(strtolower($message), 'success') !== false) {
                   echo "<script>alert('" . addslashes($message) . "'); window.location.reload();</script>";
@@ -141,44 +223,34 @@ $roleName = match($user['role']) {
     default => 'Unknown'
 };
 
-// ✅ Button states
+// ✅ Button States
 $timeInDisabled = '';
 $timeOutDisabled = '';
 $breakDisabled = '';
 
 if ($dailyStatus === null) {
-    // No record today → enable time in only
     $timeOutDisabled = 'disabled';
     $breakDisabled = 'disabled';
 } elseif ($dailyStatus == 1) {
-    // Already timed in → disable time in, enable time out and break
     $timeInDisabled = 'disabled';
 } elseif ($dailyStatus == 0) {
-    // Already timed out → disable everything
     $timeInDisabled = 'disabled';
     $timeOutDisabled = 'disabled';
     $breakDisabled = 'disabled';
 } elseif ($dailyStatus == 2) {
-    // On break → disable time in, disable break, enable time out
     $timeInDisabled = 'disabled';
     $breakDisabled = 'disabled';
 }
 
+// ✅ Calendar Setup
+$month = date('n'); // 1–12
+$year = date('Y');
+$today = date('j');
+$monthName = date('F');
+$firstDayOfWeek = date('w', strtotime("$year-$month-01"));
+$daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+$dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
-  date_default_timezone_set('Asia/Manila');
-
-  $month = date('n'); // 1-12
-  $year = date('Y');
-  $today = date('j');
-  $monthName = date('F');
-
-  // First day of the month (0 = Sunday)
-  $firstDayOfWeek = date('w', strtotime("$year-$month-01"));
-  $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-
-  $dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
-  
 $attendanceReportUrl = "$apiBaseUrl/report/" . urlencode($employeeID);
 $attendanceResponse = @file_get_contents($attendanceReportUrl);
 $totalDays = 0;
@@ -198,8 +270,19 @@ if ($lateResponse !== FALSE) {
     $totalLateDays = $decodedLate["totalLateDays"] ?? 0;
 }
 
-?>
+$summaryUrl = "$apiBaseUrl/attendance/summary/" . urlencode($employeeID);
+$summaryResponse = @file_get_contents($summaryUrl);
 
+$totalDaysWorked = 0;
+$totalLateComings = 0;
+
+if ($summaryResponse !== FALSE) {
+    $decodedSummary = json_decode($summaryResponse, true);
+    $totalDaysWorked = $decodedSummary["totalDaysWorked"] ?? 0;
+    $totalLateComings = $decodedSummary["totalLateComings"] ?? 0;
+}
+ 
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -255,7 +338,7 @@ if ($lateResponse !== FALSE) {
                     <div class="card-info">
                       <h4>Total Days Worked</h4>
                       <p>This Month</p>
-                      <h2>10 Days</h2>
+          <h2><?php echo htmlspecialchars($totalDaysWorked); ?> Days</h2>
                     </div>
                   </div>
 
@@ -267,7 +350,7 @@ if ($lateResponse !== FALSE) {
                     <div class="card-info">
                       <h4>Late Arrivals</h4>
                       <p>This Month</p>
-                      <h2>2</h2>
+    <h2><?php echo htmlspecialchars($totalLateComings); ?></h2>
                     </div>
                   </div>
 

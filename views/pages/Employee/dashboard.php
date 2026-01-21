@@ -14,6 +14,34 @@ $currentTime = date('g : i A');
 $employeeID = $user["employeeID"];
 echo "<script>console.log('Employee ID: " . addslashes($employeeID) . "');</script>";
 
+  // ✅ Function to get profile picture
+function getProfilePicture($employeeID, $lastName) {
+    $uploadsDir = "G:/projects-2025/test-reac/AgriTime/views/uploads";
+    $folderName = $employeeID . "_" . $lastName;
+    $folderPath = $uploadsDir . "/" . $folderName;
+    
+    // Check if folder exists
+    if (!is_dir($folderPath)) {
+        return "../assets/grit.jpg"; // Default image
+    }
+    
+    // Look for images in order: 1.jpg, 2.jpg, 3.jpg, etc.
+    for ($i = 1; $i <= 10; $i++) {
+        $imagePath = $folderPath . "/" . $i . ".jpg";
+        if (file_exists($imagePath)) {
+            // Return relative path for web access
+            return "../uploads/" . $folderName . "/" . $i . ".jpg";
+        }
+    }
+    
+    // If no image found, return default
+    return "../assets/grit.jpg";
+}
+
+// ✅ Get the profile picture path
+$profilePicPath = getProfilePicture($user['employeeID'], $user['lastName']);
+
+
 
 // ✅ API base URLs
 $apiBaseUrl = "http://localhost:8080/api/attendance";
@@ -241,10 +269,20 @@ if ($lateResponse !== FALSE) {
     $decodedLate = json_decode($lateResponse, true);
     $totalLateDays = $decodedLate["totalLateDays"] ?? 0;
 }
+
+$summaryUrl = "$apiBaseUrl/attendance/summary/" . urlencode($employeeID);
+$summaryResponse = @file_get_contents($summaryUrl);
+
+$totalDaysWorked = 0;
+$totalLateComings = 0;
+
+if ($summaryResponse !== FALSE) {
+    $decodedSummary = json_decode($summaryResponse, true);
+    $totalDaysWorked = $decodedSummary["totalDaysWorked"] ?? 0;
+    $totalLateComings = $decodedSummary["totalLateComings"] ?? 0;
+}
+ 
 ?>
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -280,7 +318,7 @@ if ($lateResponse !== FALSE) {
           <h2>AgriTime Payroll Attendance System</h2>
         </div>
         <div class="user-profile">
-                <img src="../assets/grit.jpg" alt="Agri Logo" width="120">
+            <img src="<?php echo htmlspecialchars($profilePicPath); ?>" alt="Profile Picture" width="120">
           <span><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></span>
           <p><?php echo htmlspecialchars($roleName); ?></p>
           <h3><?php echo $currentTime; ?></h3>
@@ -299,7 +337,7 @@ if ($lateResponse !== FALSE) {
                     <div class="card-info">
                       <h4>Total Days Worked</h4>
                       <p>This Month</p>
-                      <h2>10 Days</h2>
+    <h2><?php echo htmlspecialchars($totalDaysWorked); ?> Days</h2>
                     </div>
                   </div>
 
@@ -311,7 +349,7 @@ if ($lateResponse !== FALSE) {
                     <div class="card-info">
                       <h4>Late Arrivals</h4>
                       <p>This Month</p>
-                      <h2>2</h2>
+    <h2><?php echo htmlspecialchars($totalLateComings); ?></h2>
                     </div>
                   </div>
 
@@ -375,7 +413,7 @@ if ($lateResponse !== FALSE) {
                     </div>
                     <div class="employee-infoTimedIn">
                        <div class="employee-board">             
-                         <img src="../assets/grit.jpg" alt="Employee" class="profile-pic">
+                         <img src="<?php echo htmlspecialchars($profilePicPath); ?>" alt="Employee" class="profile-pic">
                           <h4><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?></h4>
                         
                           <p>Employee ID: <?php echo htmlspecialchars($user['employeeID']); ?></p>

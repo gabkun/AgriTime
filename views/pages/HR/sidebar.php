@@ -37,6 +37,10 @@
          <i class="icon"><img src="../assets/person.png" alt="money" class="sidebar-icon"></i>
         <a href="/hr/hraccount">My Account</a>
       </li>
+            <li class="<?php echo $currentPage == 'employeetracking' ? 'active' : ''; ?>">
+          <i class="icon"><img src="../assets/bworker.png" alt="money" class="sidebar-icon"></i>
+        <a href="/hr/employeetracking">Employee Tracking</a>
+      </li>
             <li>
     <i class="icon"><img src="../assets/logout.png" alt="logout" class="sidebar-icon"></i>
     <a href="/logout">Logout</a>

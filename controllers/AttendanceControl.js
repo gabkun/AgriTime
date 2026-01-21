@@ -820,3 +820,32 @@ export const downloadPayslipData = async (req, res) => {
     res.status(500).json({ message: "Error generating payslip" });
   }
 };
+
+export const getAttendanceSummary = async (req, res) => {
+  const { employeeID } = req.params;
+
+  if (!employeeID) {
+    return res.status(400).json({ message: "Employee ID is required" });
+  }
+
+  try {
+    const summary = await AttendanceModel.getAttendanceSummary(employeeID);
+
+    if (!summary) {
+      return res.status(404).json({ message: "No attendance records found" });
+    }
+
+    res.status(200).json({
+      employeeID,
+      totalDaysWorked: summary.total_days_worked,
+      totalLateComings: summary.total_late_comings,
+    });
+
+  } catch (err) {
+    console.error("❌ Error fetching attendance summary:", err);
+    res.status(500).json({
+      message: "Error fetching attendance summary",
+      error: err.message,
+    });
+  }
+};

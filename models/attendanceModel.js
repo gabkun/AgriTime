@@ -319,6 +319,31 @@ getPayslipById: (id) => {
 },
 
 
+getAttendanceSummary: (employeeID) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT
+        COUNT(DISTINCT DATE(ti.time_in)) AS total_days_worked,
+        SUM(
+          CASE
+            WHEN TIME(ti.time_in) > '08:00:00' THEN 1
+            ELSE 0
+          END
+        ) AS total_late_comings
+      FROM time_in ti
+      JOIN time_out to1
+        ON ti.employeeID = to1.employeeID
+        AND DATE(ti.time_in) = DATE(to1.time_out)
+      WHERE ti.employeeID = ?
+    `;
+
+    db.query(query, [employeeID], (err, results) => {
+      if (err) return reject(err);
+      resolve(results[0]);
+    });
+  });
+},
+
 };
 
 export default AttendanceModel;
