@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = @file_get_contents($url, false, $context);
 
         if ($result === FALSE) {
-            echo "<script>alert('Error connecting to API. Please try again.');</script>";
+            echo "<script>alert('User already timed out, please contact your administrator.');</script>";
         } else {
             $response = json_decode($result, true);
 
