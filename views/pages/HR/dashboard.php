@@ -422,9 +422,7 @@ if ($summaryResponse !== FALSE) {
                         </div>
                         
                     <div class="buttons">  
-                <form method="POST" style="display:inline;">
-                  <button type="submit" name="time_in" class="timein-btn" <?php echo $timeInDisabled; ?>>Time-In</button>
-                </form>
+
 
                 <form method="POST" style="display:inline;">
                   <button type="submit" name="time_out" class="timeout-btn" <?php echo $timeOutDisabled; ?>>Time-Out</button>
