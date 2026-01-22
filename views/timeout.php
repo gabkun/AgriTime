@@ -53,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <head>
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-          <title>Login - AgriTime Payroll Attendance System</title>
+          <title>Time Out - AgriTime Payroll Attendance System</title>
           <!-- Face API scripts -->
           <script defer src="js/face-api.min.js"></script>
           <script defer src="js/loadFaceDetection.js"></script>
