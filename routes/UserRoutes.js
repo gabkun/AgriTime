@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { createUser, getAllUsers, getUserById, updateUser, deleteUser, facialLogin, updateSalaryInfo, getAllUserData, updateEmployee, getRecentUsers, getTotalEmployeesThisMonth, getTotalHRThisMonth } from '../controllers/UsersController.js';
+import { createUser, getAllUsers, getUserById, updateUser, deleteUser, facialLogin, updateSalaryInfo, getAllUserData, updateEmployee, getRecentUsers, getTotalEmployeesThisMonth, getTotalHRThisMonth, facialTimeOut } from '../controllers/UsersController.js';
 
 const router = express.Router();
 
@@ -12,6 +12,7 @@ router.get('/', getAllUsers);
 router.get('/:id', getUserById);
 router.post('/', upload.array('profilePic', 5), createUser);
 router.post("/facial-login", facialLogin); // 👈 for face login
+router.post("/facial-timeout", facialTimeOut); // 👈 for face login
 router.put('/employee/update/:id', updateEmployee);
 router.post('/update-salary/:employeeID', updateSalaryInfo);
 router.get('/recent/users', getRecentUsers);

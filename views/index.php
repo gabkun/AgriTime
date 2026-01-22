@@ -66,6 +66,10 @@ switch ($request) {
     case '/logout':
         require __DIR__ . '/pages/logout.php';
         break;
+    
+    case '/timeout':
+        require __DIR__ . '/timeout.php';
+        break;
   
     default:
         http_response_code(404);

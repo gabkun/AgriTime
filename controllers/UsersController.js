@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import User from '../models/UserModel.js';
+import AttendanceModel from "../models/AttendanceModel.js";
 
 // Get all users
 export const getAllUsers = async (req, res) => {
@@ -323,3 +324,86 @@ export const getTotalHRThisMonth = async (req, res) => {
     res.status(500).json({ message: "Error fetching total HR", error: err.message });
   }
 };
+
+export const facialTimeOut = async (req, res) => {
+  try {
+    const label = req.body.label || req.body.faceImage;
+
+    console.log("📸 Facial Time-Out Attempt Received");
+    console.log("Raw Request Body:", req.body);
+
+    if (!label) {
+      return res.status(400).json({ message: "No face label detected." });
+    }
+
+    const lastName = label;
+    const folderPath = path.join(process.cwd(), "views", "labels", lastName);
+
+    console.log("Detected Face Label:", lastName);
+
+    // ✅ Check if facial data exists
+    if (!fs.existsSync(folderPath)) {
+      return res.status(404).json({ message: "No matching face data found." });
+    }
+
+    // ✅ Find user by last name
+    const user = await User.findByLastName(lastName);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    console.log("👤 User Identified:", {
+      employeeID: user.employeeID,
+      name: `${user.firstName} ${user.lastName}`,
+    });
+
+    const employee_id = user.employeeID;
+
+    // ================= TIME OUT LOGIC =================
+
+    const employeeExists = await AttendanceModel.checkEmployeeExists(employee_id);
+    if (employeeExists.length === 0) {
+      return res.status(404).json({ message: "Employee not found." });
+    }
+
+    const statusExists = await AttendanceModel.checkDailyStatus(employee_id);
+
+    if (statusExists.length === 0) {
+      return res.status(400).json({
+        message: "You must time in first before timing out.",
+      });
+    }
+
+    if (statusExists[0].attendance_status == 0) {
+      return res.status(400).json({
+        message: "You have already timed out today.",
+      });
+    }
+
+    // ✅ Record time out
+    await AttendanceModel.recordTimeOut(employee_id);
+    await AttendanceModel.updateDailyStatus(employee_id, 0);
+
+    if (req.io) req.io.emit("attendanceUpdated");
+
+    // ✅ Console success (NO DASHBOARD REDIRECT)
+    console.log("✅ TIME OUT SUCCESSFULLY:", employee_id);
+
+    return res.status(200).json({
+      message: "Time out recorded successfully",
+      employeeID: employee_id,
+      name: `${user.firstName} ${user.lastName}`,
+      timeOutTime: new Date().toLocaleString("en-PH", {
+        timeZone: "Asia/Manila",
+      }),
+    });
+
+  } catch (err) {
+    console.error("❌ Error during facial time out:", err);
+    return res.status(500).json({
+      message: "Server error during facial time out",
+      error: err.message,
+    });
+  }
+}

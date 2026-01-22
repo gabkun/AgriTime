@@ -305,6 +305,14 @@ if ($summaryResponse !== FALSE) {
         console.warn("Sidebar or toggle button not found.");
       }
     });
+
+    function handleTimeout() {
+    // Open timeout page in a new tab
+    window.open('/timeout', '_blank');
+
+    // Same behavior as <a href="/logout">
+    window.location.href = '/logout';
+}
 </script>
 
 <body>
@@ -423,9 +431,14 @@ if ($summaryResponse !== FALSE) {
                      <div class="buttons">  
 
 
-                <form method="POST" style="display:inline;">
-                  <button type="submit" name="time_out" class="timeout-btn" <?php echo $timeOutDisabled; ?>>Time-Out</button>
-                </form>
+                  <button
+                      type="button"
+                      class="timeout-btn"
+                      <?php echo $timeOutDisabled; ?>
+                      onclick="handleTimeout()"
+                  >
+                      Time-Out
+                  </button>
 
                 <?php if ($dailyStatus == 1): ?>
                   <!-- ✅ Show Break In if Timed In -->
