@@ -78,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <head>
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-          <title>Login - AgriTime Payroll Attendance System</title>
+          <title>Attendance Check</title>
           <!-- Face API scripts -->
           <script defer src="js/face-api.min.js"></script>
           <script defer src="js/loadFaceDetection.js"></script>
@@ -89,9 +89,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
           <!-- LEFT: Facial Recognition -->
           <div class="left">
-            <h2 class="login-title">Login</h2>
-            <p class="login-subtext">Welcome Back
-                <br>Pleasess Scan Face for Login 
+              <h2 class="login-title">Login</h2>
+            <p class="login-subtext">
+                <br>Please Face the Camera
                 </p>
 
 
@@ -101,13 +101,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <form method="POST" id="faceForm">
               <input type="hidden" name="faceImage" id="faceImage" />
-              <button type="button" id="scanBtn" onclick="captureFace()">Scan Face</button>
             </form>
 
-            <div class="progress-container" id="progressContainer">
-              <div class="progress-bar" id="progressBar"></div>
-            </div>
-            <div id="progressText">0%</div>
+      
 
             <!-- Nature-themed Welcome Feedback -->
             <div id="login-feedback" class="welcome-feedback">
@@ -117,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               
             <!-- Note -->
               <div class="note">
-                Don’t have an account?
+                Don't have an account?
                 <a href="register">Register here</a>
               </div>
             </div>
@@ -134,24 +130,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   <script>
   const video = document.getElementById("video");
-  const scanBtn = document.getElementById("scanBtn");
-  const progressBar = document.getElementById("progressBar");
-  const progressText = document.getElementById("progressText");
+ 
 
-  // ✅ Start the camera
+  let detectionCounts = {};
+  let isDetectionRunning = false;
+
+  // ✅ Start the camera and AUTO-START face detection
   window.addEventListener("DOMContentLoaded", async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       video.srcObject = stream;
+      // Auto-start detection after camera is ready
+      video.addEventListener('loadedmetadata', async () => {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second for camera to stabilize
+        captureFace(); // Auto-start detection
+      });
+      
     } catch (err) {
       console.error("Camera access denied or error:", err);
       alert("Unable to access the camera.");
     }
   });
 
-  // ✅ Capture Face and show progress based on detections
+  //  AUTO FACE DETECTION - runs automatically, idles when no face detected
   async function captureFace() {
-    alert("Please face the camera to start scanning...");
+    if (isDetectionRunning) return; // Prevent multiple instances
+    isDetectionRunning = true;
 
     const response = await fetch("get_labels.php");
     const labels = await response.json();
@@ -159,50 +163,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (labels.length === 0) {
       alert("No registered face data found. Please register first.");
+      isDetectionRunning = false;
       return;
     }
 
-    let detectionCounts = {};
-    progressBar.style.width = "0%";
-    progressText.innerText = "0%";
+    detectionCounts = {};
 
-    // ✅ Start detection and update bar based on progress
+    // ✅ Start detection with faster threshold (20 detections)
     await loadFaceDetection(video, labels, {
       modelsPath: "models",
       imagesPath: "labels",
+      detectionInterval: 150,
       onDetect: (label, detection) => {
         if (!label) return;
 
         detectionCounts[label] = (detectionCounts[label] || 0) + 1;
 
-        // Calculate percentage based on 100 detections target
-        const progress = Math.min((detectionCounts[label] / 2) * 100, 100);
-        progressBar.style.width = progress + "%";
-        progressText.innerText = Math.floor(progress) + "%";
-
-        // ✅ Optional funny status text update
-        if (progress < 10) progressText.innerText = "Scanning face 😎 (" + Math.floor(progress) + "%)";
-        else progressText.innerText = "Perfect match detected 😍 (" + Math.floor(progress) + "%)";
-
         console.log(`Detected: ${label} (${detectionCounts[label]}x)`);
 
-        // ✅ When reaches 100 detections, trigger login
-        if (detectionCounts[label] >= 100) {
+        // ✅ Trigger login after 20 detections (faster login)
+        if (detectionCounts[label] >= 20) {
           console.log(`✅ Triggering login for ${label}`);
           detectionCounts[label] = 0; // reset counter
 
-          document.getElementById("scanBtn").style.display = "none";
+          
           const feedback = document.getElementById("login-feedback");
           const messageEl = document.getElementById("welcome-message");
           let countdown = 1;
 
           feedback.style.display = "flex";
           document.getElementById("faceImage").value = label;
-
-          // Set progress bar full green
-          progressBar.style.width = "100%";
-          progressBar.style.background = "linear-gradient(90deg, #4caf50, #2e7d32)";
-
 
           const intervalId = setInterval(() => {
             countdown--;

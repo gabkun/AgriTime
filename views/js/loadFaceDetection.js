@@ -2,7 +2,7 @@ async function loadFaceDetection(videoElement, labels, options = {}) {
     const modelsPath = options.modelsPath || "models";
     const imagesPath = options.imagesPath || "labels";
     const onDetect = options.onDetect || (() => { });
-    const detectionInterval = options.detectionInterval || 20; 
+    const detectionInterval = options.detectionInterval || 100; 
 
     // 🔹 Loading overlay
     const loadingDiv = document.createElement("div");
@@ -45,7 +45,7 @@ async function loadFaceDetection(videoElement, labels, options = {}) {
         return Promise.all(
             labels.map(async (label) => {
                 const descriptions = [];
-                for (let i = 1; i <= 5; i++) {
+                for (let i = 1; i <= 4; i++) {
                     const img = await faceapi.fetchImage(`${imagesPath}/${label}/${i}.jpg`);
                     const det = await faceapi
                         .detectSingleFace(img)
@@ -62,7 +62,7 @@ async function loadFaceDetection(videoElement, labels, options = {}) {
         const labeledFaceDescriptors = await getLabeledFaceDescriptions();
         loadingDiv.remove();
 
-        const matcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6); // Add lower threshold for faster matching
+        const matcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.5); // Add lower threshold for faster matching
 
         // ✅ Ensure container exists
         const container = document.getElementById("video-container");
