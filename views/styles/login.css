@@ -521,3 +521,37 @@ body.login-page {
     transform: translateY(0);
   }
 }
+
+.chrona-attlog-table {
+    width: 100%;
+    max-width: 480px;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.chrona-attlog-head th {
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b7280;
+    background: #f9fafb;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.chrona-attlog-row td {
+    padding: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    text-align: center;
+}
+
+/* Status emphasis */
+.chrona-status {
+    color: #2563eb;
+}

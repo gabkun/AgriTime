@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!empty($faceImage)) {
         // Express backend API endpoint
-        $url = "http://localhost:8080/api/user/facial/timein";
+        $url = "http://localhost:8080/api/user/facial-login";
 
         // Send face image to Express backend
         $data = ['faceImage' => $faceImage];
@@ -25,19 +25,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = @file_get_contents($url, false, $context);
 
         if ($result === FALSE) {
-            echo "<script>alert('User already timed out, please contact your administrator.');</script>";
+            echo "<script>alert('Error connecting to API. Please try again.');</script>";
         } else {
             $response = json_decode($result, true);
 
             // ✅ Successful facial login
-               if ($response["message"] === "Time in recorded successfully") {
-    echo "<script>
-        alert('Time in successful. Have a great day!');
-    </script>";
-} else {
-                    $msg = $response["message"] ?? "Face not recognized or time-out failed.";
-                    echo "<script>alert('" . addslashes($msg) . "');</script>";
+            if (isset($response["message"]) && $response["message"] === "Login successful") {
+                // Save user info in PHP session
+                $_SESSION["user"] = $response["user"];
+                $_SESSION["login_time"] = $response["loginTime"];
+
+                // ✅ Check role-based redirect
+                $role = $response["user"]["role"] ?? null;
+                $firstName = addslashes($response["user"]["firstName"]);
+
+                if ($role == 1) {
+                    $redirect = "/employee/dashboard";
+                } elseif ($role == 2) {
+                    $redirect = "/hr/dashboard";
+                } elseif ($role == 3) {
+                    $redirect = "/admin/dashboard";
+                } else {
+                    echo "<script>
+                            alert('User not found. Please login again.');
+                            window.location.href = '/login';
+                          </script>";
+                    exit;
                 }
+
+                // ✅ Redirect using router route
+                echo "<script>
+                        alert('Welcome back, {$firstName}!');
+                        window.location.href = '{$redirect}';
+                      </script>";
+                exit;
+
+            } else {
+                // Handle invalid credentials or unrecognized face
+                $msg = $response["message"] ?? "Invalid credentials or face not recognized.";
+                echo "<script>alert('" . addslashes($msg) . "');</script>";
+            }
         }
     } else {
         echo "<script>alert('No face detected. Please try again.');</script>";
@@ -62,9 +89,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
           <!-- LEFT: Facial Recognition -->
           <div class="left">
-              <h2 class="login-title">Time-In</h2>
+              <h2 class="login-title">Login</h2>
             <p class="login-subtext">
-                <br>Please Face the Camera to Time in
+                <br>Please Face the Camera
                 </p>
 
 
@@ -85,10 +112,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
               
             <!-- Note -->
-                             <div class="note">
-                Press here to Proceed with Dashboard
-                <a href="login">Login here</a>
-              </div>
               <div class="note">
                 Don't have an account?
                 <a href="register">Register here</a>
@@ -96,24 +119,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <!-- RIGHT: Logo Section -->
-<div class="right">
-    <table class="chrona-attlog-table">
-        <thead>
-            <tr class="chrona-attlog-head">
-                <th>Time</th>
-                <th>Employee ID</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="chrona-attlog-row">
-                <td id="attTime">--:--</td>
-                <td id="attEmployee">----</td>
-                <td id="attStatus" class="chrona-status">---</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+            <div class="right">
+              <img src="assets/Agri.jpg" alt="System Logo" />
+              <h1>AgriTime Payroll<br>Attendance System</h1>
+           
+            </div>
             
           </body>
     </html>

@@ -4,7 +4,7 @@ $request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 // ✅ Define routes
 switch ($request) {
     case '/':
-    case '/login':
+    case '/timein':
         require __DIR__ . '/router.php';
         break;
 
@@ -69,6 +69,10 @@ switch ($request) {
     
     case '/timeout':
         require __DIR__ . '/timeout.php';
+        break;
+
+    case '/login':
+        require __DIR__ . '/login.php';
         break;
   
     default:

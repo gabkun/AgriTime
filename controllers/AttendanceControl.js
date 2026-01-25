@@ -1,4 +1,4 @@
-import AttendanceModel from '../models/attendanceModel.js';
+import AttendanceModel from '../models/attendanceModel.js'
 import PDFDocument from "pdfkit";
 import path from "path";
 import fs from "fs";

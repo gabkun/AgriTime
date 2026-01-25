@@ -407,3 +407,81 @@ export const facialTimeOut = async (req, res) => {
     });
   }
 }
+
+export const facialTimeIn = async (req, res) => {
+  try {
+    const label = req.body.label || req.body.faceImage;
+
+    console.log("📸 Facial Time-In Attempt Received");
+    console.log("Raw Request Body:", req.body);
+
+    if (!label) {
+      return res.status(400).json({ message: "No face label detected." });
+    }
+
+    const lastName = label;
+    const folderPath = path.join(process.cwd(), "views", "labels", lastName);
+
+    // ✅ Check if facial data exists
+    if (!fs.existsSync(folderPath)) {
+      return res.status(404).json({ message: "No matching face data found." });
+    }
+
+    // ✅ Find user by last name
+    const user = await User.findByLastName(lastName);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    console.log("👤 User Identified:", {
+      employeeID: user.employeeID,
+      name: `${user.firstName} ${user.lastName}`,
+    });
+
+    const employee_id = user.employeeID;
+
+    // ================= SAME LOGIC AS REGULAR TIME IN =================
+
+    // ✅ Check if employee exists
+    const employeeExists = await AttendanceModel.checkEmployeeExists(employee_id);
+    if (employeeExists.length === 0) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    // ✅ Check if already timed in today
+    const statusExists = await AttendanceModel.checkDailyStatus(employee_id);
+    if (statusExists.length > 0 && statusExists[0].attendance_status == 1) {
+      console.log("⚠️ Employee already timed in today:", employee_id);
+      return res.status(400).json({ message: "You have already timed in today." });
+    }
+
+    // ✅ Record new time-in
+    await AttendanceModel.recordTimeIn(employee_id);
+    console.log("✅ Facial Time in successfully recorded for employee:", employee_id);
+
+    // ✅ Insert or update daily status
+    if (statusExists.length === 0) {
+      await AttendanceModel.insertDailyStatus(employee_id, 1);
+    } else {
+      await AttendanceModel.updateDailyStatus(employee_id, 1);
+    }
+
+    if (req.io) req.io.emit("attendanceUpdated");
+
+    return res.status(200).json({
+      message: "Time in recorded successfully",
+      employeeID: employee_id,
+      name: `${user.firstName} ${user.lastName}`,
+      timeIn: new Date().toLocaleString("en-PH", {
+        timeZone: "Asia/Manila",
+      }),
+    });
+
+  } catch (err) {
+    console.error("❌ Error during facial time in process:", err);
+    return res.status(500).json({
+      message: "Error during facial time in process",
+      error: err.message,
+    });
+  }
+};
