@@ -77,15 +77,20 @@ recordBreakOut: (employeeID) => {
   },
 
   // Update existing daily status
-  updateDailyStatus: (employeeID, status) => {
-    const query = "UPDATE daily_status SET attendance_status = ?, timestamp = NOW() WHERE employeeID = ?";
-    return new Promise((resolve, reject) => {
-      db.query(query, [status, employeeID], (err, result) => {
-        if (err) return reject(err);
-        resolve(result);
-      });
+updateDailyStatus: (employeeID, status) => {
+  const query = `
+    UPDATE daily_status
+    SET attendance_status = ?, timestamp = NOW()
+    WHERE employeeID = ?
+      AND DATE(timestamp) = CURDATE()
+  `;
+  return new Promise((resolve, reject) => {
+    db.query(query, [status, employeeID], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
     });
-  },
+  });
+},
 
   // Check if employee exists
   checkEmployeeExists(employeeID) {

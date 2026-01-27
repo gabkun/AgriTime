@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = @file_get_contents($url, false, $context);
 
         if ($result === FALSE) {
-            echo "<script>alert('User already timed out, please contact your administrator.');</script>";
+            echo "<script>alert('User already timed in, please contact your administrator.');</script>";
         } else {
             $response = json_decode($result, true);
 
@@ -35,12 +35,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         alert('Time in successful. Have a great day!');
     </script>";
 } else {
-                    $msg = $response["message"] ?? "Face not recognized or time-out failed.";
+                    $msg = $response["message"] ?? "Face not recognized or time-in failed.";
                     echo "<script>alert('" . addslashes($msg) . "');</script>";
                 }
         }
     } else {
         echo "<script>alert('No face detected. Please try again.');</script>";
+    }
+}
+
+$attendanceData = [];
+
+$apiUrl = "http://localhost:8080/api/attendance/get/allstatus";
+
+$apiResponse = @file_get_contents($apiUrl);
+
+if ($apiResponse !== false) {
+    $decoded = json_decode($apiResponse, true);
+
+    if (!empty($decoded["data"])) {
+        $attendanceData = $decoded["data"];
     }
 }
 ?>
@@ -90,6 +104,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <a href="login">Login here</a>
               </div>
               <div class="note">
+                Press here to Proceed with Time Out
+                <a href="timeout">Timeout here</a>
+              </div>
+              <div class="note">
                 Don't have an account?
                 <a href="register">Register here</a>
               </div>
@@ -105,13 +123,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <th>Status</th>
             </tr>
         </thead>
-        <tbody>
-            <tr class="chrona-attlog-row">
-                <td id="attTime">--:--</td>
-                <td id="attEmployee">----</td>
-                <td id="attStatus" class="chrona-status">---</td>
-            </tr>
-        </tbody>
+<tbody>
+<?php if (!empty($attendanceData)): ?>
+    <?php foreach ($attendanceData as $row): ?>
+<tr class="chrona-attlog-row">
+    <td><?= htmlspecialchars($row["time"]) ?></td>
+    <td><?= htmlspecialchars($row["employeeID"]) ?></td>
+    <td class="chrona-status">
+        <?php
+            if ($row["attendance_status"] == 1) {
+                echo "<span class='status-in'>TIME IN</span>";
+            } elseif ($row["attendance_status"] == 3) {
+                echo "<span class='status-break'>ON BREAK</span>";
+            } else {
+                echo "<span class='status-out'>TIME OUT</span>";
+            }
+        ?>
+    </td>
+</tr>
+
+    <?php endforeach; ?>
+<?php else: ?>
+    <tr class="chrona-attlog-row">
+        <td colspan="3" style="text-align:center;">No attendance records found</td>
+    </tr>
+<?php endif; ?>
+</tbody>
     </table>
 </div>
             

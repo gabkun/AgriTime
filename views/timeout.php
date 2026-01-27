@@ -89,7 +89,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               <div class="leaf-spinner">🍃</div>
               <div id="welcome-message"></div>
             </div>
-              
+                            <div class="note">
+                Proceed With Time in
+                <a href="/">Time in here</a>
+              </div>
+                            <div class="note">
+                Don't have an account?
+                <a href="register">Register here</a>
+              </div>
             <!-- Note -->
 
             </div>

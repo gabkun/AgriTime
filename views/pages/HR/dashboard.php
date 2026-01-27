@@ -478,7 +478,6 @@ if ($summaryResponse !== FALSE) {
                         <div class="secretary-text">
                           <h2>Week-Ends?</h2>
                           <p>Manage schedules • Assist teams • Keep things running</p>
-                          <button class="secretary-btn">View Schedule</button>
                         </div>
                       </div>
                   </div>

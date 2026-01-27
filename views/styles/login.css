@@ -555,3 +555,13 @@ body.login-page {
 .chrona-status {
     color: #2563eb;
 }
+
+.status-in {
+    color: #16a34a;
+    font-weight: bold;
+}
+
+.status-out {
+    color: #dc2626;
+    font-weight: bold;
+}
