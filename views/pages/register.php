@@ -87,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $response = json_decode($result, true);
         if (isset($response["message"]) && $response["message"] === "User created successfully") {
-            echo "<script>alert('Registration successful! Please login.'); window.location.href='/login';</script>";
+            echo "<script>alert('Registration successful! Please login.'); window.location.href='/';</script>";
         } else {
             $msg = isset($response["message"]) ? $response["message"] : "Unknown error";
             echo "<script>alert('".$msg."');</script>";
@@ -195,7 +195,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
         <button type="submit" class="register-btn">Register</button>
-        <a href="login" class="login-link">Already have an account? Login</a>
+        <a href="/" class="login-link">Already have an account? Login</a>
       </form>
     </div>
   </div>

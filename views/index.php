@@ -63,6 +63,11 @@ switch ($request) {
         require __DIR__ . '/pages/Admin/payslipdata.php';
         break;
 
+    case '/admin/generatepayslip':
+        require __DIR__ . '/pages/Admin/generatepayslip.php';
+        break;
+
+
     case '/logout':
         require __DIR__ . '/pages/logout.php';
         break;

@@ -116,6 +116,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 Don't have an account?
                 <a href="register">Register here</a>
               </div>
+
+                            <div class="note">
+                Return to Home Page
+                <a href="/">Click here</a>
+              </div>
             </div>
 
             <!-- RIGHT: Logo Section -->

@@ -33,6 +33,10 @@
         <i class="icon"><img src="../assets/payslip2.png" alt="money" class="sidebar-icon"></i>
         <a href="/admin/payslipdata">Payslip Data</a>
       </li>
+          <li class="<?php echo $currentPage == 'generatepayslip' ? 'active' : ''; ?>">
+        <i class="icon"><img src="../assets/payslip3.png" alt="money" class="sidebar-icon"></i>
+        <a href="/admin/generatepayslip">Generate Payslip</a>
+      </li>
           <li>
     <i class="icon"><img src="../assets/logout.png" alt="logout" class="sidebar-icon"></i>
     <a href="/logout">Logout</a>

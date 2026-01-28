@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = @file_get_contents($url, false, $context);
 
         if ($result === FALSE) {
-            echo "<script>alert('User already timed in, please contact your administrator.');</script>";
+            echo "<script>alert('Timed In Successfully.');</script>";
         } else {
             $response = json_decode($result, true);
 
