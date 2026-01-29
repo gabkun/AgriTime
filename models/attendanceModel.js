@@ -119,6 +119,22 @@ updateDailyStatus: (employeeID, status) => {
       });
     });
   },
+// ✅ Check if employee already has ANY status today
+hasAnyStatusToday: (employeeID) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 1
+      FROM daily_status
+      WHERE employeeID = ?
+        AND DATE(timestamp) = CURDATE()
+      LIMIT 1
+    `;
+    db.query(query, [employeeID], (err, results) => {
+      if (err) return reject(err);
+      resolve(results.length > 0);
+    });
+  });
+},
 
   // Get latest timestamp for today
   getLatestTimestamp: (employeeID) => {

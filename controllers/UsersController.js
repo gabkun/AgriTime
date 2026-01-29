@@ -415,6 +415,7 @@ export const facialTimeIn = async (req, res) => {
     console.log("📸 Facial Time-In Attempt Received");
     console.log("Raw Request Body:", req.body);
 
+    // ❌ No face detected
     if (!label) {
       return res.status(400).json({ message: "No face label detected." });
     }
@@ -422,12 +423,12 @@ export const facialTimeIn = async (req, res) => {
     const lastName = label;
     const folderPath = path.join(process.cwd(), "views", "labels", lastName);
 
-    // ✅ Check if facial data exists
+    // ❌ No facial data folder
     if (!fs.existsSync(folderPath)) {
       return res.status(404).json({ message: "No matching face data found." });
     }
 
-    // ✅ Find user by last name
+    // ❌ User not found
     const user = await User.findByLastName(lastName);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
@@ -438,39 +439,41 @@ export const facialTimeIn = async (req, res) => {
       name: `${user.firstName} ${user.lastName}`,
     });
 
-    const employee_id = user.employeeID;
+    const employeeID = user.employeeID;
 
-    // ================= SAME LOGIC AS REGULAR TIME IN =================
-
-    // ✅ Check if employee exists
-    const employeeExists = await AttendanceModel.checkEmployeeExists(employee_id);
+    // ❌ Employee not registered
+    const employeeExists = await AttendanceModel.checkEmployeeExists(employeeID);
     if (employeeExists.length === 0) {
-      return res.status(404).json({ message: "Employee not found" });
+      return res.status(404).json({ message: "Employee not found." });
     }
 
-    // ✅ Check if already timed in today
-    const statusExists = await AttendanceModel.checkDailyStatus(employee_id);
-    if (statusExists.length > 0 && statusExists[0].attendance_status == 1) {
-      console.log("⚠️ Employee already timed in today:", employee_id);
-      return res.status(400).json({ message: "You have already timed in today." });
+    // 🔒 HARD BLOCK: already has ANY status today
+    const alreadyHasStatus = await AttendanceModel.hasAnyStatusToday(employeeID);
+
+    if (alreadyHasStatus) {
+      console.log("⛔ Facial time-in blocked (already exists today):", employeeID);
+      return res.status(409).json({
+        message: "You have already timed in today. Facial time-in is allowed only once."
+      });
     }
 
-    // ✅ Record new time-in
-    await AttendanceModel.recordTimeIn(employee_id);
-    console.log("✅ Facial Time in successfully recorded for employee:", employee_id);
+    // ==================================================
+    // ✅ FIRST TIME-IN OF THE DAY
+    // ==================================================
 
-    // ✅ Insert or update daily status
-    if (statusExists.length === 0) {
-      await AttendanceModel.insertDailyStatus(employee_id, 1);
-    } else {
-      await AttendanceModel.updateDailyStatus(employee_id, 1);
-    }
+    // 1️⃣ Record attendance time-in
+    await AttendanceModel.recordTimeIn(employeeID);
+
+    // 2️⃣ Insert daily status ONCE
+    await AttendanceModel.insertDailyStatus(employeeID, 1);
 
     if (req.io) req.io.emit("attendanceUpdated");
 
+    console.log("✅ Facial time-in successful:", employeeID);
+
     return res.status(200).json({
       message: "Time in recorded successfully",
-      employeeID: employee_id,
+      employeeID,
       name: `${user.firstName} ${user.lastName}`,
       timeIn: new Date().toLocaleString("en-PH", {
         timeZone: "Asia/Manila",
@@ -478,7 +481,7 @@ export const facialTimeIn = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ Error during facial time in process:", err);
+    console.error("❌ Error during facial time in:", err);
     return res.status(500).json({
       message: "Error during facial time in process",
       error: err.message,
