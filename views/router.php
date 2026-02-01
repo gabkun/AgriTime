@@ -107,6 +107,10 @@ if ($apiResponse !== false) {
                 Press here to Proceed with Time Out
                 <a href="timeout">Timeout here</a>
               </div>
+                            <div class="note">
+                Press here for Break Time
+                <a href="breaktime">Break Time here</a>
+              </div>
               <div class="note">
                 Don't have an account?
                 <a href="register">Register here</a>
