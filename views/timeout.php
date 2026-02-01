@@ -30,11 +30,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $response = json_decode($result, true);
 
             // ✅ Successful facial login
-                if (isset($response["message"]) && $response["message"] === "Time out recorded successfully") {
+          if (isset($response["message"]) && $response["message"] === "Time out recorded successfully") {
 
-                    echo "<script>
-                        alert('Time out successful. You may now leave.');
-                    </script>";
+              echo "<script>
+                  alert('Time out successful. You may now leave.');
+                  window.close();
+              </script>";
+
 
                 } else {
                     $msg = $response["message"] ?? "Face not recognized or time-out failed.";
@@ -76,7 +78,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <form method="POST" id="faceForm">
               <input type="hidden" name="faceImage" id="faceImage" />
-              <button type="button" id="scanBtn" onclick="captureFace()">Scan Face</button>
+             <button type="button" id="scanBtn" onclick="captureFace()" style="display:none;">
+            Scan Face
+          </button>
             </form>
 
             <div class="progress-container" id="progressContainer">
@@ -112,22 +116,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </html>
 
   <script>
+      let hasStartedScan = false;
   const video = document.getElementById("video");
   const scanBtn = document.getElementById("scanBtn");
   const progressBar = document.getElementById("progressBar");
   const progressText = document.getElementById("progressText");
 
   // ✅ Start the camera
-  window.addEventListener("DOMContentLoaded", async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      video.srcObject = stream;
-    } catch (err) {
-      console.error("Camera access denied or error:", err);
-      alert("Unable to access the camera.");
-    }
-  });
+window.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
 
+    video.onloadedmetadata = () => {
+      video.play();
+
+      // ⏳ Small delay to ensure camera is stable
+      setTimeout(() => {
+        if (!hasStartedScan) {
+          hasStartedScan = true;
+          captureFace(); // 🚀 AUTO START SCAN
+        }
+      }, 1500);
+    };
+  } catch (err) {
+    console.error("Camera access denied or error:", err);
+    alert("Unable to access the camera.");
+  }
+});
   // ✅ Capture Face and show progress based on detections
   async function captureFace() {
     alert("Please face the camera to start scanning...");
