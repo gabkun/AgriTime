@@ -314,6 +314,14 @@ if ($summaryResponse !== FALSE) {
     // Same behavior as <a href="/logout">
     window.location.href = '/logout';
 }
+
+        function handleBreak() {
+    // Open timeout page in a new tab
+    window.open('/breaktime', '_blank');
+
+    // Same behavior as <a href="/logout">
+    window.location.href = '/logout';
+}
 </script>
 
 <body>
@@ -443,14 +451,17 @@ if ($summaryResponse !== FALSE) {
 
                 <?php if ($dailyStatus == 1): ?>
                   <!-- ✅ Show Break In if Timed In -->
-                  <form method="POST" style="display:inline;">
-                    <button type="submit" name="break_in" class="break-btn">Break In</button>
-                  </form>
+                  <button
+                      type="button"
+                      class="break-btn"
+                      <?php echo $timeOutDisabled; ?>
+                      onclick="handleBreak()"
+                  >
+                      Break 
+                  </button>
                 <?php elseif ($dailyStatus == 3): ?>
                   <!-- ✅ Show Break Out if On Break -->
-                  <form method="POST" style="display:inline;">
-                    <button type="submit" name="break_out" class="break-btn">Break Out</button>
-                  </form>
+
                 <?php else: ?>
                   <!-- ✅ Default Disabled Button -->
                   <button class="break-btn" disabled>Break</button>
