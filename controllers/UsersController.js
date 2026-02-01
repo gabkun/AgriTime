@@ -488,3 +488,121 @@ export const facialTimeIn = async (req, res) => {
     });
   }
 };
+
+export const facialBreakTime = async (req, res) => {
+  try {
+    const label = req.body.label || req.body.faceImage;
+
+    console.log("📸 Facial Break Attempt Received");
+    console.log("Raw Request Body:", req.body);
+
+    if (!label) {
+      return res.status(400).json({ message: "No face label detected." });
+    }
+
+    const lastName = label;
+    const folderPath = path.join(process.cwd(), "views", "labels", lastName);
+
+    console.log("Detected Face Label:", lastName);
+
+    // ✅ Validate facial data
+    if (!fs.existsSync(folderPath)) {
+      return res.status(404).json({ message: "No matching face data found." });
+    }
+
+    // ✅ Identify user
+    const user = await User.findByLastName(lastName);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const employeeID = user.employeeID;
+
+    console.log("👤 User Identified:", {
+      employeeID,
+      name: `${user.firstName} ${user.lastName}`,
+    });
+
+    // ================= BREAK LOGIC =================
+
+    // ✅ Check employee exists
+    const employeeExists = await AttendanceModel.checkEmployeeExists(employeeID);
+    if (employeeExists.length === 0) {
+      return res.status(404).json({ message: "Employee not found." });
+    }
+
+    /**
+     * 🚨 CRITICAL RULE:
+     * Employee MUST have a DAILY STATUS for TODAY
+     * Otherwise, break in / out is NOT allowed
+     */
+    const todayStatus = await AttendanceModel.checkDailyStatus(employeeID);
+
+    if (!todayStatus || todayStatus.length === 0) {
+      return res.status(403).json({
+        message: "No attendance record found for today. Please time in first.",
+      });
+    }
+
+    const currentStatus = todayStatus[0].attendance_status;
+
+    // ================= BREAK IN =================
+    if (currentStatus === 1) {
+      await AttendanceModel.recordBreakIn(employeeID);
+      await AttendanceModel.updateDailyStatus(employeeID, 3);
+
+      if (req.io) req.io.emit("attendanceUpdated");
+
+      console.log("☕ BREAK-IN SUCCESSFULLY:", employeeID);
+
+      return res.status(200).json({
+        message: "Break-in recorded successfully",
+        action: "BREAK_IN",
+        employeeID,
+        name: `${user.firstName} ${user.lastName}`,
+        time: new Date().toLocaleString("en-PH", {
+          timeZone: "Asia/Manila",
+        }),
+      });
+    }
+
+    // ================= BREAK OUT =================
+    if (currentStatus === 3) {
+      const breakRecord = await AttendanceModel.getActiveBreak(employeeID);
+      if (breakRecord.length === 0) {
+        return res.status(400).json({
+          message: "No active break found for today.",
+        });
+      }
+
+      await AttendanceModel.recordBreakOut(employeeID);
+      await AttendanceModel.updateDailyStatus(employeeID, 1);
+
+      if (req.io) req.io.emit("attendanceUpdated");
+
+      console.log("🔁 BREAK-OUT SUCCESSFULLY:", employeeID);
+
+      return res.status(200).json({
+        message: "Break-out recorded successfully",
+        action: "BREAK_OUT",
+        employeeID,
+        name: `${user.firstName} ${user.lastName}`,
+        time: new Date().toLocaleString("en-PH", {
+          timeZone: "Asia/Manila",
+        }),
+      });
+    }
+
+    // ================= INVALID STATE =================
+    return res.status(400).json({
+      message: "Invalid attendance status for break action.",
+    });
+
+  } catch (err) {
+    console.error("❌ Error during facial break process:", err);
+    return res.status(500).json({
+      message: "Server error during facial break process",
+      error: err.message,
+    });
+  }
+};

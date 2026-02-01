@@ -76,6 +76,10 @@ switch ($request) {
         require __DIR__ . '/timeout.php';
         break;
 
+    case '/breaktime':
+        require __DIR__ . '/break.php';
+        break;
+
     case '/login':
         require __DIR__ . '/login.php';
         break;
