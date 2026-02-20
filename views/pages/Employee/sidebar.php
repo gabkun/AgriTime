@@ -29,6 +29,10 @@
           <i class="icon"><img src="../assets/bworker.png" alt="money" class="sidebar-icon"></i>
         <a href="/employee/myaccount">My Account</a>
       </li>
+            <li class="<?php echo $currentPage == 'paysliprecord' ? 'active' : ''; ?>">
+          <i class="icon"><img src="../assets/bworker.png" alt="money" class="sidebar-icon"></i>
+        <a href="/employee/paysliprecord">Payslip Records</a>
+      </li>
       <li>
     <i class="icon"><img src="../assets/logout.png" alt="logout" class="sidebar-icon"></i>
     <a href="/logout">Logout</a>

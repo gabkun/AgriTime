@@ -660,6 +660,35 @@ export const getAllpayslip = async (req, res) => {
   }
 };
 
+export const getPayslipsByEmployeeID = async (req, res) => {
+  try {
+    const { employeeID } = req.params;
+
+    if (!employeeID) {
+      return res.status(400).json({ message: "employeeID is required." });
+    }
+
+    const payslips = await AttendanceModel.getPayslipsByEmployeeID(employeeID);
+
+    if (payslips.length === 0) {
+      return res.status(404).json({
+        message: `No payslips found for employeeID: ${employeeID}`,
+      });
+    }
+
+    res.status(200).json({
+      message: "Fetched payslips per employee successfully.",
+      data: payslips,
+    });
+  } catch (error) {
+    console.error("Error fetching payslips per employee:", error);
+    res.status(500).json({
+      message: "Internal Server Error.",
+      error: error.message,
+    });
+  }
+};
+
 export const downloadPayslipData = async (req, res) => {
   const { id } = req.params; // ✅ PAYSLIP ID
 

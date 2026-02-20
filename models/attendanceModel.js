@@ -267,6 +267,22 @@ hasAnyStatusToday: (employeeID) => {
     });
   },
 
+  getPayslipsByEmployeeID: (employeeID) => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT *
+      FROM pay_slip
+      WHERE employeeID = ?
+      ORDER BY created DESC
+    `;
+
+    db.query(query, [employeeID], (err, results) => {
+      if (err) return reject(err);
+      resolve(results);
+    });
+  });
+},
+
   getAllDailyStatus: () => {
   return new Promise((resolve, reject) => {
     const query = `

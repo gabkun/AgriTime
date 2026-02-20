@@ -16,6 +16,10 @@ switch ($request) {
         require __DIR__ . '/pages/Employee/dashboard.php';
         break;
 
+    case '/employee/paysliprecord':
+        require __DIR__ . '/pages/Employee/paysliprecord.php';
+        break;
+
     case '/employee/myaccount':
         require __DIR__ . '/pages/Employee/myaccount.php';
         break;    
