@@ -356,68 +356,106 @@ export const getLateDaysReport = async (req, res) => {
 
 
 export const generatePayslip = async (req, res) => {
-  const { employeeID, startDate, endDate, sssDeduction, pagibigDeduction, philhealthDeduction } = req.body;
+  const {
+    employeeID,
+    startDate,
+    endDate,
 
+    overtimeHours = 0,
+    o_amount = 0,
+
+    rd_days = 0,
+    rd_amount = 0,
+
+    holiday_days = 0,
+    h_amount = 0,
+
+    sssDeduction = 0,
+    pagibigDeduction = 0,
+    philhealthDeduction = 0,
+  } = req.body;
+
+  // ✅ STEP 1: validate required fields
   if (!employeeID || !startDate || !endDate) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
   try {
-    // ✅ 1. Fetch all attendance records
+
+    // ✅ STEP 2: get attendance (if you still want totalHours)
     const records = await AttendanceModel.getAttendanceReport(employeeID);
 
     if (!records || records.length === 0) {
-      return res.status(404).json({ message: "No attendance records found for this employee." });
+      return res.status(404).json({
+        message: "No attendance records found."
+      });
     }
 
-    // ✅ 2. Filter records by date range (exclude weekends)
-    const filteredRecords = records.filter((r) => {
-      const date = new Date(r.date);
-      const day = date.getDay(); // 0 = Sunday, 6 = Saturday
-      return date >= new Date(startDate) && date <= new Date(endDate) && day !== 0 && day !== 6;
-    });
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-    if (filteredRecords.length === 0) {
-      return res.status(404).json({ message: "No valid working days found in the selected date range." });
-    }
-
-    // ✅ 3. Calculate totalHours and overtimeHours
     let totalHours = 0;
-    let overtimeHours = 0;
 
-    filteredRecords.forEach((r) => {
-      if (r.total_time) {
-        const [hours, minutes, seconds] = r.total_time.split(":").map(Number);
-        const workedHours = hours + minutes / 60 + seconds / 3600;
-        totalHours += workedHours;
+    records.forEach((r) => {
+      const d = new Date(r.date);
 
-        if (workedHours > 8) {
-          overtimeHours += workedHours - 8; // overtime = hours beyond 8
-        }
+      if (d >= start && d <= end && r.total_time) {
+
+        const [h, m, s] = r.total_time.split(":").map(Number);
+
+        totalHours += h + m/60 + s/3600;
       }
     });
 
-    // ✅ 4. Generate payslip using model
+    totalHours = Number(totalHours.toFixed(2));
+
+
+    // ✅ STEP 3: PUT IT HERE (THIS IS THE CORRECT LOCATION)
+    const user = await AttendanceModel.getUserPay(employeeID);
+
+    const monthlyBasicPay = Number(user.basicPay || 0);
+
+    const dailyBasicPay = monthlyBasicPay / 22;
+
+
+    // ✅ STEP 4: call model and PASS dailyBasicPay
     const payslip = await AttendanceModel.generatePayslip(
       employeeID,
       startDate,
       endDate,
-      totalHours.toFixed(2),
-      overtimeHours.toFixed(2),
-      sssDeduction || 0,
-      pagibigDeduction || 0,
-      philhealthDeduction || 0
+
+      totalHours,
+
+      Number(overtimeHours),
+      Number(o_amount),
+
+      Number(rd_days),
+      Number(rd_amount),
+
+      Number(holiday_days),
+      Number(h_amount),
+
+      Number(dailyBasicPay.toFixed(2)), // ✅ PASS THIS HERE
+
+      Number(sssDeduction),
+      Number(pagibigDeduction),
+      Number(philhealthDeduction)
     );
 
-    // ✅ 5. Send response
-    res.status(200).json(payslip);
+
+    // ✅ STEP 5: return response
+    return res.status(200).json(payslip);
+
 
   } catch (err) {
-    console.error("❌ Error generating payslip:", err);
-    res.status(500).json({
+
+    console.error(err);
+
+    return res.status(500).json({
       message: "Error generating payslip",
-      error: err.message,
+      error: err.message
     });
+
   }
 };
 
@@ -473,7 +511,7 @@ export const downloadPayslip = async (req, res) => {
     // 1️⃣ Get the latest payslip record
     const payslipRecords = await AttendanceModel.getLatestPayslip(employeeID);
 
-    if (payslipRecords.length === 0) {
+    if (!payslipRecords || payslipRecords.length === 0) {
       return res.status(404).json({ message: "No payslip found for this employee." });
     }
 
@@ -485,6 +523,29 @@ export const downloadPayslip = async (req, res) => {
       return res.status(404).json({ message: "Employee not found." });
     }
 
+    // =============================
+    // ✅ FIXED CALCULATIONS (MATCH DB LOGIC)
+    // =============================
+    // Earnings are based on payslip record (manual amounts + daily basic)
+    // gross in DB = dailyBasicPay + o_amount + h_amount + rd_amount
+    // NOTE: allowances are DISPLAY ONLY unless you decide to include it in gross too.
+    const dailyBasicPay = Number(payslip.dailyBasicPay || 0);
+    const monthlyBasicPay = Number(payslip.basicpay || 0);
+
+    const overtimePay = Number(payslip.o_amount || 0);
+    const holidayPay = Number(payslip.h_amount || 0);
+    const restDayPay = Number(payslip.rd_amount || 0);
+
+    // Use DB gross to avoid mismatch
+    const grossPay = Number(payslip.gross || (dailyBasicPay + overtimePay + holidayPay + restDayPay));
+
+    const totalDeductions =
+      Number(payslip.sssDeduction || 0) +
+      Number(payslip.pagibigDeduction || 0) +
+      Number(payslip.philhealthDeduction || 0);
+
+    const netPay = grossPay - totalDeductions;
+
     // 3️⃣ Initialize PDF
     const doc = new PDFDocument({ margin: 50 });
     const fileName = `Payslip_${employeeID}_${Date.now()}.pdf`;
@@ -492,130 +553,181 @@ export const downloadPayslip = async (req, res) => {
     const writeStream = fs.createWriteStream(filePath);
     doc.pipe(writeStream);
 
-      // =============================
-      // HEADER WITH LOGO
-      // =============================
-      const logoPath = path.join("./uploads", "logo.jpg"); // adjust path to your actual logo
-      if (fs.existsSync(logoPath)) {
-        doc.image(logoPath, 60, 40, { width: 60 }); // (x, y, size)
-      }
+    // =============================
+    // HEADER WITH LOGO (same styling)
+    // =============================
+    const logoPath = path.join("./uploads", "logo.jpg"); // adjust if needed
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, 60, 40, { width: 60 });
+    }
 
-      // Move text beside logo
-      doc
-        .fillColor("#64A70B")
-        .fontSize(18)
-        .font("Helvetica-Bold")
-        .text("AgriTime Payroll Attendance System", 130, 55) // shift right
-        .moveDown(2);
+    doc
+      .fillColor("#64A70B")
+      .fontSize(18)
+      .font("Helvetica-Bold")
+      .text("AgriTime Payroll Attendance System", 130, 55)
+      .moveDown(2);
 
-      // Company info under title
-      doc
-        .fillColor("black")
-        .fontSize(10)
-        .font("Helvetica")
-        .text("Company Name Here Corp", { align: "right" })
-        .text("Barangay Taculing, Bacolod City,", { align: "right" })
-        .text("Negros Occidental, 6000", { align: "right" })
-        .moveDown(2);
+    doc
+      .fillColor("black")
+      .fontSize(10)
+      .font("Helvetica")
+      .text("Company Name Here Corp", { align: "right" })
+      .text("Barangay Taculing, Bacolod City,", { align: "right" })
+      .text("Negros Occidental, 6000", { align: "right" })
+      .moveDown(2);
 
     // =============================
     // EMPLOYEE INFO
     // =============================
-        doc
-        .fontSize(11)
-        .font("Helvetica")
-        .text(`Employee Number: ${employeeID}`)
-        .text(`Employee Name: ${user.firstName} ${user.lastName}`)
-        .text(
-          `Period Covered: ${new Date(payslip.startDate).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "2-digit",
-          })} to ${new Date(payslip.endDate).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "2-digit",
-          })}`
-        )
-        .text(
-          `Date Generated: ${new Date(payslip.created).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "2-digit",
-          })}`
-        )
-        .moveDown(1.5);
+    doc
+      .fontSize(11)
+      .font("Helvetica")
+      .text(`Employee Number: ${employeeID}`)
+      .text(`Employee Name: ${user.firstName} ${user.lastName}`)
+      .text(
+        `Period Covered: ${new Date(payslip.startDate).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+        })} to ${new Date(payslip.endDate).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+        })}`
+      )
+      .text(
+        `Date Generated: ${new Date(payslip.created).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+        })}`
+      )
+      .moveDown(1.5);
 
     // =============================
     // EARNINGS & DEDUCTIONS HEADER
     // =============================
+    const headerY = doc.y;
     doc
-      .rect(50, doc.y, 500, 20)
-      .fill("#64A70B")
+      .rect(50, headerY, 500, 20)
+      .fill("#64A70B");
+
+    doc
       .fillColor("white")
       .fontSize(11)
       .font("Helvetica-Bold")
-      .text("EARNINGS", 70, doc.y + 5)
-      .text("DEDUCTIONS", 350, doc.y + 5);
+      .text("EARNINGS", 70, headerY + 5)
+      .text("DEDUCTIONS", 350, headerY + 5);
+
     doc.moveDown(2);
     doc.fillColor("black").font("Helvetica").fontSize(10);
 
     // =============================
-    // DATA SECTION
+    // DATA SECTION (UPDATED)
     // =============================
     const earningsStartY = doc.y;
+    const rowHeight = 18;
 
+    // ✅ Earnings now reflect the payslip calculation
     const earnings = [
-      { label: "Basic Pay", value: `₱${user.basicPay}` },
-      { label: "Allowances", value: `₱${user.allowances}` },
-      { label: "Total Hours Worked", value: `${payslip.totalHours} hrs` },
-      { label: "Overtime Hours", value: `${payslip.overtimeHours} hrs` },
+      { label: "Basic Pay (Monthly)", value: `PHP${monthlyBasicPay.toFixed(2)}` },
+      { label: "Daily Basic Pay", value: `PHP${dailyBasicPay.toFixed(2)}` },
+
+      { label: "Overtime Hours", value: `${Number(payslip.overtimeHours || 0).toFixed(2)} hrs` },
+      { label: "Overtime Pay", value: `PHP${overtimePay.toFixed(2)}` },
+
+      { label: "Holiday Days", value: `${Number(payslip.holiday_days || 0)}` },
+      { label: "Holiday Pay", value: `PHP${holidayPay.toFixed(2)}` },
+
+      { label: "Rest Day Days", value: `${Number(payslip.rd_days || 0)}` },
+      { label: "Rest Day Pay", value: `PHP${restDayPay.toFixed(2)}` },
+
+      { label: "Total Hours Worked", value: `${Number(payslip.totalHours || 0).toFixed(2)} hrs` },
+
+      // Display allowances from users table (DISPLAY ONLY)
+      { label: "Allowances (Display)", value: `PHP${Number(user.allowances || 0).toFixed(2)}` },
     ];
 
     const deductions = [
-      { label: "SSS Deduction", value: `₱${payslip.sssDeduction}` },
-      { label: "Pag-IBIG Deduction", value: `₱${payslip.pagibigDeduction}` },
-      { label: "PhilHealth Deduction", value: `₱${payslip.philhealthDeduction}` },
+      { label: "SSS Deduction", value: `PHP${Number(payslip.sssDeduction || 0).toFixed(2)}` },
+      { label: "Pag-IBIG Deduction", value: `PHP${Number(payslip.pagibigDeduction || 0).toFixed(2)}` },
+      { label: "PhilHealth Deduction", value: `PHP${Number(payslip.philhealthDeduction || 0).toFixed(2)}` },
     ];
 
     const maxRows = Math.max(earnings.length, deductions.length);
-    const rowHeight = 18;
 
     for (let i = 0; i < maxRows; i++) {
       const y = earningsStartY + i * rowHeight;
 
+      // prevent overflow to next page
+      if (y > doc.page.height - 140) {
+        doc.addPage();
+
+        // redraw header on new page (same style)
+        const newHeaderY = 60;
+        doc
+          .rect(50, newHeaderY, 500, 20)
+          .fill("#64A70B");
+
+        doc
+          .fillColor("white")
+          .fontSize(11)
+          .font("Helvetica-Bold")
+          .text("EARNINGS", 70, newHeaderY + 5)
+          .text("DEDUCTIONS", 350, newHeaderY + 5);
+
+        doc.moveDown(2);
+        doc.fillColor("black").font("Helvetica").fontSize(10);
+
+        // reset baseline for rows after page break
+        // push remaining rows starting at current doc.y
+        const pageStartY = doc.y;
+        for (let j = i; j < maxRows; j++) {
+          const yy = pageStartY + (j - i) * rowHeight;
+
+          if (earnings[j]) {
+            doc.text(earnings[j].label, 70, yy);
+            doc.text(earnings[j].value, 220, yy, { width: 120, align: "right" });
+          }
+
+          if (deductions[j]) {
+            doc.text(deductions[j].label, 350, yy);
+            doc.text(deductions[j].value, 520, yy, { width: 60, align: "right" });
+          }
+        }
+
+        // done printing rows after break
+        break;
+      }
+
       if (earnings[i]) {
         doc.text(earnings[i].label, 70, y);
-        doc.text(earnings[i].value, 200, y);
+        doc.text(earnings[i].value, 220, y, { width: 120, align: "right" });
       }
 
       if (deductions[i]) {
         doc.text(deductions[i].label, 350, y);
-        doc.text(deductions[i].value, 480, y);
+        doc.text(deductions[i].value, 520, y, { width: 60, align: "right" });
       }
     }
 
     // =============================
-    // COMPUTATION
+    // TOTALS (FIXED)
     // =============================
-    const grossPay = Number(user.basicPay) + Number(user.allowances);
-    const totalDeductions =
-      Number(payslip.sssDeduction) +
-      Number(payslip.pagibigDeduction) +
-      Number(payslip.philhealthDeduction);
-    const netPay = grossPay - totalDeductions;
-
     doc.moveDown(3);
     doc.font("Helvetica-Bold").fontSize(11);
-    doc.text(`TOTAL EARNINGS: ₱${grossPay.toFixed(2)}`, 70);
-    doc.text(`TOTAL DEDUCTIONS: ₱${totalDeductions.toFixed(2)}`, 350);
+
+    doc.text(`GROSS PAY: PHP${grossPay.toFixed(2)}`, 70);
+    doc.text(`TOTAL DEDUCTIONS: PHP${totalDeductions.toFixed(2)}`, 350);
+
     doc.moveDown(1.5);
 
     // NET PAY
     doc
       .fontSize(14)
       .fillColor("#64A70B")
-      .text(`NET PAY: ₱${netPay.toFixed(2)}`, { align: "center" })
+      .text(`NET PAY: PHP${netPay.toFixed(2)}`, { align: "center" })
       .fillColor("black")
       .moveDown(3);
 
@@ -632,7 +744,7 @@ export const downloadPayslip = async (req, res) => {
     writeStream.on("finish", () => {
       res.download(filePath, fileName, (err) => {
         if (err) console.error(err);
-        fs.unlinkSync(filePath); // delete after sending
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
       });
     });
   } catch (err) {
@@ -818,7 +930,7 @@ export const downloadPayslipData = async (req, res) => {
 
     doc.moveDown(3);
     doc.font("Helvetica-Bold").fontSize(11);
-    doc.text(`TOTAL EARNINGS: PHP ${grossPay.toFixed(2)}`, 70);
+    doc.text(`GROSS: PHP ${grossPay.toFixed(2)}`, 70);
     doc.text(`TOTAL DEDUCTIONS: PHP ${totalDeductions.toFixed(2)}`, 350);
 
     doc

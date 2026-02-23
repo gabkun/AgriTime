@@ -189,83 +189,133 @@ hasAnyStatusToday: (employeeID) => {
     });
   },
 
-  // ✅ Generate Payslip (NEW FUNCTION)
-  generatePayslip: (
-    employeeID,
-    startDate,
-    endDate,
-    totalHours,
-    overtimeHours,
-    sssDeduction,
-    pagibigDeduction,
-    philhealthDeduction
-  ) => {
-    return new Promise((resolve, reject) => {
-      // Get employee basic pay
-      const getPayQuery = "SELECT basicPay FROM users WHERE employeeID = ?";
-      db.query(getPayQuery, [employeeID], (err, result) => {
-        if (err) return reject(err);
-        if (result.length === 0) return reject(new Error("Employee not found"));
+getUserPay: (employeeID) => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT basicPay FROM users WHERE employeeID = ? LIMIT 1`;
+    db.query(sql, [employeeID], (err, rows) => {
+      if (err) return reject(err);
+      if (!rows || rows.length === 0) return reject(new Error("Employee not found"));
+      resolve(rows[0]);
+    });
+  });
+},
 
-        const basicPay = result[0].basicPay;
-        const dailyHours = 8;
-        const workingDaysPerMonth = 22;
-        const hourlyRate = basicPay / (workingDaysPerMonth * dailyHours);
+generatePayslip: (
+  employeeID,
+  startDate,
+  endDate,
+  totalHours,
 
-        const regularPay = totalHours * hourlyRate;
-        const overtimePay = overtimeHours * (hourlyRate * 1.25);
-        const grossPay = regularPay + overtimePay;
+  overtimeHours,
+  o_amount,
+
+  rd_days,
+  rd_amount,
+
+  holiday_days,
+  h_amount,
+
+  dailyBasicPay, // ✅ new param
+
+  sssDeduction,
+  pagibigDeduction,
+  philhealthDeduction
+) => {
+  return new Promise((resolve, reject) => {
+
+    // ✅ gross formula using dailyBasicPay
+    const basicpay = Number(dailyBasicPay || 0) * 22;
+    const gross =
+      Number(dailyBasicPay || 0) +
+      Number(o_amount || 0) +
+      Number(h_amount || 0) +
+      Number(rd_amount || 0);
+
+    const insertPayslipQuery = `
+      INSERT INTO pay_slip
+      (
+        employeeID, startDate, endDate,
+        totalHours, overtimeHours, o_amount,
+        holiday_days, h_amount,
+        rd_days, rd_amount,
+        dailyBasicPay,  -- ✅ NEW COLUMN
+        basicpay,
+        gross,
+        sssDeduction, pagibigDeduction, philhealthDeduction,
+        created
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+    `;
+
+    db.query(
+      insertPayslipQuery,
+      [
+        employeeID,
+        startDate,
+        endDate,
+
+        totalHours,
+        overtimeHours,
+        Number(o_amount || 0),
+
+        holiday_days,
+        Number(h_amount || 0),
+
+        rd_days,
+        Number(rd_amount || 0),
+
+        Number(dailyBasicPay || 0), // ✅ insert dailyBasicPay
+        Number(basicpay.toFixed(2)), // ✅ basicpay column (monthly)
+
+        Number(gross.toFixed(2)),
+
+        Number(sssDeduction || 0),
+        Number(pagibigDeduction || 0),
+        Number(philhealthDeduction || 0),
+      ],
+      (insertErr, insertRes) => {
+        if (insertErr) return reject(insertErr);
 
         const totalDeductions =
-          Number(sssDeduction) +
-          Number(pagibigDeduction) +
-          Number(philhealthDeduction);
+          Number(sssDeduction || 0) +
+          Number(pagibigDeduction || 0) +
+          Number(philhealthDeduction || 0);
 
-        const netPay = grossPay - totalDeductions;
+        const netPay = gross - totalDeductions;
 
-        const insertPayslipQuery = `
-          INSERT INTO pay_slip 
-          (employeeID, startDate, endDate, totalHours, overtimeHours, sssDeduction, pagibigDeduction, philhealthDeduction, created)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
-        `;
-
-        db.query(
-          insertPayslipQuery,
-          [
+        resolve({
+          message: "Payslip generated successfully",
+          payslip: {
+            id: insertRes.insertId,
             employeeID,
             startDate,
             endDate,
             totalHours,
             overtimeHours,
-            sssDeduction,
-            pagibigDeduction,
-            philhealthDeduction,
-          ],
-          (insertErr, insertRes) => {
-            if (insertErr) return reject(insertErr);
 
-            resolve({
-              message: "Payslip generated successfully",
-              payslip: {
-                employeeID,
-                startDate,
-                endDate,
-                totalHours,
-                overtimeHours,
-                hourlyRate: hourlyRate.toFixed(2),
-                regularPay: regularPay.toFixed(2),
-                overtimePay: overtimePay.toFixed(2),
-                grossPay: grossPay.toFixed(2),
-                totalDeductions: totalDeductions.toFixed(2),
-                netPay: netPay.toFixed(2),
-                created: "NOW()",
-              },
-            });
-          }
-        );
-      });
-    });
-  },
+            dailyBasicPay: Number(dailyBasicPay || 0).toFixed(2),
+
+            o_amount: Number(o_amount || 0).toFixed(2),
+            holiday_days,
+            h_amount: Number(h_amount || 0).toFixed(2),
+            rd_days,
+            rd_amount: Number(rd_amount || 0).toFixed(2),
+
+            gross: Number(gross).toFixed(2),
+
+            sssDeduction: Number(sssDeduction || 0).toFixed(2),
+            pagibigDeduction: Number(pagibigDeduction || 0).toFixed(2),
+            philhealthDeduction: Number(philhealthDeduction || 0).toFixed(2),
+            totalDeductions: totalDeductions.toFixed(2),
+
+            netPay: netPay.toFixed(2),
+            created: "NOW()",
+          },
+        });
+      }
+    );
+  });
+},
 
   getPayslipsByEmployeeID: (employeeID) => {
   return new Promise((resolve, reject) => {
