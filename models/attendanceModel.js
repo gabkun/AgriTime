@@ -215,7 +215,7 @@ generatePayslip: (
   holiday_days,
   h_amount,
 
-  dailyBasicPay, // ✅ new param
+  dailyBasicPay,
 
   sssDeduction,
   pagibigDeduction,
@@ -223,13 +223,25 @@ generatePayslip: (
 ) => {
   return new Promise((resolve, reject) => {
 
-    // ✅ gross formula using dailyBasicPay
-    const basicpay = Number(dailyBasicPay || 0) * 22;
-    const gross =
-      Number(dailyBasicPay || 0) +
-      Number(o_amount || 0) +
-      Number(h_amount || 0) +
-      Number(rd_amount || 0);
+    // ✅ Ensure numbers (avoid NaN)
+    const daily = Number(dailyBasicPay || 0);
+    const overtimeAmt = Number(o_amount || 0);
+    const holidayAmt  = Number(h_amount || 0);
+    const rdAmt       = Number(rd_amount || 0);
+
+    const sss   = Number(sssDeduction || 0);
+    const pag   = Number(pagibigDeduction || 0);
+    const phil  = Number(philhealthDeduction || 0);
+
+    // ✅ Monthly basic pay (22 working days)
+    const basicpay = daily * 22;
+
+    // ✅ CORRECT gross
+    const gross = basicpay + overtimeAmt + holidayAmt + rdAmt;
+
+    // ✅ Deductions + net
+    const totalDeductions = sss + pag + phil;
+    const netPay = gross - totalDeductions;
 
     const insertPayslipQuery = `
       INSERT INTO pay_slip
@@ -238,7 +250,7 @@ generatePayslip: (
         totalHours, overtimeHours, o_amount,
         holiday_days, h_amount,
         rd_days, rd_amount,
-        dailyBasicPay,  -- ✅ NEW COLUMN
+        dailyBasicPay,
         basicpay,
         gross,
         sssDeduction, pagibigDeduction, philhealthDeduction,
@@ -254,34 +266,26 @@ generatePayslip: (
         startDate,
         endDate,
 
-        totalHours,
-        overtimeHours,
-        Number(o_amount || 0),
+        Number(totalHours || 0),
+        Number(overtimeHours || 0),
+        overtimeAmt,
 
-        holiday_days,
-        Number(h_amount || 0),
+        Number(holiday_days || 0),
+        holidayAmt,
 
-        rd_days,
-        Number(rd_amount || 0),
+        Number(rd_days || 0),
+        rdAmt,
 
-        Number(dailyBasicPay || 0), // ✅ insert dailyBasicPay
-        Number(basicpay.toFixed(2)), // ✅ basicpay column (monthly)
-
+        Number(daily.toFixed(2)),
+        Number(basicpay.toFixed(2)),
         Number(gross.toFixed(2)),
 
-        Number(sssDeduction || 0),
-        Number(pagibigDeduction || 0),
-        Number(philhealthDeduction || 0),
+        Number(sss.toFixed(2)),
+        Number(pag.toFixed(2)),
+        Number(phil.toFixed(2)),
       ],
       (insertErr, insertRes) => {
         if (insertErr) return reject(insertErr);
-
-        const totalDeductions =
-          Number(sssDeduction || 0) +
-          Number(pagibigDeduction || 0) +
-          Number(philhealthDeduction || 0);
-
-        const netPay = gross - totalDeductions;
 
         resolve({
           message: "Payslip generated successfully",
@@ -290,22 +294,24 @@ generatePayslip: (
             employeeID,
             startDate,
             endDate,
-            totalHours,
-            overtimeHours,
 
-            dailyBasicPay: Number(dailyBasicPay || 0).toFixed(2),
+            totalHours: Number(totalHours || 0),
+            overtimeHours: Number(overtimeHours || 0),
 
-            o_amount: Number(o_amount || 0).toFixed(2),
-            holiday_days,
-            h_amount: Number(h_amount || 0).toFixed(2),
-            rd_days,
-            rd_amount: Number(rd_amount || 0).toFixed(2),
+            dailyBasicPay: daily.toFixed(2),
+            basicpay: basicpay.toFixed(2),
 
-            gross: Number(gross).toFixed(2),
+            o_amount: overtimeAmt.toFixed(2),
+            holiday_days: Number(holiday_days || 0),
+            h_amount: holidayAmt.toFixed(2),
+            rd_days: Number(rd_days || 0),
+            rd_amount: rdAmt.toFixed(2),
 
-            sssDeduction: Number(sssDeduction || 0).toFixed(2),
-            pagibigDeduction: Number(pagibigDeduction || 0).toFixed(2),
-            philhealthDeduction: Number(philhealthDeduction || 0).toFixed(2),
+            gross: gross.toFixed(2),
+
+            sssDeduction: sss.toFixed(2),
+            pagibigDeduction: pag.toFixed(2),
+            philhealthDeduction: phil.toFixed(2),
             totalDeductions: totalDeductions.toFixed(2),
 
             netPay: netPay.toFixed(2),

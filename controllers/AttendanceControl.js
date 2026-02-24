@@ -572,9 +572,9 @@ export const downloadPayslip = async (req, res) => {
       .fillColor("black")
       .fontSize(10)
       .font("Helvetica")
-      .text("Company Name Here Corp", { align: "right" })
+      .text("Ecological & Agricultural Development Foundation Inc.", { align: "right" })
       .text("Barangay Taculing, Bacolod City,", { align: "right" })
-      .text("Negros Occidental, 6000", { align: "right" })
+      .text("Negros Occidental, 6100", { align: "right" })
       .moveDown(2);
 
     // =============================

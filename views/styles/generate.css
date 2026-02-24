@@ -475,3 +475,20 @@ tr:hover {
 .save-btn:hover {
   background-color: #218838;
 }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #166534;
+  margin-bottom: 4px;
+}
+
+.form-group input {
+  padding: 10px;
+  border-radius: 8px;
+}

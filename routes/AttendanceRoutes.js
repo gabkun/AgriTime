@@ -16,7 +16,7 @@ router.post("/generate", generatePayslip);
 router.get("/download/:employeeID", downloadPayslip);
 router.get("/download/payslip/:id", downloadPayslipData);
 router.get('/get/all/payslip', getAllpayslip);
-router.get('/get/all/:employeeID', getAllpayslip);
+router.get('/get/payslip/:employeeID', getAllpayslip);
 router.get( "/attendance/summary/:employeeID", getAttendanceSummary);
 
 export default router;

@@ -1,4 +1,4 @@
-<?php  
+<?php   
 session_start();
 date_default_timezone_set("Asia/Manila");
 
@@ -55,7 +55,7 @@ if ($response !== FALSE) {
             <h3>Payslip Overview</h3>
             <p>Track all employee payslip data</p>
           </div>
-          <button class="generate-btn">Generate HR Payslip</button>
+          <button class="generate-btn">Generate Employee Payslip</button>
         </div>
       </section>
 
@@ -91,21 +91,36 @@ if ($response !== FALSE) {
                   <td>Approved</td>
                   <td class="action-btns">
 
-                    <!-- VIEW BUTTON (passes full data to modal) -->
-                    <button class="view-btn"
-                      onclick="openModal(
-                        'view',
-                        '<?= $p['employeeID'] ?>',
-                        '<?= $start ?>',
-                        '<?= $end ?>',
-                        '<?= $p['totalHours'] ?>',
-                        '<?= $p['overtimeHours'] ?>',
-                        '<?= $p['sssDeduction'] ?>',
-                        '<?= $p['pagibigDeduction'] ?>',
-                        '<?= $p['philhealthDeduction'] ?>'
-                      )">
-                      View
-                    </button>
+<button class="view-btn"
+  onclick="openModal(
+    'view',
+
+    '<?= $p['employeeID'] ?>',
+    '<?= $p['startDate'] ?>',
+    '<?= $p['endDate'] ?>',
+
+    '<?= $p['totalHours'] ?? 0 ?>',
+    '<?= $p['overtimeHours'] ?? 0 ?>',
+    '<?= $p['o_amount'] ?? 0 ?>',
+
+    '<?= $p['holiday_days'] ?? 0 ?>',
+    '<?= $p['h_amount'] ?? 0 ?>',
+
+    '<?= $p['rd_days'] ?? 0 ?>',
+    '<?= $p['rd_amount'] ?? 0 ?>',
+
+    '<?= $p['dailyBasicPay'] ?? 0 ?>',
+    '<?= $p['basicpay'] ?? 0 ?>',
+    '<?= $p['gross'] ?? 0 ?>',
+
+    '<?= $p['sssDeduction'] ?? 0 ?>',
+    '<?= $p['pagibigDeduction'] ?? 0 ?>',
+    '<?= $p['philhealthDeduction'] ?? 0 ?>',
+
+    '<?= $p['created'] ?>'
+  )">
+  View
+</button>
 
                   </td>
                 </tr>
@@ -136,16 +151,99 @@ if ($response !== FALSE) {
 
       <div class="modal-body">
 
-        <div class="form-grid">
-          <input type="text" id="empID" placeholder="Employee ID" readonly>
-          <input type="text" id="empStartDate" placeholder="Start Date" readonly>
-          <input type="text" id="empEndDate" placeholder="End Date" readonly>
-          <input type="number" id="empTotalHours" placeholder="Total Hours" readonly>
-          <input type="number" id="empOvertime" placeholder="Overtime Hours" readonly>
-          <input type="number" id="empSSS" placeholder="SSS Deduction" readonly>
-          <input type="number" id="empPagibig" placeholder="Pag-ibig Deduction" readonly>
-          <input type="number" id="empPhilhealth" placeholder="PhilHealth Deduction" readonly>
-        </div>
+ <div class="form-grid">
+
+  <div class="form-group">
+    <label>Employee ID</label>
+    <input type="text" id="empID" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>Start Date</label>
+    <input type="text" id="empStartDate" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>End Date</label>
+    <input type="text" id="empEndDate" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>Created Date</label>
+    <input type="text" id="empCreated" readonly>
+  </div>
+
+
+  <div class="form-group">
+    <label>Total Hours</label>
+    <input type="number" id="empTotalHours" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>Overtime Hours</label>
+    <input type="number" id="empOvertime" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>Overtime Amount (₱)</label>
+    <input type="number" id="empOvertimeAmount" readonly>
+  </div>
+
+
+  <div class="form-group">
+    <label>Holiday Days</label>
+    <input type="number" id="empHolidayDays" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>Holiday Amount (₱)</label>
+    <input type="number" id="empHolidayAmount" readonly>
+  </div>
+
+
+  <div class="form-group">
+    <label>Rest Day Count</label>
+    <input type="number" id="empRddays" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>Rest Day Amount (₱)</label>
+    <input type="number" id="empRdAmount" readonly>
+  </div>
+
+
+  <div class="form-group">
+    <label>Daily Basic Pay (₱)</label>
+    <input type="text" id="empDailyBasicPay" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>Total Basic Pay (₱)</label>
+    <input type="text" id="empBasicPay" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>Gross Pay (₱)</label>
+    <input type="text" id="empGross" readonly>
+  </div>
+
+
+  <div class="form-group">
+    <label>SSS Deduction (₱)</label>
+    <input type="number" id="empSSS" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>Pag-IBIG Deduction (₱)</label>
+    <input type="number" id="empPagibig" readonly>
+  </div>
+
+  <div class="form-group">
+    <label>PhilHealth Deduction (₱)</label>
+    <input type="number" id="empPhilhealth" readonly>
+  </div>
+
+</div>
 
       </div>
 
@@ -169,13 +267,70 @@ if ($response !== FALSE) {
       <div class="modal-body">
         <form id="generateForm" onsubmit="generatePayslip(event)">
           <div class="form-grid">
-            <input type="text" id="genEmployeeID" placeholder="Employee ID" required>
-            <input type="date" id="genStartDate" required>
-            <input type="date" id="genEndDate" required>
-            <input type="number" id="genSSS" placeholder="SSS Deduction" required>
-            <input type="number" id="genPagibig" placeholder="Pag-ibig Deduction" required>
-            <input type="number" id="genPhilhealth" placeholder="PhilHealth Deduction" required>
+            <!-- Employee -->
+  <input type="text"
+         id="genEmployeeID"
+         placeholder="Employee ID (e.g. EMP-22810)"
+         required>
+
+  <input type="date"
+         id="genStartDate"
+         placeholder="Start Date"
+         required>
+
+  <input type="date"
+         id="genEndDate"
+         placeholder="End Date"
+         required>
+
+
+  <!-- OVERTIME -->
+  <input type="number"
+         id="genOvertimeHours"
+         placeholder="Overtime Hours">
+
+  <input type="number"
+         id="genOvertimeAmount"
+         placeholder="Overtime Amount (₱)">
+
+
+  <!-- REST DAY -->
+  <input type="number"
+         id="genRddays"
+         placeholder="Rest Day Count">
+
+  <input type="number"
+         id="genRdAmount"
+         placeholder="Rest Day Amount (₱)">
+
+
+  <!-- HOLIDAY -->
+  <input type="number"
+         id="genHolidayDays"
+         placeholder="Holiday Count">
+
+  <input type="number"
+         id="genHolidayAmount"
+         placeholder="Holiday Amount (₱)">
+
+
+  <!-- DEDUCTIONS -->
+  <input type="number"
+         id="genSSS"
+         placeholder="SSS Deduction (₱)"
+         required>
+
+  <input type="number"
+         id="genPagibig"
+         placeholder="Pag-IBIG Deduction (₱)"
+         required>
+
+  <input type="number"
+         id="genPhilhealth"
+         placeholder="PhilHealth Deduction (₱)"
+         required>
           </div>
+
           <div class="modal-footer">
             <button type="submit" class="save-btn">Generate Payslip</button>
           </div>
@@ -193,25 +348,58 @@ if ($response !== FALSE) {
 let viewModal = document.getElementById("employeeModal");
 let saveBtn = document.getElementById("saveChanges");
 
-function openModal(mode, id, start, end, total, overtime, sss, pagibig, philhealth) {
+function formatDate(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso; // fallback if not valid date
+  return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "2-digit" });
+}
 
+function openModal(
+  mode,
+  employeeID, startDate, endDate,
+  totalHours, overtimeHours, o_amount,
+  holiday_days, h_amount,
+  rd_days, rd_amount,
+  dailyBasicPay, basicpay, gross,
+  sssDeduction, pagibigDeduction, philhealthDeduction,
+  created
+) {
   viewModal.style.display = "block";
 
-  document.getElementById("empID").value = id;
-  document.getElementById("empStartDate").value = start;
-  document.getElementById("empEndDate").value = end;
-  document.getElementById("empTotalHours").value = total;
-  document.getElementById("empOvertime").value = overtime;
-  document.getElementById("empSSS").value = sss;
-  document.getElementById("empPagibig").value = pagibig;
-  document.getElementById("empPhilhealth").value = philhealth;
+  // ID + Dates
+  document.getElementById("empID").value = employeeID;
+  document.getElementById("empStartDate").value = formatDate(startDate);
+  document.getElementById("empEndDate").value = formatDate(endDate);
+  document.getElementById("empCreated").value = formatDate(created);
+
+  // Hours + OT
+  document.getElementById("empTotalHours").value = totalHours ?? 0;
+  document.getElementById("empOvertime").value = overtimeHours ?? 0;
+  document.getElementById("empOvertimeAmount").value = o_amount ?? 0;
+
+  // Holiday
+  document.getElementById("empHolidayDays").value = holiday_days ?? 0;
+  document.getElementById("empHolidayAmount").value = h_amount ?? 0;
+
+  // Rest Day
+  document.getElementById("empRddays").value = rd_days ?? 0;
+  document.getElementById("empRdAmount").value = rd_amount ?? 0;
+
+  // Pay
+  document.getElementById("empDailyBasicPay").value = dailyBasicPay ?? 0;
+  document.getElementById("empBasicPay").value = basicpay ?? 0;
+  document.getElementById("empGross").value = gross ?? 0;
+
+  // Deductions
+  document.getElementById("empSSS").value = sssDeduction ?? 0;
+  document.getElementById("empPagibig").value = pagibigDeduction ?? 0;
+  document.getElementById("empPhilhealth").value = philhealthDeduction ?? 0;
 
   const isEdit = mode === "edit";
+  document.getElementById("modalTitle").innerText = isEdit ? "Edit Payslip" : "View Payslip";
 
-  document.getElementById("modalTitle").innerText = 
-      isEdit ? "Edit Payslip" : "View Payslip";
-
-  document.querySelectorAll(".form-grid input").forEach(el => {
+  document.querySelectorAll("#employeeModal .form-grid input").forEach(el => {
     el.readOnly = !isEdit;
   });
 
@@ -236,16 +424,33 @@ function closeGenerateModal() {
   generateModal.style.display = "none";
 }
 
+function numVal(id) {
+  const v = document.getElementById(id).value;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
 async function generatePayslip(event) {
   event.preventDefault();
 
+  // ✅ Match backend request body EXACTLY
   const data = {
-    employeeID: document.getElementById("genEmployeeID").value,
+    employeeID: document.getElementById("genEmployeeID").value.trim(),
     startDate: document.getElementById("genStartDate").value,
     endDate: document.getElementById("genEndDate").value,
-    sssDeduction: parseFloat(document.getElementById("genSSS").value),
-    pagibigDeduction: parseFloat(document.getElementById("genPagibig").value),
-    philhealthDeduction: parseFloat(document.getElementById("genPhilhealth").value)
+
+    overtimeHours: numVal("genOvertimeHours"),
+    o_amount: numVal("genOvertimeAmount"),
+
+    rd_days: numVal("genRddays"),
+    rd_amount: numVal("genRdAmount"),
+
+    holiday_days: numVal("genHolidayDays"),
+    h_amount: numVal("genHolidayAmount"),
+
+    sssDeduction: numVal("genSSS"),
+    pagibigDeduction: numVal("genPagibig"),
+    philhealthDeduction: numVal("genPhilhealth")
   };
 
   try {
@@ -262,7 +467,7 @@ async function generatePayslip(event) {
       closeGenerateModal();
       location.reload();
     } else {
-      alert("Failed: " + result.message);
+      alert("Failed: " + (result.message || "Unknown error"));
     }
   } catch (err) {
     console.error(err);
