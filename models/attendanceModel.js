@@ -177,17 +177,25 @@ hasAnyStatusToday: (employeeID) => {
     });
   },
 
- getAllpayslip: () => {
-    return new Promise((resolve, reject) => {
-      const query = `
-        SELECT * FROM pay_slip
-      `;
-      db.query(query, (err, results) => {
-        if (err) return reject(err);
-        resolve(results);
-      });
+getAllpayslip: () => {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 
+        p.*,
+        u.firstName,
+        u.lastName
+      FROM pay_slip p
+      LEFT JOIN users u
+        ON u.employeeID = p.employeeID
+      ORDER BY p.created DESC
+    `;
+
+    db.query(query, (err, results) => {
+      if (err) return reject(err);
+      resolve(results);
     });
-  },
+  });
+},
 
 getUserPay: (employeeID) => {
   return new Promise((resolve, reject) => {

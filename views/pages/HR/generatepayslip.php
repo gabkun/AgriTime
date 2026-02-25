@@ -50,13 +50,28 @@ if ($response !== FALSE) {
 
       <!-- PAGE HEADER -->
       <section class="attendance-section">
-        <div class="report-header">
-          <div>
-            <h3>Payslip Overview</h3>
-            <p>Track all employee payslip data</p>
-          </div>
-          <button class="generate-btn">Generate Employee Payslip</button>
-        </div>
+       <div class="report-header">
+  <div>
+    <h3>Payslip Overview</h3>
+    <p>Track all employee payslip data</p>
+  </div>
+
+  <div style="display:flex; gap:10px;">
+
+    <!-- DOWNLOAD BUTTON -->
+    <a href="http://localhost:8080/api/attendance/get/all/payslip/excel" target="_blank">
+      <button class="download-btn" style="background:#16a34a;">
+        Download Excel
+      </button>
+    </a>
+
+    <!-- GENERATE BUTTON -->
+    <button class="generate-btn">
+      Generate Employee Payslip
+    </button>
+
+  </div>
+</div>
       </section>
 
       <!-- PAYSLIP TABLE -->

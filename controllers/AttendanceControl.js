@@ -1,5 +1,6 @@
 import AttendanceModel from '../models/attendanceModel.js'
 import PDFDocument from "pdfkit";
+import ExcelJS from "exceljs";
 import path from "path";
 import fs from "fs";
 
@@ -990,3 +991,270 @@ export const getAttendanceSummary = async (req, res) => {
     });
   }
 };
+
+export const downloadAllPayslipExcel = async (req, res) => {
+  try {
+
+    const payslips = await AttendanceModel.getAllpayslip();
+
+    if (!payslips || payslips.length === 0) {
+      return res.status(404).json({
+        message: "No payslips found."
+      });
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Payroll");
+
+    /* =====================================================
+       TITLE ROW
+    ===================================================== */
+    const title =
+      "Ecological & Agricultural Development Foundation Inc. Payroll";
+
+    worksheet.mergeCells("A1:R1");
+
+    const titleCell = worksheet.getCell("A1");
+
+    titleCell.value = title;
+
+    titleCell.font = {
+      bold: true,
+      size: 16
+    };
+
+    titleCell.alignment = {
+      horizontal: "center",
+      vertical: "middle"
+    };
+
+    worksheet.getRow(1).height = 30;
+
+    /* =====================================================
+       HEADER ROW
+    ===================================================== */
+
+    const headers = [
+      "Payslip ID",
+      "Employee ID",
+      "First Name",
+      "Last Name",
+      "Start Date",
+      "End Date",
+
+      "Total Hours",
+      "Overtime Hours",
+      "Overtime Amount",
+
+      "Holiday Days",
+      "Holiday Amount",
+
+      "Rest Day Count",
+      "Rest Day Amount",
+
+      "Daily Basic Pay",
+      "Basic Pay",
+      "Gross Pay",
+
+      "SSS Deduction",
+      "Pag-IBIG Deduction",
+      "PhilHealth Deduction",
+
+      "Created Date"
+    ];
+
+    const headerRow = worksheet.addRow(headers);
+
+    headerRow.font = { bold: true };
+
+    headerRow.alignment = {
+      horizontal: "center",
+      vertical: "middle"
+    };
+
+    headerRow.eachCell((cell) => {
+
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFD9D9D9" }
+      };
+
+      cell.border = {
+        top: { style: "thin" },
+        bottom: { style: "thin" },
+        left: { style: "thin" },
+        right: { style: "thin" }
+      };
+
+    });
+
+    /* =====================================================
+       DATA ROWS
+    ===================================================== */
+
+    payslips.forEach(p => {
+
+worksheet.addRow([
+
+  p.id,
+
+  p.employeeID,
+  p.firstName || "",
+  p.lastName || "",
+
+  formatDate(p.startDate),
+  formatDate(p.endDate),
+
+  p.totalHours,
+  p.overtimeHours,
+  p.o_amount,
+
+  p.holiday_days,
+  p.h_amount,
+
+  p.rd_days,
+  p.rd_amount,
+
+  p.dailyBasicPay,
+  p.basicpay,
+  p.gross,
+
+  p.sssDeduction,
+  p.pagibigDeduction,
+  p.philhealthDeduction,
+
+  formatDate(p.created)
+
+]);
+
+    });
+
+    /* =====================================================
+       AUTO COLUMN WIDTH
+    ===================================================== */
+
+/* =====================================================
+   PROFESSIONAL COLUMN WIDTH + CELL FORMATTING
+===================================================== */
+
+// Set exact column widths
+worksheet.columns = [
+  { width: 10 }, // Payslip ID
+  { width: 16 }, // Employee ID
+  { width: 18 }, // First Name
+  { width: 18 }, // Last Name
+  { width: 14 }, // Start Date
+  { width: 14 }, // End Date
+  { width: 14 }, // Total Hours
+  { width: 16 }, // Overtime Hours
+  { width: 18 }, // OT Amount
+  { width: 14 }, // Holiday Days
+  { width: 18 }, // Holiday Amount
+  { width: 14 }, // RD Days
+  { width: 18 }, // RD Amount
+  { width: 18 }, // Daily Basic Pay
+  { width: 18 }, // Basic Pay
+  { width: 18 }, // Gross Pay
+  { width: 18 }, // SSS
+  { width: 18 }, // Pagibig
+  { width: 18 }, // Philhealth
+  { width: 16 }  // Created Date
+];
+
+// Header row height
+headerRow.height = 22;
+
+// Format ALL cells
+worksheet.eachRow((row, rowNumber) => {
+
+  row.height = 20;
+
+  row.eachCell((cell) => {
+
+    // alignment
+    cell.alignment = {
+      vertical: "middle",
+      horizontal: "center",
+      wrapText: true
+    };
+
+    // borders
+    cell.border = {
+      top: { style: "thin" },
+      bottom: { style: "thin" },
+      left: { style: "thin" },
+      right: { style: "thin" }
+    };
+
+  });
+
+});
+
+// Money columns formatting (₱)
+const moneyCols = [9, 11, 13, 14, 15, 16, 17, 18, 19];
+
+moneyCols.forEach(colNumber => {
+
+  worksheet.getColumn(colNumber).numFmt = '"₱"#,##0.00';
+
+});
+
+// Center date columns
+const dateCols = [5, 6, 20];
+
+dateCols.forEach(colNumber => {
+
+  worksheet.getColumn(colNumber).alignment = {
+    horizontal: "center"
+  };
+
+});
+
+    /* =====================================================
+       DOWNLOAD RESPONSE
+    ===================================================== */
+
+    const fileName =
+      "Ecological_Agricultural_Development_Foundation_Payroll.xlsx";
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${fileName}"`
+    );
+
+    await workbook.xlsx.write(res);
+
+    res.end();
+
+  }
+  catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Excel export failed",
+      error: error.message
+    });
+
+  }
+};
+
+/* =====================================================
+   HELPER DATE FORMAT
+===================================================== */
+
+function formatDate(date) {
+
+  if (!date) return "";
+
+  const d = new Date(date);
+
+  return d.toISOString().split("T")[0];
+
+}

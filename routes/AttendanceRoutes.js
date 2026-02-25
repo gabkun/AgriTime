@@ -1,5 +1,5 @@
 import express from 'express';
-import { timein, timeout, breaktime, breakout, getPayslipsByEmployeeID, getDailyStatus, getDailyTimestamp, getLateDaysReport, getAttendanceReport, generatePayslip, getAllDailyStatus, downloadPayslip, getAllpayslip, downloadPayslipData, getAttendanceSummary   } from '../controllers/AttendanceControl.js';
+import { timein, timeout, breaktime, breakout, downloadAllPayslipExcel, getPayslipsByEmployeeID, getDailyStatus, getDailyTimestamp, getLateDaysReport, getAttendanceReport, generatePayslip, getAllDailyStatus, downloadPayslip, getAllpayslip, downloadPayslipData, getAttendanceSummary   } from '../controllers/AttendanceControl.js';
 
 const router = express.Router();
 
@@ -18,5 +18,6 @@ router.get("/download/payslip/:id", downloadPayslipData);
 router.get('/get/all/payslip', getAllpayslip);
 router.get('/get/payslip/:employeeID', getAllpayslip);
 router.get( "/attendance/summary/:employeeID", getAttendanceSummary);
+router.get("/get/all/payslip/excel", downloadAllPayslipExcel);
 
 export default router;
